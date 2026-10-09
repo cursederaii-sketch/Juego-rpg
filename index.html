@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>Juramento · Soulslike 2D</title>
 <link rel="stylesheet" href="style.css">
 </head><body>
-<div id="stage"><canvas id="cv" width="320" height="180"></canvas></div>
+<div id="stage"><canvas id="cv" width="384" height="216"></canvas><button id="pause" aria-label="Pausa">☰</button></div>
 <div id="ui">
- <div class="grid" id="mv"><button data-k="left">◀</button><button data-k="right">▶</button></div>
- <div class="grid" id="ac"><button data-k="light">Ligero</button><button data-k="heavy">Pesado</button><button data-k="dodge">Esquiva</button><button data-k="block">Bloqueo</button><button data-k="flask">Frasco</button><button data-k="act">Actuar</button></div>
+ <div id="pad"><div id="ring"></div><div id="knob"></div></div>
+ <div class="grid" id="ac">
+  <button data-k="light">Ligero</button><button data-k="heavy">Pesado</button><button data-k="block">Bloqueo</button>
+  <button data-k="dodge">Esquiva</button><button data-k="flask">Frasco</button><button data-k="act">Actuar</button>
+ </div>
 </div>
 <div id="dlg"></div><div id="menu"></div>
 <script src="data.js"></script>
 <script src="story.js"></script>
+<script src="arte.js"></script>
+<script src="sprites.js"></script>
+<script src="mundo.js"></script>
+<script src="regiones.js"></script>
 <script src="game.js"></script>
+<script src="render.js"></script>
+<script src="inicio.js"></script>
 </body></html>

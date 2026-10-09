@@ -21,15 +21,3 @@ const WP={
  lanza:{n:'Lanza de Valdora',d:'Gran alcance, golpes rápidos.',wl:26,l:{d:11,c:11,r:44,t:.42,a:[.12,.22]},h:{d:26,c:25,r:52,t:.8,a:[.34,.46]}},
  mandoble:{n:'Mandoble del Vacío',d:'Lento y devastador.',wl:20,l:{d:19,c:17,r:34,t:.5,a:[.16,.28]},h:{d:44,c:36,r:42,t:1.05,a:[.5,.64]}},
  caballero:{n:'Espada del Caballero',d:'Reliquia con memoria propia.',wl:24,l:{d:17,c:13,r:36,t:.4,a:[.1,.22]},h:{d:40,c:30,r:46,t:.85,a:[.35,.5]}}};
-// regiones: w=ancho, en=enemigos, npc, it=objetos (w=arma, f=fragmento), boss; m/dm=escala de vida/daño
-const RG=[
- {id:'cripta',n:'Cripta Olvidada',act:'Acto I — El hombre sin nombre',w:1100,m:1,dm:1,sky:['#07050f','#1a1330'],co:'#0f0a1c',fl:'#150f26',dc:'arc',boss:'sepulturero',
-  en:[['soldier',340],['hollow',480],['hollow',640],['soldier',860]],npc:[{id:'sombra',x:250}],it:[{x:560,w:'larga'},{x:1000,f:1}]},
- {id:'valdora',n:'Valdora en ruinas',act:'Acto I — El hombre sin nombre',w:1500,m:1.3,dm:1.15,sky:['#150a0a','#4a2418'],co:'#1c0f0f',fl:'#241512',dc:'house',boss:'pastora',
-  en:[['soldier',320],['archer',480],['hollow',620],['hollow',700],['brute',900],['archer',1000],['soldier',1100]],npc:[{id:'mirela',x:160},{id:'dorn',x:560},{id:'brenna',x:1000}],it:[{x:880,w:'lanza'},{x:1250,f:1}]},
- {id:'bosque',n:'Bosque Marchito',act:'Acto II — La verdad del reino',w:1500,m:1.7,dm:1.3,sky:['#050f0c','#12301f'],co:'#081a12',fl:'#0f2418',dc:'tree',boss:'cazador',
-  en:[['hollow',300],['hollow',380],['archer',520],['brute',700],['hollow',860],['archer',980],['brute',1100]],npc:[{id:'voz',x:420}],it:[{x:760,w:'mandoble'},{x:1200,f:1}]},
- {id:'puertas',n:'Puertas de la Capital',act:'Acto II — La verdad del reino',w:1400,m:2.1,dm:1.45,sky:['#0a0f1c','#2a3a5c'],co:'#0f1626',fl:'#18223a',dc:'arc',boss:'caballero',
-  en:[['soldier',300],['soldier',420],['brute',560],['archer',700],['brute',900],['soldier',1000]],npc:[],it:[{x:600,f:1}]},
- {id:'trono',n:'Salón del Trono',act:'Acto III — El último juramento',w:1200,m:2.6,dm:1.6,sky:['#0f0716','#3a1445'],co:'#1a0c26',fl:'#24123a',dc:'arc',boss:'rey',
-  en:[['brute',300],['soldier',420],['soldier',520],['archer',640],['brute',760]],npc:[],it:[{x:450,f:1}]}];
