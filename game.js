@@ -273,6 +273,7 @@ function hud(){const p=P;g.font='8px monospace';
  if(G.mode==='dying'){g.fillStyle='rgba(0,0,0,'+Math.min(.75,(1.6-G.dieT)*.6)+')';g.fillRect(0,0,GW,GH);g.globalAlpha=Math.min(1,(1.6-G.dieT)*.8);g.font='bold 22px serif';glow(GW/2,GH/2,90,'192,36,60',.35);tx('HAS CAÍDO',GW/2,GH/2+6,'#c0243c','center');g.globalAlpha=1}
  if(G.win>0){const a=Math.min(.5,(2.5-G.win)*.4);g.fillStyle='rgba(255,230,109,'+a+')';g.fillRect(0,GH/2-22,GW,36);g.font='bold 18px serif';tx('JEFE DERROTADO',GW/2,GH/2+2,'#fff','center')}}
 
+RG.forEach(q=>q.bx=q.w-330);
 newP(60);spawnEn();title();
 let last=performance.now();
-(function loop(n){const dt=Math.min(.033,(n-last)/1000);last=n;TM+=dt;update(dt);draw();requestAnimationFrame(loop)})(last);
+(function loop(n){const dt=Math.min(.033,(n-last)/1000);last=n;TM+=dt;requestAnimationFrame(loop);try{update(dt);draw()}catch(e){console.error(e)}})(last);
