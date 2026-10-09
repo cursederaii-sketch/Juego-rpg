@@ -1,5 +1,5 @@
 :root{box-sizing:border-box;color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:#05030a;--gold:#c9a54a;--vi:#7a3cff}
-html,body{height:100%;margin:0;background:radial-gradient(ellipse at 50% 30%,#1a0f2e,#05030a 70%);overflow:hidden;font-family:Georgia,'Palatino Linotype',serif;color:#e8e0f5;touch-action:none;user-select:none;-webkit-user-select:none}
+html,body{height:100%;margin:0;background:radial-gradient(ellipse at 50% 30%,#1a0f2e,#05030a 70%);overflow:hidden;font-family:Georgia,'Palatino Linotype',serif;color:#e8e0f5;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{display:flex;flex-direction:column}
 #stage{flex:1;min-height:0;display:flex;margin:6px 6px 0;border:2px solid #3a2a5c;box-shadow:0 0 0 1px #000,0 0 24px rgba(122,60,255,.25),inset 0 0 20px #000;border-radius:6px;overflow:hidden}
 canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;background:#000}

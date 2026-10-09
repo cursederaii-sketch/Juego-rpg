@@ -8,9 +8,17 @@ const KM={a:'left',arrowleft:'left',d:'right',arrowright:'right',j:'light',k:'he
 const press=k=>{if(EDGE[k])buf[k]=.3;else held[k]=1},rel=k=>{held[k]=0};
 addEventListener('keydown',e=>{const k=KM[e.key.toLowerCase()];if(k&&!e.repeat){press(k);e.preventDefault()}});
 addEventListener('keyup',e=>{const k=KM[e.key.toLowerCase()];if(k)rel(k)});
-document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;
- b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);press(k);b.classList.add('on')});
- ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>{rel(k);b.classList.remove('on')}))});
+// controles táctiles (pointer + fallback touch, anti-menú contextual, suelta todo al perder foco)
+const btns=[...document.querySelectorAll('[data-k]')];
+const relAll=()=>btns.forEach(b=>{rel(b.dataset.k);b.classList.remove('on')});
+btns.forEach(b=>{const k=b.dataset.k;
+ const down=e=>{e.preventDefault();if(e.pointerId!=null)try{b.setPointerCapture(e.pointerId)}catch(_){}if(!b.classList.contains('on')){b.classList.add('on');press(k)}};
+ const up=()=>{rel(k);b.classList.remove('on')};
+ if(window.PointerEvent){b.addEventListener('pointerdown',down);['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,up))}
+ else{b.addEventListener('touchstart',down,{passive:false});['touchend','touchcancel'].forEach(ev=>b.addEventListener(ev,up))}
+ b.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+ b.addEventListener('contextmenu',e=>e.preventDefault())});
+addEventListener('blur',relAll);addEventListener('pagehide',relAll);document.addEventListener('visibilitychange',relAll);
 // estado persistente
 const DEF=()=>({souls:0,frag:0,ri:0,bf:{r:0,x:60},fires:['0:60'],weapon:'corta',wpns:['corta'],up:{},A:{vig:0,res:0,fue:0},oath:'',oaths:[],mir:0,dorn:0,cab:'',bk:{},tk:{},drop:null,flasks:3});
 let S=DEF(),P,E=[],PR=[],RK=[],PT=[],rg=RG[0],cam=0,TM=0;
