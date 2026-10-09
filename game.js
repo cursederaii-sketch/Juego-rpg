@@ -194,7 +194,7 @@ const trav=(r,x)=>{S.flasks=3;loadRegion(r,x);closeM()};
 function newGame(){S=DEF();loadRegion(0,0);closeM();say(INTRO)}
 function cont(){S=load();loadRegion(S.bf.r,S.bf.x);closeM()}
 function fin(k){const e=ENDS[k];G.mode='end';const m=$('menu');m.style.display='flex';
- m.innerHTML='<div class="card"><h2>Final</h2><h1>'+e[0]+'</h1><p>'+e[1]+'</p><button id="go" onclick="title()">Volver al título</button></div>'}
+ m.innerHTML='<div class="card"><h2>Final</h2><h1>'+e[0]+'</h1><p>'+e[1]+'</p><button id="go" onclick="showTitle()">Volver al título</button></div>'}
 // efectos de sonido en acciones clave
 {const h=hitE,t=takeHit,b=bossDown,f=bonfire,hp=hurtP;
  hitE=(e,d,k,v)=>{sfx(240,.12,'sawtooth',.05,70);h(e,d,k,v)};takeHit=(d,x,y)=>{sfx(130,.3,'sawtooth',.08,40);t(d,x,y)};

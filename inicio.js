@@ -9,7 +9,7 @@ function applyCfg(){
 const setC=(k,v)=>{CFG[k]=+v;saveCfg();applyCfg()};
 let setFrom='title';
 function openSettings(from){
- if(from)setFrom=from;G.mode=G.mode==='play'?'menu':G.mode;const m=$('menu'),sc=m.scrollTop;m.style.display='flex';
+ if(from)setFrom=from;G.mode=G.mode==='play'?'menu':G.mode;const m=$('menu'),sc=m.scrollTop;m.style.display='flex';m.classList.remove('tt');
  const sl=(t,k,a,b,s)=>'<h2>'+t+' <span class="hint">'+CFG[k]+'</span></h2><input type="range" min="'+a+'" max="'+b+'" step="'+s+'" value="'+CFG[k]+'" oninput="setC(\''+k+'\',this.value);this.previousElementSibling.lastChild.textContent=this.value">';
  const tg=(t,k)=>'<button class="oath'+(CFG[k]?' sel':'')+'" onclick="CFG[\''+k+'\']=CFG[\''+k+'\']?0:1;saveCfg();applyCfg();openSettings()"><b>'+t+'</b>'+(CFG[k]?'Activado':'Desactivado')+'</button>';
  const tl={auto:'Automático',on:'Siempre visibles',off:'Ocultos (teclado)'};
@@ -19,23 +19,25 @@ function openSettings(from){
   +sl('Tamaño de botones','tsize',.8,1.4,.1)+sl('Opacidad de botones','topac',30,100,5)
   +tg('Modo zurdo','lefty')+tg('Vibración','vib')
   +'<h2>Pantalla</h2>'+tg('Minimapa','mini')+tg('Indicadores de acción','hints')+tg('Números de daño','dmg')+tg('Filtro CRT','crt')+tg('Suavizar píxeles','smooth')
-  +'<button id="go" onclick="'+(setFrom==='title'?'title()':'openPause()')+'">Volver</button></div>';
+  +'<button id="go" onclick="'+(setFrom==='title'?'showTitle()':'openPause()')+'">Volver</button></div>';
  m.scrollTop=sc}
 function openPause(){
- if(G.mode!=='play'&&G.mode!=='menu')return;relAll();G.mode='menu';const m=$('menu');m.style.display='flex';
+ if(G.mode!=='play'&&G.mode!=='menu')return;relAll();G.mode='menu';const m=$('menu');m.style.display='flex';m.classList.remove('tt');
  m.innerHTML='<div class="card"><h1>Pausa</h1><p>'+rg.n+'</p><button id="go" onclick="closeM()">Continuar</button>'
   +'<button class="oath" onclick="openSettings(\'pause\')"><b>Ajustes</b>Sonido, controles y pantalla</button>'
-  +'<button class="oath" onclick="save();title()"><b>Guardar y salir al título</b></button></div>'}
-function title(){
- G.mode='title';relAll();$('dlg').style.display='none';const m=$('menu'),has=!!load();m.style.display='flex';
- m.innerHTML='<div class="card"><h1>Juramento</h1><p>Soulslike 2D · mundo abierto</p><p class="hint">No permitas que el mundo vuelva a olvidarte.</p>'
-  +(has?'<button class="oath" onclick="cont()"><b>Continuar</b>Seguir desde tu última hoguera</button>':'')
-  +'<button class="oath" onclick="'+(has?'if(confirm(\'Se borrará tu partida guardada. ¿Empezar de nuevo?\'))':'')+'newGame()"><b>Nueva partida</b>Despertar en la cripta</button>'
-  +'<button class="oath" onclick="openSettings(\'title\')"><b>Ajustes</b>Sonido, controles y pantalla</button></div>'}
+  +'<button class="oath" onclick="save();showTitle()"><b>Guardar y salir al título</b></button></div>'}
+function showTitle(){
+ G.mode='title';relAll();$('dlg').style.display='none';const m=$('menu'),has=!!load();m.style.display='flex';m.classList.add('tt');
+ m.innerHTML='<div class="tbtns"><button class="tb" onclick="tPlay()">Jugar</button><button class="tb" onclick="openSettings(\'title\')">Ajustes</button><button class="tb'+(has?'':' off')+'" onclick="tLoad()">Cargar partida</button><div id="tmsg"></div></div>'}
+function tMsg(t){const e=$('tmsg');if(e){e.textContent=t;clearTimeout(tMsg.t);tMsg.t=setTimeout(()=>{e.textContent=''},2200)}}
+function tLoad(){if(!load())return tMsg('No hay partida guardada');m_off();cont()}
+function tPlay(){if(!load()){m_off();return newGame()}
+ $('menu').innerHTML='<div class="tbtns"><div id="tq">Ya tienes una partida guardada.<br>¿Empezar una nueva y borrarla?</div><button class="tb" onclick="m_off();newGame()">Sí, empezar de nuevo</button><button class="tb" onclick="m_off();cont()">Continuar la guardada</button><button class="tb" onclick="showTitle()">Volver</button></div>'}
+const m_off=()=>$('menu').classList.remove('tt');
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if((k==='escape'||k==='p')&&!e.repeat){if(G.mode==='play')openPause();else if(G.mode==='menu'&&$('menu').querySelector('h1')&&$('menu').querySelector('h1').textContent==='Pausa')closeM()}});
 $('pause').addEventListener('click',openPause);
 $('pause').addEventListener('touchstart',e=>e.stopPropagation());
 // ---- bucle ----
 let last=performance.now();
 function loop(t){requestAnimationFrame(loop);let dt=(t-last)/1000;last=t;if(!(dt>0))return;dt=Math.min(dt,.05);TM+=dt;try{update(dt);draw()}catch(e){if(!loop.err){loop.err=1;console.error(e)}}}
-applyCfg();title();requestAnimationFrame(loop);
+applyCfg();showTitle();requestAnimationFrame(loop);
