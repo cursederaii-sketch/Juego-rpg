@@ -1,17 +1,3 @@
-// ---- botones pixel art: marco y texto dibujados a mano (fuente 5x7) ----
-const FNT={A:'.###.#...##...#######...##...##...#',B:'####.#...##...#####.#...##...#####.',C:'.#####....#....#....#....#.....####',D:'####.#...##...##...##...##...#####.',E:'######....#....####.#....#....#####',F:'######....#....####.#....#....#....',G:'.#####....#....#.####...##...#.###.',H:'#...##...##...#######...##...##...#',I:'#####..#....#....#....#....#..#####',J:'..###...#....#....#....#.#..#..##..',K:'#...##..#.#.#..##...#.#..#..#.#...#',L:'#....#....#....#....#....#....#####',M:'#...###.###.#.##.#.##...##...##...#',N:'#...###..##.#.##..###...##...##...#',O:'.###.#...##...##...##...##...#.###.',P:'####.#...##...#####.#....#....#....',Q:'.###.#...##...##...##.#.##..#..##.#',R:'####.#...##...#####.#.#..#..#.#...#',S:'.#####....#.....###.....#....#####.',T:'#####..#....#....#....#....#....#..',U:'#...##...##...##...##...##...#.###.',V:'#...##...##...##...##...#.#.#...#..',W:'#...##...##...##.#.##.#.###.###...#',X:'#...##...#.#.#...#...#.#.#...##...#',Y:'#...##...#.#.#...#....#....#....#..',Z:'#####....#...#...#...#...#....#####'};
-function pxText(str,sc){const w=[...str].reduce((a,c)=>a+(c===' '?4:6),0)-1,c=mkc(w+1,8),x=c.getContext('2d');let ox=0;
- for(const ch of str){if(ch===' '){ox+=4;continue}const gl=FNT[ch];if(!gl){ox+=6;continue}
-  for(const[dx,dy,col]of[[1,1,'#b8780a'],[0,0,'#1a0f00']])for(let i=0;i<35;i++)if(gl[i]==='#'){x.fillStyle=col;x.fillRect(ox+i%5+dx,((i/5)|0)+dy,1,1)}ox+=6}
- const u=c.toDataURL();return{u,w:(w+1)*sc,h:8*sc}}
-function pxFrame(dark){const c=mkc(12,12),x=c.getContext('2d'),Y=dark?'#e0a818':'#ffd23c',HI=dark?'#f0c850':'#fff0a0',LO=dark?'#a86a08':'#c8860a';
- for(let j=0;j<12;j++)for(let i=0;i<12;i++){const d=Math.min(i,j,11-i,11-j);let col;
-  if(d<2){if(Math.min(i,11-i)===0&&Math.min(j,11-j)===0)continue;col='#000'}
-  else if(d===2)col=(i===2||j===2)&&i<=j+0&&j<=i+0?HI:(i===2||j===2)?HI:LO;else col=Y;
-  if(d===2&&(i===9||j===9))col=LO;x.fillStyle=col;x.fillRect(i,j,1,1)}
- return c.toDataURL()}
-const pb=(t,fn,cls)=>{const p=pxText(t,3);return '<button class="tb'+(cls?' '+cls:'')+'" onclick="'+fn+'"><img src="'+p.u+'" style="width:'+p.w+'px;height:'+p.h+'px" alt="'+t+'"></button>'};
-{const d=document.documentElement.style;d.setProperty('--fr','url('+pxFrame(0)+')');d.setProperty('--frd','url('+pxFrame(1)+')')}
 // ===== INICIO: título, ajustes, pausa, controles táctiles y bucle principal =====
 function applyCfg(){
  const d=document.documentElement.style,b=document.body.classList;
@@ -38,15 +24,20 @@ function openSettings(from){
 function openPause(){
  if(G.mode!=='play'&&G.mode!=='menu')return;relAll();G.mode='menu';const m=$('menu');m.style.display='flex';m.classList.remove('tt');
  m.innerHTML='<div class="card"><h1>Pausa</h1><p>'+rg.n+'</p><button id="go" onclick="closeM()">Continuar</button>'
+  +'<p>'+S.name+'</p><button class="oath" onclick="openDiary(\'mem\',\'pause\')"><b>Diario</b>Recuerdos, bestiario, logros y mapa</button>'
   +'<button class="oath" onclick="openSettings(\'pause\')"><b>Ajustes</b>Sonido, controles y pantalla</button>'
   +'<button class="oath" onclick="save();showTitle()"><b>Guardar y salir al título</b></button></div>'}
 function showTitle(){
  G.mode='title';relAll();$('dlg').style.display='none';const m=$('menu'),has=!!load();m.style.display='flex';m.classList.add('tt');
- m.innerHTML='<div class="tbtns">'+pb('JUGAR','tPlay()')+pb('AJUSTES',"openSettings('title')")+pb('CARGAR PARTIDA','tLoad()',has?'':'off')+'<div id="tmsg"></div></div>'}
+ m.innerHTML='<div class="tbtns"><button class="tb" onclick="tPlay()">Jugar</button><button class="tb" onclick="openSettings(\'title\')">Ajustes</button><button class="tb'+(has?'':' off')+'" onclick="tLoad()">Cargar partida</button><div id="tmsg"></div></div>'}
 function tMsg(t){const e=$('tmsg');if(e){e.textContent=t;clearTimeout(tMsg.t);tMsg.t=setTimeout(()=>{e.textContent=''},2200)}}
 function tLoad(){if(!load())return tMsg('No hay partida guardada');m_off();cont()}
-function tPlay(){if(!load()){m_off();return newGame()}
- $('menu').innerHTML='<div class="tbtns"><div id="tq">Ya tienes una partida guardada.<br>¿Empezar una nueva y borrarla?</div>'+pb('NUEVA PARTIDA','m_off();newGame()')+pb('CONTINUAR','m_off();cont()')+pb('VOLVER','showTitle()')+'</div>'}
+function askName(){G.mode='title';const m=$('menu');m.style.display='flex';m_off();
+ m.innerHTML='<div class="card"><h1>Tu nombre</h1><p>Despiertas sin recordar quién eres. Un nombre te viene a los labios... ¿cuál?</p><input id="nm" type="text" maxlength="14" placeholder="Sin nombre" autocomplete="off" spellcheck="false"><button id="go" onclick="startGame()">Despertar</button><button class="oath" onclick="showTitle()" style="text-align:center">Volver</button></div>';
+ const i=$('nm');i.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')startGame()});setTimeout(()=>{try{i.focus()}catch(e){}},60)}
+function startGame(){const v=(($('nm')||{}).value||'').trim().replace(/[<>&"'`]/g,'').slice(0,14);newGame(v||'Sin nombre')}
+function tPlay(){const sv=load();if(!sv){return askName()}
+ $('menu').innerHTML='<div class="tbtns"><div id="tq">Ya tienes una partida guardada ('+esc(sv.name||'Sin nombre')+').<br>¿Empezar una nueva y borrarla?</div><button class="tb" onclick="askName()">Sí, empezar de nuevo</button><button class="tb" onclick="m_off();cont()">Continuar la guardada</button><button class="tb" onclick="showTitle()">Volver</button></div>'}
 const m_off=()=>$('menu').classList.remove('tt');
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if((k==='escape'||k==='p')&&!e.repeat){if(G.mode==='play')openPause();else if(G.mode==='menu'&&$('menu').querySelector('h1')&&$('menu').querySelector('h1').textContent==='Pausa')closeM()}});
 $('pause').addEventListener('click',openPause);

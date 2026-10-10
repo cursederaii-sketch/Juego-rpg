@@ -121,3 +121,34 @@ function bakeRoll(k,fr){const c=mkc(30,30),x=c.getContext('2d'),A=k.A;x.translat
  x.setTransform(1,0,0,1,0,0);return finish(c)}
 const bodyArt=(id,dir,pose,fr)=>cached('b'+id+dir+pose+(fr&3),()=>bakeBody(KITS[id],dir,pose,fr));
 const rollArt=(id,fr)=>cached('r'+id+(fr&3),()=>bakeRoll(KITS[id],fr));
+
+// ===== AMPLIACIÓN: grietas, puertas, antorchas de puzzle y personajes nuevos =====
+function bakeChasm(t,v){const c=mkc(16,16),x=c.getContext('2d'),R=rngS(v*61+17),b=mixc(t.mo,'#000000',.78);rect(x,0,0,16,16,b);
+ for(let i=0;i<5;i++){const X=R()*16|0,Y=R()*16|0;rect(x,X,Y,1+(R()*3|0),1,mixc(t.mo,'#000000',.55))}
+ for(let i=0;i<3;i++){let X=R()*16|0,Y=R()*10|0;for(let k=0;k<5;k++){dot(x,X,Y,mixc(t.hi,'#000000',.55));X+=(R()<.5?1:0);Y+=1}}
+ rect(x,0,12,16,4,mixc(b,'#000000',.4));return c}
+function bakeGate(t,kind){const c=mkc(18,28),x=c.getContext('2d'),b=25,st=t.wf;
+ rect(x,1,b-22,3,22,st[1]);rect(x,14,b-22,3,22,st[2]);rect(x,1,b-22,1,22,t.hi);rect(x,0,b-1,18,1,t.mo);
+ rect(x,1,b-23,16,3,st[0]);rect(x,1,b-23,16,1,t.hi);
+ const bar=kind==='mdoor'?'#7a5aa8':'#6a6a78',lt=kind==='mdoor'?'#c0a0ff':'#9a9aa8';
+ for(let i=0;i<4;i++){const X=4+i*3;rect(x,X,b-20,2,20,bar);rect(x,X,b-20,1,20,lt)}
+ rect(x,3,b-14,12,2,bar);rect(x,3,b-6,12,2,bar);
+ if(kind==='ldoor'){rect(x,7,b-12,4,5,'#c9a54a');rect(x,8,b-14,2,3,'#c9a54a');dot(x,9,b-10,'#0a0610')}
+ if(kind==='mdoor'){disc(x,9,b-11,3,'#3a2a5a');dot(x,9,b-11,'#e0c0ff');dot(x,8,b-12,'#c0a0ff')}
+ return finish(c)}
+Object.assign(OBJ,{ldoor:(v,t)=>bakeGate(t,'ldoor'),sgate:(v,t)=>bakeGate(t,'sgate'),mdoor:(v,t)=>bakeGate(t,'mdoor'),ptorch:(v,t)=>bakeBrazier(t),
+ chest:(v,t)=>null});
+['ldoor','sgate','mdoor','ptorch'].forEach(k=>SOLID_OBJ.add(k));
+const _mk=(b,o)=>Object.assign({},KITS[b],o);
+Object.assign(KITS,{
+ warden:{bw:11,th:9,lh:7,hw:8,hh:8,A:['#5a4a2a','#7a6a40','#33291a'],boot:'#1c160c',belt:'#2a2216',buckle:'#c9a54a',head:'hood',hc:['#3a2e18','#5a4a2a','#241c0e'],eye:'#ffe66d',cape:'#33291a',capeE:'#7a6a40',pauld:1,wp:'sword'},
+ guardiana:{big:1,bw:14,th:11,lh:8,hw:9,hh:9,A:['#7a7660','#a8a38a','#47443a'],boot:'#26241c',belt:'#2a2216',buckle:'#d8d0b8',head:'skull',hc:['#d8d0b8','#f0e8d0','#948c78'],eye:'#99ffcc',cape:'#2a2a22',capeE:'#7a7660',pauld:2,wp:'dagger'},
+ heraldo:{big:1,bw:13,th:11,lh:9,hw:9,hh:9,A:['#8a6a2a','#b08a3a','#4a3a14'],boot:'#2a1e0a',belt:'#2a1a10',buckle:'#ffe66d',head:'crown',hc:['#5a4018','#7a5a28','#3a280e'],eye:'#ff9a3c',cape:'#5a3a14',capeE:'#c9a54a',pauld:1,wp:'staff',skirt:1},
+ capdorn:_mk('dorn',{big:1,bw:15,th:11,lh:8,hw:10,hh:9,pauld:2,wp:'sword'}),
+ ysolde:{bw:10,th:9,lh:0,hw:8,hh:8,A:['#3a4a7a','#6a80b8','#222c4a'],boot:'#222c4a',head:'hood',hc:['#2a3664','#4a5c94','#18203c'],eye:'#e8f0ff',face:'#c8d4f0',ghost:.6,skirt:1,wp:'none'},
+ anselmo:{bw:10,th:8,lh:7,hw:8,hh:8,A:['#6a6a56','#8a8a70','#3e3e30'],boot:'#2a2a1e',belt:'#3a2a1a',head:'hood',hc:['#5a5a48','#7a7a62','#38382c'],eye:'#3a2230',face:'#d0b090',cape:'#4a4a38',capeE:'#8a8a70',wp:'none'},
+ aldeano:{bw:9,th:8,lh:7,hw:8,hh:8,A:['#5a6a4a','#7a8a62','#38442c'],boot:'#26301c',belt:'#3a2a1a',head:'hood',hc:['#4a5a3a','#6a7a52','#2c3820'],eye:'#3a2230',face:'#e0b898',wp:'none'},
+ aldric:_mk('caballero',{ghost:.6,chains:0,wp:'none',cape:'#3a3a60',capeE:'#8aa0d0'}),
+ mirela2:_mk('mirela',{})
+});
+KITS.aldea1=KITS.aldeano;KITS.aldea2=Object.assign({},KITS.aldeano,{A:['#6a4a5a','#8a6a7a','#44303a'],hc:['#5a3a4a','#7a5a6a','#3a2430']});
