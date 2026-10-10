@@ -33,9 +33,14 @@ function showTitle(){
 function tMsg(t){const e=$('tmsg');if(e){e.textContent=t;clearTimeout(tMsg.t);tMsg.t=setTimeout(()=>{e.textContent=''},2200)}}
 function tLoad(){if(!load())return tMsg('No hay partida guardada');m_off();cont()}
 function askName(){G.mode='title';const m=$('menu');m.style.display='flex';m_off();
- m.innerHTML='<div class="card"><h1>Tu nombre</h1><p>Despiertas sin recordar quién eres. Un nombre te viene a los labios... ¿cuál?</p><input id="nm" type="text" maxlength="14" placeholder="Sin nombre" autocomplete="off" spellcheck="false"><button id="go" onclick="startGame()">Despertar</button><button class="oath" onclick="showTitle()" style="text-align:center">Volver</button></div>';
- const i=$('nm');i.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')startGame()});setTimeout(()=>{try{i.focus()}catch(e){}},60)}
-function startGame(){const v=(($('nm')||{}).value||'').trim().replace(/[<>&"'`]/g,'').slice(0,14);newGame(v||'Sin nombre')}
+ m.innerHTML='<form id="nf" class="card nmcard" autocomplete="off" onsubmit="startGame();return false"><h1>Tu nombre</h1><p>Despiertas sin recordar quién eres. Un nombre te viene a los labios... ¿cuál?</p>'
+  +'<div class="nrow"><input id="nm" type="text" maxlength="14" placeholder="Sin nombre" enterkeyhint="go" autocomplete="off" autocapitalize="words" spellcheck="false"><button type="submit" class="tb" id="nok">Despertar</button></div>'
+  +'<div id="nerr"></div><button type="button" class="oath" onclick="showTitle()" style="text-align:center">Volver</button></form>';
+ const i=$('nm');i.addEventListener('keydown',e=>e.stopPropagation());setTimeout(()=>{try{i.focus()}catch(e){}},80)}
+let _sg=0;
+function startGame(){if(_sg)return;const er=$('nerr');
+ try{const v=(($('nm')||{}).value||'').trim().replace(/[<>&"'`]/g,'').slice(0,14);_sg=1;newGame(v||'Sin nombre');setTimeout(()=>{_sg=0},1000)}
+ catch(e){_sg=0;console.error(e);if(er)er.textContent='Error al empezar: '+(e&&e.message||e)}}
 function tPlay(){const sv=load();if(!sv){return askName()}
  $('menu').innerHTML='<div class="tbtns"><div id="tq">Ya tienes una partida guardada ('+esc(sv.name||'Sin nombre')+').<br>¿Empezar una nueva y borrarla?</div><button class="tb" onclick="askName()">Sí, empezar de nuevo</button><button class="tb" onclick="m_off();cont()">Continuar la guardada</button><button class="tb" onclick="showTitle()">Volver</button></div>'}
 const m_off=()=>$('menu').classList.remove('tt');
@@ -45,4 +50,4 @@ $('pause').addEventListener('touchstart',e=>e.stopPropagation());
 // ---- bucle ----
 let last=performance.now();
 function loop(t){requestAnimationFrame(loop);let dt=(t-last)/1000;last=t;if(!(dt>0))return;dt=Math.min(dt,.05);TM+=dt;try{update(dt);draw()}catch(e){if(!loop.err){loop.err=1;console.error(e)}}}
-applyCfg();showTitle();requestAnimationFrame(loop);
+applyCfg();try{document.fonts&&document.fonts.load('10px "Press Start 2P"')}catch(e){}showTitle();requestAnimationFrame(loop);

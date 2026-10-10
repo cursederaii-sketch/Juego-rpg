@@ -3,10 +3,11 @@ const GW=384,GH=216;
 const WALLISH=new Set(['wall','roof','hwall']);
 // rectángulos de colisión dentro de la baldosa (1 = baldosa completa)
 const COL={wall:1,roof:1,hwall:1,gate:1,tree:[4,3,12,16],dtree:[5,3,11,16],pillar:[3,4,13,16],bpillar:[3,5,13,16],statue:[3,4,13,16],tomb:[3,5,13,16],cross:[5,6,11,16],barrel:[3,5,13,16],crate:[2,4,14,16],rock:[2,5,14,16],brazier:[3,6,13,16],well:[0,4,16,16],barr:[1,6,15,16],urn:[4,5,12,16]};
+Object.assign(COL,{ldoor:1,sgate:1,mdoor:1,ptorch:[3,6,13,16]});
 const SIGHT=new Set(['wall','roof','hwall','gate','tree','dtree','pillar','statue','well']);
 class Mapa{
  constructor(rg){this.rg=rg;this.th=TH[rg.th];this.cols=rg.cols;this.rows=rg.rows;const n=this.cols*this.rows;this.gd=new Array(n).fill('f');this.on=new Array(n).fill(null);this.ov=new Uint8Array(n);
-  this.water=[];this.fires=[];this.npcs=[];this.items=[];this.ens=[];this.torches=[];this.decs=[];this.arena=null;this.exitP=null;this.gateOn=false;this.R=rngS(rg.cols*131+rg.rows*7+rg.id.length*31);this.walkT=0}
+  this.water=[];this.fires=[];this.npcs=[];this.items=[];this.ens=[];this.torches=[];this.decs=[];this.arena=null;this.exitP=null;this.gateOn=false;this.portals=[];this.levers=[];this.sgs=[];this.lds=[];this.pzs=[];this.notes=[];this.ambs=[];this.fwr=[];this.owr=[];this.fw=new Uint8Array(n);this.ow=new Array(n).fill(null);this.fly=false;this.seen=new Uint8Array(n);this.R=rngS(rg.cols*131+rg.rows*7+rg.id.length*31);this.walkT=0}
  i(x,y){return y*this.cols+x}ok(x,y){return x>=0&&y>=0&&x<this.cols&&y<this.rows}
  fillG(c){this.gd.fill(c)}fillO(nm){for(let i=0;i<this.on.length;i++){this.on[i]=nm;this.ov[i]=this.R()*255|0}}
  g(c,x,y,w,h){for(let j=y;j<y+h;j++)for(let k=x;k<x+w;k++)if(this.ok(k,j))this.gd[this.i(k,j)]=c}
@@ -17,7 +18,7 @@ class Mapa{
  ring(nm,t){this.o(nm,0,0,this.cols,t);this.o(nm,0,this.rows-t,this.cols,t);this.o(nm,0,0,t,this.rows);this.o(nm,this.cols-t,0,t,this.rows)}
  path(pts,w,c){const r=Math.floor(w/2);for(let s=0;s<pts.length-1;s++){let[x0,y0]=pts[s];const[x1,y1]=pts[s+1],n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0));for(let k=0;k<=n;k++){const px=Math.round(x0+(x1-x0)*k/n),py=Math.round(y0+(y1-y0)*k/n);this.room(px-r,py-r,w,w,c)}}}
  sc(nm,n,x,y,w,h,op={}){const R=rngS((op.seed||1)*7919+this.cols),gap=op.gap||2,av=op.avoid||'';let placed=0;
-  for(let a=0;a<n*40&&placed<n;a++){const tx=x+(R()*w|0),ty=y+(R()*h|0);if(!this.ok(tx,ty)||this.on[this.i(tx,ty)])continue;if(av.includes(this.gd[this.i(tx,ty)]))continue;
+  for(let a=0;a<n*40&&placed<n;a++){const tx=x+(R()*w|0),ty=y+(R()*h|0);if(!this.ok(tx,ty)||this.on[this.i(tx,ty)])continue;if(av.includes(this.gd[this.i(tx,ty)])||this.gd[this.i(tx,ty)]==='k')continue;
    let bad=false;for(let j=-(gap-1);j<=gap-1&&!bad;j++)for(let k=-(gap-1);k<=gap-1;k++){if(this.ok(tx+k,ty+j)&&this.on[this.i(tx+k,ty+j)]&&!NOSOLID_OBJ.has(this.on[this.i(tx+k,ty+j)])){bad=true;break}}
    if(bad)continue;if(this.fires.concat(this.npcs,this.items,this.ens).some(e=>Math.abs(e.tx-tx)<2&&Math.abs(e.ty-ty)<2))continue;
    const i=this.i(tx,ty);this.on[i]=nm;this.ov[i]=R()*255|0;placed++}}
@@ -26,14 +27,35 @@ class Mapa{
  torch(x,y){if(this.ok(x,y)&&this.on[this.i(x,y)]==='wall'&&this.ok(x,y+1)&&!WALLISH.has(this.on[this.i(x,y+1)]||''))this.torches.push({tx:x,ty:y,x:x*16+8,y:y*16+10})}
  ent(a,tx,ty,o){this.softClr(tx,ty,1);return Object.assign({tx,ty,x:tx*16+8,y:ty*16+8},o||{},a||{})}
  fire(x,y){this.fires.push(this.ent({id:this.fires.length},x,y))}
- npc(id,x,y){this.npcs.push(this.ent({id},x,y))}
+ npc(id,x,y,o){this.npcs.push(this.ent({id},x,y,o))}
  item(x,y,sp){this.items.push(this.ent({},x,y,sp))}
- en(t,x,y){this.ens.push(this.ent({t},x,y))}
+ en(t,x,y,o){this.ens.push(this.ent({t},x,y,o))}
  exit(x,y){this.softClr(x,y,1);this.exitP={tx:x,ty:y,x:x*16+8,y:y*16+8}}
  setArena(r,gates,bx,by){this.arena={x:r.x,y:r.y,w:r.w,h:r.h,gates,bx,by}}
  setGate(on){this.gateOn=on;if(!this.arena)return;this.arena.gates.forEach(([x,y,w,h])=>{for(let j=y;j<y+h;j++)for(let k=x;k<x+w;k++){const i=this.i(k,j);this.on[i]=on?'gate':null}})}
+ // --- exploración: grietas, secretos, llaves, palancas, puzzles ---
+ chasm(x,y,w,h){this.g('k',x,y,w,h)}
+ fwall(x,y,w,h,id){for(let j=y;j<y+h;j++)for(let k=x;k<x+w;k++)if(this.ok(k,j)){const i=this.i(k,j);this.on[i]='wall';this.ov[i]=this.R()*255|0;this.fw[i]=1}this.fwr.push({x,y,w,h,id})}
+ owall(x,y,w,h,oath){for(let j=y;j<y+h;j++)for(let k=x;k<x+w;k++)if(this.ok(k,j)){const i=this.i(k,j);this.on[i]='wall';this.ov[i]=this.R()*255|0;this.ow[i]=oath}this.owr.push({x,y,w,h,oath})}
+ portal(id,x,y,o){this.softClr(x,y,1);this.portals.push(Object.assign({id,tx:x,ty:y,x:x*16+8,y:y*16+8,sx:0,sy:20},o||{}))}
+ lever(x,y,id){this.softClr(x,y,0);this.levers.push({tx:x,ty:y,x:x*16+8,y:y*16+8,id})}
+ sgate(x,y,w,h,need){this.o('sgate',x,y,w,h);this.sgs.push({x,y,w,h,need})}
+ ldoor(x,y,w,h,key,lbl){this.o('ldoor',x,y,w,h);this.lds.push({x,y,w,h,key,lbl,id:key+':'+x+':'+y,px:(x+w/2)*16,py:(y+h/2)*16+4})}
+ puzzle(id,ts,order,door){ts.forEach(([x,y])=>this.o('ptorch',x,y,1,1));this.o('mdoor',door[0],door[1],door[2],door[3]);this.pzs.push({id,door,order,prog:0,lit:[],t:ts.map(([x,y,c],i)=>({i,tx:x,ty:y,x:x*16+8,y:y*16+8,c}))})}
+ note(x,y,id){this.notes.push({tx:x,ty:y,x:x*16+8,y:y*16+8,id})}
+ amb(id,x,y,w,h,sp,o){this.ambs.push({id,x,y,w,h,sp,o:o||{}})}
+ clearT(r){for(let j=r[1];j<r[1]+r[3];j++)for(let k=r[0];k<r[0]+r[2];k++)if(this.ok(k,j))this.on[this.i(k,j)]=null}
+ applyDyn(){for(const r of this.fwr)if(S.rv[this.rg.id+':'+r.id])for(let j=r.y;j<r.y+r.h;j++)for(let k=r.x;k<r.x+r.w;k++){const i=this.i(k,j);this.on[i]=null;this.fw[i]=0}
+  for(const r of this.owr)for(let j=r.y;j<r.y+r.h;j++)for(let k=r.x;k<r.x+r.w;k++)this.on[this.i(k,j)]=S.oath===r.oath?null:'wall'}
+ applyState(){this.applyDyn();for(const sg of this.sgs)if(sg.need.every(id=>S.lv[this.rg.id+':'+id]))this.clearT([sg.x,sg.y,sg.w,sg.h]);
+  for(const d of this.lds)if(S.dl[d.id])this.clearT([d.x,d.y,d.w,d.h]);for(const z of this.pzs)if(S.pz[z.id]){this.clearT(z.door);z.lit=z.t.map(t=>t.i);z.prog=z.order.length}}
+ reveal(px,py,r){r=r||7;const cx=px>>4,cy=py>>4;let ch=false;const m=this.mmv.getContext('2d');
+  for(let j=cy-r;j<=cy+r;j++)for(let k=cx-r;k<=cx+r;k++){if(!this.ok(k,j)||(k-cx)*(k-cx)+(j-cy)*(j-cy)>r*r)continue;const i=this.i(k,j);if(this.seen[i])continue;if(!this.los(px,py,k*16+8,j*16+8))continue;this.seen[i]=1;m.drawImage(this.mini,k,j,1,1,k,j,1,1);ch=true}return ch}
+ initSeen(str){this.seen.fill(0);const m=this.mmv.getContext('2d');m.clearRect(0,0,this.cols,this.rows);if(!str)return;for(let i=0;i<this.seen.length&&i<str.length;i++)if(str.charCodeAt(i)===49){this.seen[i]=1;m.drawImage(this.mini,i%this.cols,(i/this.cols)|0,1,1,i%this.cols,(i/this.cols)|0,1,1)}}
+ packSeen(){let s='';for(let i=0;i<this.seen.length;i++)s+=this.seen[i]?'1':'0';return s}
  // --- consulta ---
- col(tx,ty){if(!this.ok(tx,ty))return 1;const i=this.i(tx,ty);if(this.gd[i]==='w')return 1;const n=this.on[i];return n?(COL[n]||0):0}
+ col(tx,ty){if(!this.ok(tx,ty))return 1;const i=this.i(tx,ty);const gg=this.gd[i];if(gg==='w')return 1;if(gg==='k')return this.fly?0:1;const n=this.on[i];if(n==='wall'&&this.fw[i])return 0;return n?(COL[n]||0):0}
+ chasmAt(x,y){return this.ok(x>>4,y>>4)&&this.gd[this.i(x>>4,y>>4)]==='k'}
  hit(x,y,hw,hh){const x0=Math.floor((x-hw)/16),x1=Math.floor((x+hw-.01)/16),y0=Math.floor((y-hh)/16),y1=Math.floor((y+hh-.01)/16);
   for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){const c=this.col(tx,ty);if(!c)continue;if(c===1)return true;const rx=tx*16,ry=ty*16;if(x+hw>rx+c[0]&&x-hw<rx+c[2]&&y+hh>ry+c[1]&&y-hh<ry+c[3])return true}return false}
  move(e,dx,dy,hw,hh){hw=hw||e.hw||5;hh=hh||e.hh||3;const ox=e.x,oy=e.y;if(dx&&!this.hit(e.x+dx,e.y,hw,hh))e.x+=dx;if(dy&&!this.hit(e.x,e.y+dy,hw,hh))e.y+=dy;return Math.abs(e.x-ox)+Math.abs(e.y-oy)}
@@ -49,13 +71,14 @@ class Mapa{
  // --- horneado: suelo + muros + sombras en un solo canvas ---
  bake(){const T=this.th,C=this.cols,Rw=this.rows,cv=mkc(C*16,Rw*16),x=cv.getContext('2d'),isW=(tx,ty)=>this.ok(tx,ty)&&WALLISH.has(this.on[this.i(tx,ty)]||'');
   const stone=T.grass&&this.rg.th==='valdora'?bakeCobble:bakeStone,gAt=(tx,ty)=>this.ok(tx,ty)?this.gd[this.i(tx,ty)]:'x';
-  const st=[0,1,2,3].map(v=>stone(T,v)),gr=[0,1,2,3,4].map(v=>bakeGrass(T,v)),di=[0,1,2].map(v=>bakeDirt(T,v)),bo=bakeBoards(T,0);
+  const st=[0,1,2,3].map(v=>stone(T,v)),gr=[0,1,2,3,4].map(v=>bakeGrass(T,v)),di=[0,1,2].map(v=>bakeDirt(T,v)),bo=bakeBoards(T,0),kc=[0,1,2].map(v=>bakeChasm(T,v));
   for(let ty=0;ty<Rw;ty++)for(let tx=0;tx<C;tx++){const i=this.i(tx,ty),c=this.gd[i],h=(tx*7+ty*13+tx*ty)%5,X=tx*16,Y=ty*16;
-   let art=c==='g'?gr[h]:c==='p'?di[h%3]:c==='b'?bo:c==='c'?cached('car'+T.k+(h%3),()=>bakeCarpet(T,h)):c==='w'?null:st[h%4];
+   let art=c==='g'?gr[h]:c==='p'?di[h%3]:c==='b'?bo:c==='k'?kc[h%3]:c==='c'?cached('car'+T.k+(h%3),()=>bakeCarpet(T,h)):c==='w'?null:st[h%4];
    if(art)x.drawImage(art,X,Y);else x.drawImage(bakeWater(T,0,h),X,Y);
    // bordes entre tipos de suelo
    const sides=[['n',0,-1],['s',0,1],['w',-1,0],['e',1,0]];
    for(const[sd,ax,ay]of sides){const nb=gAt(tx+ax,ty+ay);if(nb==='x'||nb===c)continue;let col=null,al=1;
+    if(c==='k'){x.fillStyle=sd==='n'?'#8a7aaa':sd==='s'?'#05030a':'#2a2240';const r=sd==='n'?[0,0,16,1]:sd==='s'?[0,15,16,1]:sd==='w'?[0,0,1,16]:[15,0,1,16];x.fillRect(X+r[0],Y+r[1],r[2],r[3]);continue}
     if((c==='p')&&nb==='g')col=T.grass[0];else if((c==='f')&&T.grass&&nb==='g'&&this.rg.th!=='trono')col=T.grass[0];else if(c==='g'&&nb==='w')col='#0a1018';else if(c==='w'&&nb!=='w')col='#9ac8e8';else if(c==='p'&&nb==='w')col='#1a1410';
     if(col){x.globalAlpha=c==='w'?.55:c==='g'&&nb==='w'?.5:1;x.drawImage(edgeStrip(col,sd,h),X,Y);x.globalAlpha=1}}}
   // muros y tejados
@@ -70,5 +93,5 @@ class Mapa{
   this.water=[];for(let ty=0;ty<Rw;ty++)for(let tx=0;tx<C;tx++){if(this.gd[this.i(tx,ty)]!=='w')continue;const e=[];for(const[sd,ax,ay]of[['n',0,-1],['s',0,1],['w',-1,0],['e',1,0]]){const nb=gAt(tx+ax,ty+ay);if(nb!=='x'&&nb!=='w')e.push([sd,'#9ac8e8'])}this.water.push({tx,ty,v:(tx*7+ty*13+tx*ty)%5,e})}
   this.base=cv;
   // minimapa 1px por baldosa
-  const mm=mkc(C,Rw),m=mm.getContext('2d');for(let ty=0;ty<Rw;ty++)for(let tx=0;tx<C;tx++){const n=this.on[this.i(tx,ty)],c=this.gd[this.i(tx,ty)];m.fillStyle=WALLISH.has(n||'')?'#0e0a18':c==='w'?'#1a3a6a':n==='tree'||n==='dtree'?'#1f3a2a':n?'#3a3250':c==='p'?'#6a5a42':c==='c'?'#7a1a2e':c==='g'?'#2a3a2e':'#4a4560';m.fillRect(tx,ty,1,1)}this.mini=mm}
+  const mm=mkc(C,Rw),m=mm.getContext('2d');for(let ty=0;ty<Rw;ty++)for(let tx=0;tx<C;tx++){const n=this.on[this.i(tx,ty)],c=this.gd[this.i(tx,ty)];m.fillStyle=WALLISH.has(n||'')?'#0e0a18':c==='k'?'#000':c==='w'?'#1a3a6a':n==='tree'||n==='dtree'?'#1f3a2a':n?'#3a3250':c==='p'?'#6a5a42':c==='c'?'#7a1a2e':c==='g'?'#2a3a2e':'#4a4560';m.fillRect(tx,ty,1,1)}this.mini=mm;const _ps=this.packSeen();this.mmv=mkc(C,Rw);this.initSeen(_ps)}
 }
