@@ -42,7 +42,7 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='ti
  for(const t of W.torches){if(t.x<cx-20||t.x>cx+GW+20||t.y<cy-30||t.y>cy+GH+30)continue;fr(t.x-1,t.y-1,2,8,'#3a3440');fr(t.x-3,t.y+4,6,2,'#5a5260');fr(t.x-2,t.y-1,4,2,'#2a2630');flame(t.x,t.y-1,2,9,t.tx);Lt.push({x:t.x-cx,y:t.y-cy-4,r:58,i:.85,c:'255,150,70',a:.14})}
  // objetos altos (ordenados)
  for(let ty=ty0;ty<=ty1;ty++)for(let tx=tx0;tx<=tx1;tx++){const i=W.i(tx,ty),n=W.on[i];if(!n||WALLISH.has(n)||n==='gate')continue;const art=objArt(n,W.ov[i]%4,W.th);if(!art)continue;const wx=tx*16+8,wy=ty*16+15;
-  Dr.push({y:wy,f:()=>{let al=1;if((n==='tree'||n==='dtree')&&P.y<wy&&P.y>wy-54&&Math.abs(P.x-wx)<22)al=.5;g.globalAlpha=al;g.drawImage(art,Math.round(wx-art.width/2),Math.round(wy-(art.height-3)));g.globalAlpha=1;
+  Dr.push({y:wy,f:()=>{let al=1;if((n==='tree'||n==='dtree')&&P.y<wy&&P.y>wy-54&&Math.abs(P.x-wx)<22)al=.5;g.globalAlpha=al;drawObjA(art,n,wx,wy,tx,ty);g.globalAlpha=1;
    if(n==='brazier'){flame(wx,wy-12,4,12,tx);}if(n==='ptorch')pflame(wx,wy,tx,ty);if(n==='mdoor'&&Math.floor(ts*3)%2)glow(wx,wy-10,12,'180,120,255',.12);if(n==='tomb'&&W.th.k==='cripta'&&(tx*7+ty)%5===0)glow(wx,wy-8,10,'120,100,200',.08)}});
   if(n==='brazier')Lt.push({x:wx-cx,y:wy-cy-12,r:64,i:.85,c:'255,140,60',a:.14});if(n==='ptorch'&&ptLit(tx,ty))Lt.push({x:wx-cx,y:wy-cy-12,r:56,i:.8,c:PCOLR[ptInfo(tx,ty).t.c],a:.16})}
  // hogueras
@@ -79,7 +79,7 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='ti
  for(const f of FX)drawFX(f);
  for(const p of PT){const al=Math.min(1,p.l*(p.k==='a'?.6:3)),y=p.y-p.z;if(p.x<cx-8||p.x>cx+GW+8||y<cy-8||y>cy+GH+8)continue;g.globalAlpha=al;
   if(p.k==='soul'){glow(p.x,y,9,'176,92,255',.5);fr(p.x-1,y-1,3,3,'#e0c0ff')}else if(p.k==='d'){const s=2+(1-p.l/.4)*3;fr(p.x-s/2,y-s/2,s,s,p.c)}else if(p.k==='a'){fr(p.x,y,p.c.includes('255,140')?2:1,p.c.includes('255,140')?2:1,p.c)}else fr(p.x,y,2,2,p.c);g.globalAlpha=1}
- for(const f of FT){g.globalAlpha=Math.min(1,f.l*2);tx(f.t,f.x,f.y,f.c,'center',7);g.globalAlpha=1}
+ for(const f of FT){g.globalAlpha=Math.min(1,f.l*2);tx(f.t,f.x,f.y,f.c,'center',7+Math.round(Math.max(0,f.l-.7)*28));g.globalAlpha=1}
  g.restore();
  // iluminación y ambiente (en coordenadas de pantalla)
  lighting(Lt.map(l=>({...l,x:l.x+Math.round(sh[0]),y:l.y+Math.round(sh[1])})));fog();
