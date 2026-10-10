@@ -1,5 +1,5 @@
 // ===== MOTOR (vista cenital) =====
-const $=id=>document.getElementById(id),cv=$('cv'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+const $=id=>document.getElementById(id),cv=$('cv'),g=cv.getContext('2d',{alpha:false});g.imageSmoothingEnabled=false;
 const R=Math.random,cl=(v,a,b)=>Math.max(a,Math.min(b,v)),sgn=v=>v<0?-1:1,hash=k=>{const h=Math.sin(k*12.9898)*43758.5453;return h-Math.floor(h)};
 // ---- ajustes (se editan en inicio.js) ----
 const KEYD={up:['w','arrowup'],down:['s','arrowdown'],left:['a','arrowleft'],right:['d','arrowright'],light:['j'],heavy:['k'],dodge:['l',' '],block:['shift','i'],flask:['f'],act:['e']};

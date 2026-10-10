@@ -113,3 +113,16 @@ details.rg{text-align:left;border:1px solid #3a3450;border-left:3px solid var(--
 
 @keyframes pop{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+/* ---------- habilidad (Onda) y ultimate (Cólera) ---------- */
+#ac button[data-k=light]{grid-area:2/1}#ac button[data-k=heavy]{grid-area:2/2}#ac button[data-k=block]{grid-area:2/3}
+#ac button[data-k=dodge]{grid-area:3/1}#ac button[data-k=flask]{grid-area:3/2}#ac button[data-k=act]{grid-area:3/3}
+#ac button[data-k=skill],#ac button[data-k=ult]{width:calc(46px*var(--ts,1));height:calc(46px*var(--ts,1));justify-self:center;align-self:end}
+#ac button[data-k=skill]{--c:#9ad0ff;grid-area:1/1}#ac button[data-k=ult]{--c:#ffd24a;grid-area:1/3}
+#ac button[data-k=skill] svg,#ac button[data-k=ult] svg{width:calc(17px*var(--ts,1));height:calc(17px*var(--ts,1))}
+#ac button[data-k=skill] i,#ac button[data-k=ult] i{font-size:calc(7px*var(--ts,1))}
+#ac button[data-k=skill]:after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(rgba(0,0,0,.7) calc(var(--cd,0)*1%),transparent 0)}
+#ac button[data-k=ult]{opacity:.8}
+#ac button[data-k=ult]:after{content:'';position:absolute;inset:-5px;border-radius:50%;pointer-events:none;background:conic-gradient(var(--c) calc(var(--ch,0)*1%),rgba(255,255,255,.14) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px))}
+#ac button[data-k=ult].rdy{opacity:1;background:radial-gradient(circle at 50% 30%,#6a4a10,#201008 72%);animation:ultp 1s ease-in-out infinite}
+@keyframes ultp{0%,100%{box-shadow:0 0 0 2px #000,0 0 8px var(--c),inset 0 0 0 3px rgba(0,0,0,.55),0 4px 10px #000}50%{box-shadow:0 0 0 2px #000,0 0 24px var(--c),inset 0 0 10px rgba(255,210,74,.45),0 4px 10px #000}}

@@ -77,11 +77,11 @@ const _bakeM=Mapa.prototype.bake;Mapa.prototype.bake=function(){_bakeM.call(this
 
 // ---- luz: halos, rayos volumétricos, niebla baja, viñeta y gradación ----
 const SHAFT={cripta:['150,130,220',.05],valdora:['255,190,130',.06],bosque:['200,255,200',.08],puertas:['200,220,255',.06],marisma:['180,255,200',.06],cantera:['140,190,255',.05],torre:['255,240,200',.08]};
+const shaftSpr=(col,i)=>cached('sh'+col+'|'+i,()=>{const wd=24+i*7,cc=mkc(wd,GH),x=cc.getContext('2d'),q=x.createLinearGradient(0,0,wd,0);q.addColorStop(0,'rgba('+col+',0)');q.addColorStop(.5,'rgba('+col+',1)');q.addColorStop(1,'rgba('+col+',0)');x.fillStyle=q;x.beginPath();x.moveTo(0,0);x.lineTo(wd,0);x.lineTo(wd-80,GH);x.lineTo(-80,GH);x.closePath();x.fill();return cc});
 const _lighting=lighting;lighting=function(L){_lighting(L);const T=W.th;g.save();
- for(const l of L)if(l.c)glow(l.x,l.y,l.r*1.3,l.c,(l.a||.16)*.45);
- const sh=SHAFT[T.k];if(sh){g.globalCompositeOperation='lighter';const sw=GW+180;for(let i=0;i<4;i++){const bx=(((i*118+TM*7-cam.x*.35)%sw)+sw)%sw-90,wd=24+i*7,al=sh[1]*(.7+.3*Math.sin(TM*.7+i*1.7)),q=g.createLinearGradient(bx,0,bx+wd,0);
-  q.addColorStop(0,'rgba('+sh[0]+',0)');q.addColorStop(.5,'rgba('+sh[0]+','+al+')');q.addColorStop(1,'rgba('+sh[0]+',0)');g.fillStyle=q;g.beginPath();g.moveTo(bx,0);g.lineTo(bx+wd,0);g.lineTo(bx+wd-80,GH);g.lineTo(bx-80,GH);g.closePath();g.fill()}}
+ if(PERF.lv<2)for(const l of L)if(l.c)glow(l.x,l.y,l.r*1.3,l.c,(l.a||.16)*.45);
+ const sh=SHAFT[T.k];if(sh&&PERF.lv<1){g.globalCompositeOperation='lighter';const sw=GW+180;for(let i=0;i<4;i++){const bx=(((i*118+TM*7-cam.x*.35)%sw)+sw)%sw-90,al=sh[1]*(.7+.3*Math.sin(TM*.7+i*1.7));g.globalAlpha=al;g.drawImage(shaftSpr(sh[0],i),Math.round(bx),0)}g.globalAlpha=1}
  g.globalCompositeOperation='source-over';
- for(let i=0;i<3;i++){const fx=(((i*190+TM*(5+i*2)-cam.x*.5)%(GW+240))+GW+240)%(GW+240)-120,fy=GH-26-i*16+Math.sin(TM*.5+i)*4,q=g.createRadialGradient(fx,fy,4,fx,fy,95);q.addColorStop(0,'rgba('+T.fog+',.07)');q.addColorStop(1,'rgba('+T.fog+',0)');g.fillStyle=q;g.fillRect(fx-95,fy-60,190,120)}
- const vq=g.createRadialGradient(GW/2,GH/2,GH*.38,GW/2,GH/2,GW*.62);vq.addColorStop(0,'rgba(0,0,0,0)');vq.addColorStop(1,'rgba(0,0,0,.48)');g.fillStyle=vq;g.fillRect(0,0,GW,GH);
+ if(PERF.lv<1){const sp=fogSpr(T.fog,95,4,.07);for(let i=0;i<3;i++){const fx=(((i*190+TM*(5+i*2)-cam.x*.5)%(GW+240))+GW+240)%(GW+240)-120,fy=GH-26-i*16+Math.sin(TM*.5+i)*4;g.drawImage(sp,0,35,190,120,Math.round(fx-95),Math.round(fy-60),190,120)}}
+ g.drawImage(vigSpr('a',GH*.38,'0,0,0',.48),0,0);
  g.restore()};

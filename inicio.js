@@ -49,5 +49,12 @@ $('pause').addEventListener('click',openPause);
 $('pause').addEventListener('touchstart',e=>e.stopPropagation());
 // ---- bucle ----
 let last=performance.now();
-function loop(t){requestAnimationFrame(loop);let dt=(t-last)/1000;last=t;if(!(dt>0))return;dt=Math.min(dt,.05);TM+=dt;try{update(dt);draw()}catch(e){if(!loop.err){loop.err=1;console.error(e)}}}
+const MENUEL=$('menu');
+// calidad adaptativa: si el coste real por fotograma es alto, se desactivan primero los efectos atmosféricos y luego los halos extra
+function perfTick(work,gap){const P_=PERF;P_.ema=P_.ema?P_.ema*.94+work*.06:work;P_.fr++;P_.t+=gap;
+ if(P_.t<2500)return;const bad=P_.ema>9||P_.gap>42;
+ if(bad&&P_.lv<2){P_.lv++;P_.good=0;P_.ema=0}else if(!bad&&P_.ema<4&&P_.lv>0){if(++P_.good>=3){P_.lv--;P_.good=0;P_.ema=0}}else P_.good=0;
+ P_.t=0;P_.gap=0}
+function loop(t){requestAnimationFrame(loop);if(t-last<10)return;let dt=(t-last)/1000;last=t;if(!(dt>0))return;PERF.gap=PERF.gap?PERF.gap*.9+Math.min(dt,.25)*100:Math.min(dt,.25)*1000;dt=Math.min(dt,.05);TM+=dt;
+ try{const a=performance.now();update(dt);const menu=MENUEL.style.display&&MENUEL.style.display!=='none';if(!menu)draw();if(G.mode==='play')perfTick(performance.now()-a,dt*1000)}catch(e){if(!loop.err){loop.err=1;console.error(e)}}}
 applyCfg();try{document.fonts&&document.fonts.load('10px "Press Start 2P"')}catch(e){}showTitle();requestAnimationFrame(loop);

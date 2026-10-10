@@ -1,7 +1,20 @@
 // ===== RENDER: mundo, personajes, efectos, iluminación y HUD =====
 const FONT='"Press Start 2P",monospace';
 const fr=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),w,h)};
-const glow=(x,y,rad,rgb,a)=>{const q=g.createRadialGradient(x,y,0,x,y,rad);q.addColorStop(0,'rgba('+rgb+','+a+')');q.addColorStop(1,'rgba('+rgb+',0)');g.save();g.globalCompositeOperation='lighter';g.fillStyle=q;g.fillRect(x-rad,y-rad,rad*2,rad*2);g.restore()};
+// Rendimiento: los degradados se pre-renderizan una sola vez (sprites) y cada fotograma sólo se copian con drawImage.
+const PERF={lv:0,ema:0,fr:0,t:0,good:0};
+const GLS={};
+const glowSpr=(rgb,R)=>{const k=rgb+'|'+R;let c=GLS[k];if(!c){c=mkc(R*2,R*2);const x=c.getContext('2d'),q=x.createRadialGradient(R,R,0,R,R,R);q.addColorStop(0,'rgba('+rgb+',1)');q.addColorStop(1,'rgba('+rgb+',0)');x.fillStyle=q;x.fillRect(0,0,R*2,R*2);GLS[k]=c}return c};
+const glow=(x,y,rad,rgb,a)=>{if(!(a>0)||!(rad>0))return;const R=Math.max(1,Math.round(rad)),po=g.globalCompositeOperation,pa=g.globalAlpha;g.globalCompositeOperation='lighter';g.globalAlpha=pa*(a>1?1:a);g.drawImage(glowSpr(rgb,R),Math.round(x)-R,Math.round(y)-R);g.globalAlpha=pa;g.globalCompositeOperation=po};
+const LGS={};
+const lightSpr=(R,i)=>{const k=R+'|'+i;let c=LGS[k];if(!c){c=mkc(R*2,R*2);const x=c.getContext('2d'),q=x.createRadialGradient(R,R,R*.08,R,R,R);q.addColorStop(0,'rgba(0,0,0,'+i+')');q.addColorStop(.55,'rgba(0,0,0,'+i*.5+')');q.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=q;x.fillRect(0,0,R*2,R*2);LGS[k]=c}return c};
+const FGS={};
+const fogSpr=(rgb,R,r0,al)=>{const k=rgb+'|'+R+'|'+r0+'|'+al;let c=FGS[k];if(!c){c=mkc(R*2,R*2);const x=c.getContext('2d'),q=x.createRadialGradient(R,R,r0,R,R,R);q.addColorStop(0,'rgba('+rgb+','+al+')');q.addColorStop(1,'rgba('+rgb+',0)');x.fillStyle=q;x.fillRect(0,0,R*2,R*2);FGS[k]=c}return c};
+const VIGS={};
+const vigSpr=(k,r0,rgb,al)=>VIGS[k]||(VIGS[k]=(()=>{const c=mkc(GW,GH),x=c.getContext('2d'),q=x.createRadialGradient(GW/2,GH/2,r0,GW/2,GH/2,GW*.62);q.addColorStop(0,'rgba('+rgb+',0)');q.addColorStop(1,'rgba('+rgb+','+al+')');x.fillStyle=q;x.fillRect(0,0,GW,GH);return c})());
+// capa de agua animada: un único canvas del tamaño del mapa por fotograma de animación
+const waterSet=th=>th._ws||(th._ws=[0,1,2,3].map(f=>[0,1,2,3,4].map(v=>bakeWater(th,f,v))));
+function waterLayers(w){if(w._wl)return w._wl;const ws=waterSet(w.th);w._wl=[0,1,2,3].map(f=>{const c=mkc(w.cols*16,w.rows*16),x=c.getContext('2d');for(const t of w.water){x.drawImage(ws[f][t.v],t.tx*16,t.ty*16);if(t.e.length){x.globalAlpha=.55;for(const[sd,col]of t.e)x.drawImage(edgeStrip(col,sd,t.v),t.tx*16,t.ty*16);x.globalAlpha=1}}return c});return w._wl}
 const tx=(s,x,y,c,al,sz)=>{g.font=(sz||8)+'px '+FONT;g.textAlign=al||'left';g.fillStyle='#000';g.fillText(s,x+1,y+1);g.fillStyle=c;g.fillText(s,x,y)};
 const dirOf=(fx,fy)=>Math.abs(fx)>Math.abs(fy)?(fx<0?'l':'r'):(fy<0?'u':'d');
 const tint=(c,col)=>cached('tn'+(c._id||(c._id=Math.random()))+col,()=>{const f=mkc(c.width,c.height),x=f.getContext('2d');x.drawImage(c,0,0);x.globalCompositeOperation='source-atop';x.fillStyle=col;x.fillRect(0,0,f.width,f.height);return f});
@@ -28,7 +41,7 @@ const WK={soldier:['sword',11],hollow:['claw',7],archer:['bow',0],brute:['hammer
 const dk=mkc(GW,GH),dg=dk.getContext('2d');
 function lighting(L){const a=W.th.amb;let al=a[3],rgb=a[0]+','+a[1]+','+a[2];const bo=E.find(e=>e.b&&e.s!=='dead'&&e.ph===2);if(bo){rgb='40,2,12';al=Math.min(.78,al+.1)}else if(S.night&&rg.out){rgb='4,6,32';al=Math.min(.84,al+.22)}
  dg.globalCompositeOperation='source-over';dg.clearRect(0,0,GW,GH);dg.fillStyle='rgba('+rgb+','+al+')';dg.fillRect(0,0,GW,GH);dg.globalCompositeOperation='destination-out';
- for(const l of L){const q=dg.createRadialGradient(l.x,l.y,l.r*.08,l.x,l.y,l.r);q.addColorStop(0,'rgba(0,0,0,'+l.i+')');q.addColorStop(.55,'rgba(0,0,0,'+l.i*.5+')');q.addColorStop(1,'rgba(0,0,0,0)');dg.fillStyle=q;dg.fillRect(l.x-l.r,l.y-l.r,l.r*2,l.r*2)}
+ for(const l of L){const R=Math.max(1,Math.round(l.r));dg.drawImage(lightSpr(R,l.i),Math.round(l.x)-R,Math.round(l.y)-R)}
  g.drawImage(dk,0,0);for(const l of L)if(l.c)glow(l.x,l.y,l.r*.8,l.c,l.a||.16)}
 // ---- dibujo principal ----
 function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='title')return;
@@ -37,11 +50,12 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='ti
  g.drawImage(W.base,cx,cy,GW,GH,cx,cy,GW,GH);
  const tx0=Math.max(0,(cx>>4)-1),tx1=Math.min(W.cols-1,((cx+GW)>>4)+1),ty0=Math.max(0,(cy>>4)-1),ty1=Math.min(W.rows-1,((cy+GH)>>4)+5),Lt=[],Dr=[];
  // agua animada
- const wf=(ts*3|0)&3;for(const w of W.water){if(w.tx<tx0||w.tx>tx1||w.ty<ty0||w.ty>ty1)continue;g.drawImage(cached('wa'+W.th.k+wf+'_'+w.v,()=>bakeWater(W.th,wf,w.v)),w.tx*16,w.ty*16);for(const[sd,col]of w.e){g.globalAlpha=.55;g.drawImage(edgeStrip(col,sd,w.v),w.tx*16,w.ty*16);g.globalAlpha=1}}
- // antorchas
+ if(W.water.length){const wf=(ts*3|0)&3;g.drawImage(waterLayers(W)[wf],cx,cy,GW,GH,cx,cy,GW,GH)}
+  // antorchas
  for(const t of W.torches){if(t.x<cx-20||t.x>cx+GW+20||t.y<cy-30||t.y>cy+GH+30)continue;fr(t.x-1,t.y-1,2,8,'#3a3440');fr(t.x-3,t.y+4,6,2,'#5a5260');fr(t.x-2,t.y-1,4,2,'#2a2630');flame(t.x,t.y-1,2,9,t.tx);Lt.push({x:t.x-cx,y:t.y-cy-4,r:58,i:.85,c:'255,150,70',a:.14})}
  // objetos altos (ordenados)
- for(let ty=ty0;ty<=ty1;ty++)for(let tx=tx0;tx<=tx1;tx++){const i=W.i(tx,ty),n=W.on[i];if(!n||WALLISH.has(n)||n==='gate')continue;const art=objArt(n,W.ov[i]%4,W.th);if(!art)continue;const wx=tx*16+8,wy=ty*16+15;
+ const AC=W._ac||(W._ac=new Array(W.on.length));
+ for(let ty=ty0;ty<=ty1;ty++)for(let tx=tx0;tx<=tx1;tx++){const i=W.i(tx,ty),n=W.on[i];if(!n||WALLISH.has(n)||n==='gate')continue;let ca=AC[i];if(!ca||ca.n!==n)ca=AC[i]={n,a:objArt(n,W.ov[i]%4,W.th)};const art=ca.a;if(!art)continue;const wx=tx*16+8,wy=ty*16+15;
   Dr.push({y:wy,f:()=>{let al=1;if((n==='tree'||n==='dtree')&&P.y<wy&&P.y>wy-54&&Math.abs(P.x-wx)<22)al=.5;g.globalAlpha=al;drawObjA(art,n,wx,wy,tx,ty);g.globalAlpha=1;
    if(n==='brazier'){flame(wx,wy-12,4,12,tx);}objFx(n,wx,wy,tx,ty);if(n==='ptorch')pflame(wx,wy,tx,ty);if(n==='mdoor'&&Math.floor(ts*3)%2)glow(wx,wy-10,12,'180,120,255',.12);if(n==='tomb'&&W.th.k==='cripta'&&(tx*7+ty)%5===0)glow(wx,wy-8,10,'120,100,200',.08)}});
   if(n==='brazier')Lt.push({x:wx-cx,y:wy-cy-12,r:64,i:.85,c:'255,140,60',a:.14});{const _l=objLight(n,wx,wy,cx,cy);if(_l)Lt.push(_l)}if(n==='ptorch'&&ptLit(tx,ty))Lt.push({x:wx-cx,y:wy-cy-12,r:56,i:.8,c:PCOLR[ptInfo(tx,ty).t.c],a:.16})}
@@ -82,13 +96,13 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='ti
  for(const f of FT){g.globalAlpha=Math.min(1,f.l*2);tx(f.t,f.x,f.y,f.c,'center',7+Math.round(Math.max(0,f.l-.7)*28));g.globalAlpha=1}
  g.restore();
  // iluminación y ambiente (en coordenadas de pantalla)
- lighting(Lt.map(l=>({...l,x:l.x+Math.round(sh[0]),y:l.y+Math.round(sh[1])})));fog();
- const vg=g.createRadialGradient(GW/2,GH/2,GH*.42,GW/2,GH/2,GW*.62);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,12,.6)');g.fillStyle=vg;g.fillRect(0,0,GW,GH);
+ {const sx=Math.round(sh[0]),sy=Math.round(sh[1]);if(sx||sy)for(const l of Lt){l.x+=sx;l.y+=sy}}lighting(Lt);fog();
+ g.drawImage(vigSpr('b',GH*.42,'0,0,12',.6),0,0);
  if(P.hp/P.mhp<.3&&P.s!=='dead'){g.fillStyle='rgba(160,0,30,'+(.07+.05*Math.sin(ts*6))+')';g.fillRect(0,0,GW,GH)}
  if(G.flash>0){g.fillStyle='rgba(200,20,40,'+G.flash*.5+')';g.fillRect(0,0,GW,GH)}
  hud();
  if(G.fade>0){g.fillStyle='rgba(0,0,0,'+Math.min(1,G.fade*1.6)+')';g.fillRect(0,0,GW,GH)}}
-function fog(){const t=W.th.fog;for(let i=0;i<4;i++){const x=((TM*(5+i*3)+i*180)%(GW+300))-150,y=GH*(.2+i*.22)+Math.sin(TM*.4+i*2)*14,q=g.createRadialGradient(x,y,0,x,y,120);q.addColorStop(0,'rgba('+t+',.07)');q.addColorStop(1,'rgba('+t+',0)');g.fillStyle=q;g.fillRect(x-120,y-60,240,120)}}
+function fog(){if(PERF.lv>=1)return;const t=W.th.fog,sp=fogSpr(t,120,0,.07);for(let i=0;i<4;i++){const x=((TM*(5+i*3)+i*180)%(GW+300))-150,y=GH*(.2+i*.22)+Math.sin(TM*.4+i*2)*14;g.drawImage(sp,0,60,240,120,Math.round(x-120),Math.round(y-60),240,120)}}
 function drawFire(x,y){shadow(x,y+2,24,.3);for(let i=0;i<10;i++){const a=i/10*6.283,sx=x+Math.cos(a)*9,sy=y+Math.sin(a)*4.5;fr(sx-2,sy-3,4,3,i%2?'#5a5260':'#46404e');fr(sx-2,sy-3,4,1,'#7a7288')}
  g.fillStyle='#241c22';g.beginPath();g.ellipse(x,y-1,7,3,0,0,6.283);g.fill();pline(g,x-1,y-2,x-1,y-26,'#aab4c6',2);fr(x-5,y-20,10,2,'#c9a54a');fr(x-2,y-28,3,3,'#8a96ac');
  for(const o of[[-3,0],[3,1],[0,2]])flame(x+o[0],y-3,5-o[1],14+o[1]*3,x+o[0]);
