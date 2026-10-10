@@ -66,10 +66,10 @@ function takeHit(d,fx,fy){const p=P;if(p.s==='dead')return;p.hp-=d;p.sk=0;G.shak
  if(fx!==undefined){const l=Math.hypot(fx,fy)||1;p.kx=fx/l*110;p.ky=fy/l*110}
  if(p.hp<=0){p.hp=0;p.s='dead';p.t=0;G.mode='dying';G.dieT=1.6;if(S.souls>0)S.drop={r:S.ri,x:p.x,y:p.y,s:S.souls};S.souls=0;S.st.deaths++;checkAch();return}
  p.s='hit';p.t=0;p.hd=true}
-function hurtP(d,e){const p=P;if(dodging()){spark(p.x,p.y,'#7df9ff',4);ftext(p.x,p.y-26,'esquiva','#7df9ff');p.cnt=1.1;p.st=Math.min(p.mst,p.st+8);return}
+function hurtP(d,e){const p=P;if(dodging()){spark(p.x,p.y,'#7df9ff',4);ftext(p.x,p.y-26,'esquiva','#7df9ff');p.cnt=1.1;p.st=Math.min(p.mst,p.st+(hasR('cieno')?20:8));return}
  const ax=e.x-p.x,ay=e.y-p.y,l=Math.hypot(ax,ay)||1,front=(ax*p.fx+ay*p.fy)/l>.1;
  if(p.s==='idle'&&held.block&&p.ex<=0&&front){
-  if(p.bt<.2){spark(p.x+p.fx*9,p.y-10,'#ffe66d',16);G.hs=.12;G.shake=2;p.st=Math.min(p.mst,p.st+20);S.st.parries++;if(hasR('espejo')){p.st=p.mst;p.hp=Math.min(p.mhp,p.hp+6);ftext(p.x,p.y-30,'+6','#7dff9a')}checkAch();if(!e.proj){e.s='stg';e.tm=0;e.stgT=1.1;e.rip=true}FX.push({k:'ring',x:p.x+p.fx*9,y:p.y-8,l:.3,m:.3,c:'255,230,109'});toast('¡Parada!');return}
+  if(p.bt<(hasR('vigia')?.28:.2)){spark(p.x+p.fx*9,p.y-10,'#ffe66d',16);G.hs=.12;G.shake=2;p.st=Math.min(p.mst,p.st+20);S.st.parries++;if(hasR('espejo')){p.st=p.mst;p.hp=Math.min(p.mhp,p.hp+6);ftext(p.x,p.y-30,'+6','#7dff9a')}checkAch();if(!e.proj){e.s='stg';e.tm=0;e.stgT=1.1;e.rip=true}FX.push({k:'ring',x:p.x+p.fx*9,y:p.y-8,l:.3,m:.3,c:'255,230,109'});toast('¡Parada!');return}
   p.st-=d*1.3*(S.oath==='guardian'?.5:1);p.sd=.8;spark(p.x+p.fx*8,p.y-8,'#8aa3c7',8);G.hs=.05;G.shake=1.5;p.hp-=Math.round(d*.15);p.kx=-ax/l*50;p.ky=-ay/l*50;
   if(p.hp<=0){takeHit(0);return}
   if(p.st<=0){p.st=0;p.ex=1.2;p.s='hit';p.t=0;p.hd=true}return}

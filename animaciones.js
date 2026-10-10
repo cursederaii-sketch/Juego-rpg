@@ -60,13 +60,6 @@ function drawObjA(art,n,wx,wy,tx_,ty_){const X=Math.round(wx-art.width/2),Y=Math
  const amp=n==='bush'?1:n==='dtree'?1.2:1.7,s=Math.sin(TM*1.4+tx_*.8+ty_*.37)*(.7+.3*Math.sin(TM*.35+tx_*.1)),h=art.height,w=art.width,s1=Math.round(s*amp),s2=Math.round(s*amp*.45),c1=Math.floor(h*.35),c2=Math.floor(h*.62);
  g.drawImage(art,0,0,w,c1,X+s1,Y,w,c1);g.drawImage(art,0,c1,w,c2-c1,X+s2,Y+c1,w,c2-c1);g.drawImage(art,0,c2,w,h-c2,X,Y+c2,w,h-c2)}
 
-// --- HUD: barras con eco, pulso de vida baja y almas que suben ---
-const _hud=hud;hud=function(){_hud();const p=P;if(!p||AN.hg==null)return;const bw=Math.min(130,p.mhp*.9),sw=Math.min(110,p.mst*.8);
- if(AN.hg>p.hp+.5)fr(8+bw*p.hp/p.mhp,8,bw*(AN.hg-p.hp)/p.mhp,7,'#ffd9a8');
- if(AN.sg>p.st+.5)fr(8+sw*p.st/p.mst,19,sw*(AN.sg-p.st)/p.mst,4,'#f0f5b0');
- if(p.hp/p.mhp<.3&&p.s!=='dead'){g.strokeStyle='rgba(255,60,80,'+(.45+.4*Math.sin(TM*7))+')';g.lineWidth=1;g.strokeRect(5.5,5.5,bw+5,12)}
- if(AN.sp&&AN.sp.t>0){g.globalAlpha=Math.min(1,AN.sp.t*2);tx('+'+AN.sp.d,GW-68,15-(1-AN.sp.t)*8,'#ffe66d','right',7);g.globalAlpha=1}};
-
 // --- estado por fotograma ---
 function animTick(dt){if(!P||!W||G.mode==='title')return;
  if(P.s==='dodge'){AN.gt-=dt;if(AN.gt<=0){AN.gt=.035;AN.gh.push({x:P.x,y:P.y,f:(P.t*16|0),t:TM})}}

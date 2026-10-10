@@ -4,12 +4,12 @@
 <title>Juramento · Soulslike 2D</title>
 <link rel="stylesheet" href="style.css">
 </head><body>
-<div id="stage"><canvas id="cv" width="384" height="216"></canvas><button id="pause" aria-label="Pausa">☰</button></div>
+<div id="stage"><canvas id="cv" width="384" height="216"></canvas><button id="pause" aria-label="Pausa"><svg viewBox="0 0 24 24"><path d="M7 5v14M17 5v14"/></svg></button></div>
 <div id="ui">
  <div id="pad"><div id="ring"></div><div id="knob"></div></div>
  <div class="grid" id="ac">
-  <button data-k="light">Ligero</button><button data-k="heavy">Pesado</button><button data-k="block">Bloqueo</button>
-  <button data-k="dodge">Esquiva</button><button data-k="flask">Frasco</button><button data-k="act">Actuar</button>
+  <button data-k="light" aria-label="Ligero"><svg viewBox="0 0 24 24"><path d="M20 4L10 14M7 11l6 6M10 14l-5 5"/></svg><i>Ligero</i></button><button data-k="heavy" aria-label="Pesado"><svg viewBox="0 0 24 24"><path d="M20 4L9 15M5.5 11.5l7 7M9 15l-5 5M16 3l5 5"/></svg><i>Pesado</i></button><button data-k="block" aria-label="Bloqueo"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg><i>Bloqueo</i></button>
+  <button data-k="dodge" aria-label="Esquiva"><svg viewBox="0 0 24 24"><path d="M3 8h6M2 12h9M3 16h6M13 6l7 6-7 6"/></svg><i>Esquiva</i></button><button data-k="flask" aria-label="Frasco"><svg viewBox="0 0 24 24"><path d="M10 3h4M10.5 3v5l-4 7a4 4 0 003.5 6h4a4 4 0 003.5-6l-4-7V3M8 15h8"/></svg><i>Frasco</i></button><button data-k="act" aria-label="Actuar"><svg viewBox="0 0 24 24"><path d="M12 2l9 10-9 10L3 12zM12 8v5M12 15.5v.5"/></svg><i>Actuar</i></button>
  </div>
 </div>
 <div id="dlg"></div><div id="menu"></div>
@@ -20,9 +20,12 @@
 <script src="mundo.js"></script>
 <script src="regiones.js"></script>
 <script src="regiones2.js"></script>
+<script src="regiones3.js"></script>
 <script src="game.js"></script>
 <script src="render.js"></script>
 <script src="sistemas.js"></script>
+<script src="calidad.js"></script>
+<script src="interfaz.js"></script>
 <script src="animaciones.js"></script>
 <script src="inicio.js"></script>
 </body></html>
