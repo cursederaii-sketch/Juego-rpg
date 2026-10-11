@@ -1,0 +1,27 @@
+
+{
+  "name": "juramento",
+  "version": "1.0.0",
+  "description": "Juramento - Juego RPG",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^37.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.juramento.rpg",
+    "productName": "Juramento",
+    "files": [
+      "**/*",
+      "!dist/**/*",
+      "!node_modules/**/*"
+    ],
+    "win": {
+      "target": "portable"
+    }
+  }
+}
