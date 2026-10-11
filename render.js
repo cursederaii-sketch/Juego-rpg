@@ -67,7 +67,7 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='ti
   for(let k=0;k<3;k++){const t=(ts*.8+k/3)%1;fr(it.x-6+k*6+Math.sin(ts*2+k)*2,y+6-t*18,1,1,'rgba(255,255,200,'+(1-t)+')')}}});Lt.push({x:it.x-cx,y:it.y-cy-6,r:26,i:.6,c:ic,a:.12})});
  if(S.drop&&S.drop.r===S.ri)Dr.push({y:S.drop.y,f:()=>{const d=S.drop,y=d.y-6+Math.sin(ts*4)*2;glow(d.x,y,20,'176,92,255',.5);disc(g,Math.round(d.x),Math.round(y),3,'#c08cff');disc(g,Math.round(d.x),Math.round(y),1,'#fff');for(let k=0;k<4;k++){const t=(ts*.9+k/4)%1;fr(d.x+Math.sin(ts*3+k*2)*5,y+4-t*14,1,1,'rgba(200,150,255,'+(1-t)+')')}}});
  // PNJ
- W.npcs.forEach(n=>{if((n.night&&!S.night)||(n.when&&!n.when()))return;Dr.push({y:n.y,f:()=>{const k=KITS[n.id],gh=k.ghost,by=gh?Math.sin(ts*2+n.tx)*2-3:0,dx=P.x-n.x,dy=P.y-n.y;if(!gh)shadow(n.x,n.y,12);else{shadow(n.x,n.y+4,10,.18);glow(n.x,n.y-10,22,'150,170,255',.2)}
+ W.npcs.forEach(n=>{if((n.night&&!S.night)||(n.when&&!n.when()))return;Dr.push({y:n.y,f:()=>{const k=KITS[n.id]||KITS.aldeano,gh=k.ghost,by=gh?Math.sin(ts*2+n.tx)*2-3:0,dx=P.x-n.x,dy=P.y-n.y;if(!gh)shadow(n.x,n.y,12);else{shadow(n.x,n.y+4,10,.18);glow(n.x,n.y-10,22,'150,170,255',.2)}
   body(n.id,n.x,n.y+by,dx,dy,'idle',(ts*2|0)+n.tx,{al:gh||1})}});if(Math.abs(n.x-cx-GW/2)<GW)Lt.push({x:n.x-cx,y:n.y-cy-10,r:32,i:.55,c:n.id==='sombra'||n.id==='voz'?'140,150,255':'255,220,160',a:.1})});
  // lápidas con nota, palancas, portales, muros falsos y runas
  W.notes.forEach(n=>{if(S.notes[n.id]||n.x<cx-20||n.x>cx+GW+20)return;Dr.push({y:n.y+9,f:()=>{const a=.18+.14*Math.sin(ts*3+n.tx);glow(n.x,n.y-2,12,'160,200,255',a);fr(n.x-1+Math.sin(ts*2)*3,n.y-8-((ts*6)%6),1,1,'rgba(200,230,255,.8)')}})});

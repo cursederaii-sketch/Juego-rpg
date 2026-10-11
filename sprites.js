@@ -149,6 +149,7 @@ Object.assign(KITS,{
  anselmo:{bw:10,th:8,lh:7,hw:8,hh:8,A:['#6a6a56','#8a8a70','#3e3e30'],boot:'#2a2a1e',belt:'#3a2a1a',head:'hood',hc:['#5a5a48','#7a7a62','#38382c'],eye:'#3a2230',face:'#d0b090',cape:'#4a4a38',capeE:'#8a8a70',wp:'none'},
  aldeano:{bw:9,th:8,lh:7,hw:8,hh:8,A:['#5a6a4a','#7a8a62','#38442c'],boot:'#26301c',belt:'#3a2a1a',head:'hood',hc:['#4a5a3a','#6a7a52','#2c3820'],eye:'#3a2230',face:'#e0b898',wp:'none'},
  aldric:_mk('caballero',{ghost:.6,chains:0,wp:'none',cape:'#3a3a60',capeE:'#8aa0d0'}),
- mirela2:_mk('mirela',{})
+ mirela2:_mk('mirela',{}),
+ dorn2:_mk('dorn',{wp:'none'})
 });
 KITS.aldea1=KITS.aldeano;KITS.aldea2=Object.assign({},KITS.aldeano,{A:['#6a4a5a','#8a6a7a','#44303a'],hc:['#5a3a4a','#7a5a6a','#3a2430']});

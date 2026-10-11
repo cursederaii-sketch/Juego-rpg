@@ -130,15 +130,15 @@ details.rg{text-align:left;border:1px solid #3a3450;border-left:3px solid var(--
 /* ---- mando (PS4) ---- */
 body.gp #ui{display:none}
 .gpf{outline:2px solid #ffd36a!important;outline-offset:2px;box-shadow:0 0 12px rgba(255,200,90,.6)!important}
-#gpHelp{display:none;position:fixed;inset:0;z-index:40;align-items:center;justify-content:center;padding:10px;box-sizing:border-box;background:rgba(4,2,10,.72);font-family:inherit;touch-action:manipulation}
-#gpHelp.on{display:flex}
-#gpHelp .gc{max-width:420px;width:100%;max-height:100%;overflow:auto;box-sizing:border-box;padding:16px 14px;border:1px solid #6a5226;border-radius:8px;background:linear-gradient(180deg,rgba(24,14,44,.96),rgba(8,4,16,.97));color:#e8e0ff;text-align:center}
-#gpHelp h2{margin:0 0 12px;font-size:12px;color:#ffd36a;font-weight:normal}
-#gpHelp .gg{display:grid;gap:7px;text-align:left}
-#gpHelp .gr{display:grid;grid-template-columns:44% 1fr;gap:8px;align-items:center;font-size:8px;line-height:1.4}
-#gpHelp .gr b{font-weight:normal;font-size:9px;text-align:right}
-#gpHelp p{margin:12px 0 0;font-size:7px;line-height:1.6;color:#b9afdc}
-#gpHelp .gs{color:#7f759f}
+#gpHelp{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));z-index:70;width:150px;box-sizing:border-box;padding:6px 8px;border:1px solid #6a5226;border-radius:6px;background:rgba(10,6,20,.82);color:#e8e0ff;font-family:inherit;cursor:pointer;touch-action:manipulation;opacity:.92}
+#gpHelp.on{display:block}
+#gpHelp .gh{display:flex;justify-content:space-between;gap:6px;font-size:7px;color:#ffd36a;line-height:1.5}
+#gpHelp .gh i{font-style:normal;color:#7f759f;font-size:6px}
+#gpHelp .gg,#gpHelp .gm{display:none}
+#gpHelp.open .gg{display:grid;gap:3px;margin-top:6px}
+#gpHelp.open .gm{display:block;margin-top:6px;font-size:6px;line-height:1.5;color:#b9afdc}
+#gpHelp .gr{display:grid;grid-template-columns:48% 1fr;gap:6px;align-items:center;font-size:7px;line-height:1.3}
+#gpHelp .gr b{font-weight:normal;font-size:7px;text-align:right}
 
 /* ---- pantalla completa / horizontal ---- */
 #fs{position:absolute;top:8px;left:calc(50% + 36px);z-index:4;height:28px;width:34px;padding:0;border-radius:14px;opacity:.8;display:flex;align-items:center;justify-content:center}
@@ -148,3 +148,13 @@ body.gp #ui{display:none}
 #rot .s{font-size:8px;color:#a89cc8}
 @keyframes rotp{0%,25%{transform:rotate(0)}65%,100%{transform:rotate(-90deg)}}
 @media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+
+#gpHelp .gb{display:none;gap:6px;margin-top:6px}
+#gpHelp.open .gb{display:flex}
+#gpHelp .gb button,#gpCal button{font:inherit;font-size:7px;padding:4px 7px;border:1px solid #6a5226;border-radius:4px;background:#1a1030;color:#ffd36a;cursor:pointer}
+#gpCal{display:none;position:fixed;inset:0;z-index:90;align-items:center;justify-content:center;background:rgba(4,2,10,.82);font-family:inherit}
+#gpCal.on{display:flex}
+#gpCal .gk{text-align:center;padding:18px 22px;border:1px solid #6a5226;border-radius:8px;background:rgba(14,8,28,.96);color:#e8e0ff;min-width:200px}
+#gpCal h3{margin:0 0 12px;font-size:10px;color:#ffd36a;font-weight:normal}
+#gpCal p{margin:0 0 8px;font-size:14px;line-height:1.5}
+#gpCal small{display:block;margin-bottom:12px;font-size:7px;color:#7f759f}
