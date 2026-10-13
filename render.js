@@ -39,7 +39,7 @@ function weapon(k,ox,oy,a,len,o={}){const c=Math.cos(a),s=Math.sin(a),pp=(t,w=0)
 const WK={soldier:['sword',11],hollow:['claw',7],archer:['bow',0],brute:['hammer',17],sepulturero:['shovel',22],pastora:['staff',24],cazador:['dagger',9],caballero:['greatsword',24,'255,60,90'],rey:['greatsword',27,'255,230,109'],warden:['sword',11],guardiana:['dagger',13,'153,255,204'],heraldo:['staff',22],capdorn:['sword',20]};
 // ---- fuentes de luz ----
 const dk=mkc(GW,GH),dg=dk.getContext('2d');
-function lighting(L){const a=W.th.amb;let al=a[3],rgb=a[0]+','+a[1]+','+a[2];const bo=E.find(e=>e.b&&e.s!=='dead'&&e.ph===2);if(bo){rgb='40,2,12';al=Math.min(.78,al+.1)}else if(S.night&&rg.out){rgb='4,6,32';al=Math.min(.84,al+.22)}
+function lighting(L){const a=W.th.amb;let al=a[3]*.86,rgb=a[0]+','+a[1]+','+a[2];const bo=E.find(e=>e.b&&e.s!=='dead'&&e.ph===2);if(bo){rgb='40,2,12';al=Math.min(.78,al+.1)}else if(rg.day){rgb='255,238,200';al=.05}else if(rg.out&&window.skyAmb){const c=skyAmb(a);rgb=c.rgb;al=c.al}else if(S.night&&rg.out){rgb='4,6,32';al=Math.min(.84,al+.22)}
  dg.globalCompositeOperation='source-over';dg.clearRect(0,0,GW,GH);dg.fillStyle='rgba('+rgb+','+al+')';dg.fillRect(0,0,GW,GH);dg.globalCompositeOperation='destination-out';
  for(const l of L){const R=Math.max(1,Math.round(l.r));dg.drawImage(lightSpr(R,l.i),Math.round(l.x)-R,Math.round(l.y)-R)}
  g.drawImage(dk,0,0);for(const l of L)if(l.c)glow(l.x,l.y,l.r*.8,l.c,l.a||.16)}
@@ -68,7 +68,7 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='ti
  if(S.drop&&S.drop.r===S.ri)Dr.push({y:S.drop.y,f:()=>{const d=S.drop,y=d.y-6+Math.sin(ts*4)*2;glow(d.x,y,20,'176,92,255',.5);disc(g,Math.round(d.x),Math.round(y),3,'#c08cff');disc(g,Math.round(d.x),Math.round(y),1,'#fff');for(let k=0;k<4;k++){const t=(ts*.9+k/4)%1;fr(d.x+Math.sin(ts*3+k*2)*5,y+4-t*14,1,1,'rgba(200,150,255,'+(1-t)+')')}}});
  // PNJ
  W.npcs.forEach(n=>{if((n.night&&!S.night)||(n.when&&!n.when()))return;Dr.push({y:n.y,f:()=>{const k=KITS[n.id]||KITS.aldeano,gh=k.ghost,by=gh?Math.sin(ts*2+n.tx)*2-3:0,dx=P.x-n.x,dy=P.y-n.y;if(!gh)shadow(n.x,n.y,12);else{shadow(n.x,n.y+4,10,.18);glow(n.x,n.y-10,22,'150,170,255',.2)}
-  body(n.id,n.x,n.y+by,dx,dy,'idle',(ts*2|0)+n.tx,{al:gh||1})}});if(Math.abs(n.x-cx-GW/2)<GW)Lt.push({x:n.x-cx,y:n.y-cy-10,r:32,i:.55,c:n.id==='sombra'||n.id==='voz'?'140,150,255':'255,220,160',a:.1})});
+  (n.mv?body(KITS[n.id]?n.id:'aldeano',n.x,n.y+by,n.wx,n.wy,'walk',ts*8|0,{al:gh||1}):body(KITS[n.id]?n.id:'aldeano',n.x,n.y+by,dx,dy,'idle',(ts*2|0)+n.tx,{al:gh||1}))}});if(Math.abs(n.x-cx-GW/2)<GW)Lt.push({x:n.x-cx,y:n.y-cy-10,r:32,i:.55,c:n.id==='sombra'||n.id==='voz'?'140,150,255':'255,220,160',a:.1})});
  // lápidas con nota, palancas, portales, muros falsos y runas
  W.notes.forEach(n=>{if(S.notes[n.id]||n.x<cx-20||n.x>cx+GW+20)return;Dr.push({y:n.y+9,f:()=>{const a=.18+.14*Math.sin(ts*3+n.tx);glow(n.x,n.y-2,12,'160,200,255',a);fr(n.x-1+Math.sin(ts*2)*3,n.y-8-((ts*6)%6),1,1,'rgba(200,230,255,.8)')}})});
  W.levers.forEach(l=>{if(l.x<cx-20||l.x>cx+GW+20)return;const on=!!S.lv[rg.id+':'+l.id];Dr.push({y:l.y+6,f:()=>{shadow(l.x,l.y+6,10,.3);fr(l.x-4,l.y+2,8,4,'#4a4260');fr(l.x-4,l.y+2,8,1,'#7a7092');fr(l.x-1,l.y-2,2,5,'#2a2430');pline(g,l.x,l.y,l.x+(on?6:-6),l.y-7,'#c9a54a',2);disc(g,Math.round(l.x+(on?6:-6)),Math.round(l.y-8),2,on?'#7dff9a':'#ff6b7a')}})});
@@ -102,7 +102,7 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='ti
  if(G.flash>0){g.fillStyle='rgba(200,20,40,'+G.flash*.5+')';g.fillRect(0,0,GW,GH)}
  hud();
  if(G.fade>0){g.fillStyle='rgba(0,0,0,'+Math.min(1,G.fade*1.6)+')';g.fillRect(0,0,GW,GH)}}
-function fog(){if(PERF.lv>=1)return;const t=W.th.fog,sp=fogSpr(t,120,0,.07);for(let i=0;i<4;i++){const x=((TM*(5+i*3)+i*180)%(GW+300))-150,y=GH*(.2+i*.22)+Math.sin(TM*.4+i*2)*14;g.drawImage(sp,0,60,240,120,Math.round(x-120),Math.round(y-60),240,120)}}
+function fog(){if(PERF.lv>=1)return;const t=W.th.fog,sp=fogSpr(t,120,0,.04);for(let i=0;i<4;i++){const x=((TM*(5+i*3)+i*180)%(GW+300))-150,y=GH*(.2+i*.22)+Math.sin(TM*.4+i*2)*14;g.drawImage(sp,0,60,240,120,Math.round(x-120),Math.round(y-60),240,120)}}
 function drawFire(x,y){shadow(x,y+2,24,.3);for(let i=0;i<10;i++){const a=i/10*6.283,sx=x+Math.cos(a)*9,sy=y+Math.sin(a)*4.5;fr(sx-2,sy-3,4,3,i%2?'#5a5260':'#46404e');fr(sx-2,sy-3,4,1,'#7a7288')}
  g.fillStyle='#241c22';g.beginPath();g.ellipse(x,y-1,7,3,0,0,6.283);g.fill();pline(g,x-1,y-2,x-1,y-26,'#aab4c6',2);fr(x-5,y-20,10,2,'#c9a54a');fr(x-2,y-28,3,3,'#8a96ac');
  for(const o of[[-3,0],[3,1],[0,2]])flame(x+o[0],y-3,5-o[1],14+o[1]*3,x+o[0]);
@@ -167,7 +167,7 @@ function hud(){const p=P;
   g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=1;g.strokeRect(x0+cam.x/16*k+.5,y0+cam.y/16*k+.5,GW/16*k,GH/16*k);fr(x0+P.x/16*k-1,y0+P.y/16*k-1,3,3,Math.floor(TM*4)%2?'#7df9ff':'#fff')}
  const b=E.find(e=>e.b&&e.s!=='dead'&&e.aw);
  if(b){tx(b.b.n,GW/2,GH-23,'#f0e6ff','center',8);bar(60,GH-17,264,5,b.hp/b.mhp,'#c0243c','#5a0e1e');for(const s of[-1,1]){fr(GW/2+s*136-3,GH-20,6,10,'#c9a54a');fr(GW/2+s*136-1,GH-19,2,8,'#0a0610')}}
- if(G.banner){const a=Math.min(1,G.banner.l);g.globalAlpha=a;fr(0,GH/2-44,GW,38,'rgba(0,0,0,.55)');fr(40,GH/2-43,GW-80,1,'#c9a54a');fr(40,GH/2-7,GW-80,1,'#c9a54a');tx(G.banner.t,GW/2,GH/2-30,'#bfa8ff','center',6);tx(G.banner.s,GW/2,GH/2-14,'#fff','center',12);g.globalAlpha=1}
+ if(G.banner){const a=Math.min(1,G.banner.l);g.globalAlpha=a;fr(40,GH/2-43,GW-80,1,'#c9a54a');fr(40,GH/2-7,GW-80,1,'#c9a54a');tx(G.banner.t,GW/2,GH/2-30,'#bfa8ff','center',6);tx(G.banner.s,GW/2,GH/2-14,'#fff','center',12);g.globalAlpha=1}
  if(G.msgT>0){g.globalAlpha=Math.min(1,G.msgT);tx(G.msg,GW/2,70,'#ffe66d','center',8);g.globalAlpha=1}
  if(G.mode==='dying'){g.fillStyle='rgba(0,0,0,'+Math.min(.78,(1.6-G.dieT)*.6)+')';g.fillRect(0,0,GW,GH);g.globalAlpha=Math.min(1,(1.6-G.dieT)*.8);glow(GW/2,GH/2,100,'192,36,60',.35);tx('HAS CAÍDO',GW/2,GH/2+6,'#c0243c','center',18);g.globalAlpha=1}
  if(G.win>0){const a=Math.min(.5,(2.5-G.win)*.4);g.fillStyle='rgba(255,230,109,'+a+')';g.fillRect(0,GH/2-24,GW,38);tx('JEFE DERROTADO',GW/2,GH/2+2,'#fff','center',14)}}

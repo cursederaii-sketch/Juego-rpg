@@ -14,7 +14,7 @@ function openSettings(from){
  const tg=(t,k)=>'<button class="oath'+(CFG[k]?' sel':'')+'" onclick="CFG[\''+k+'\']=CFG[\''+k+'\']?0:1;saveCfg();applyCfg();openSettings()"><b>'+t+'</b>'+(CFG[k]?'Activado':'Desactivado')+'</button>';
  const tl={auto:'Automático',on:'Siempre visibles',off:'Ocultos (teclado)'};
  m.innerHTML='<div class="card"><h1 style="font-size:24px">Ajustes</h1>'
-  +sl('Volumen general','master',0,100,5)+sl('Efectos','sfx',0,100,5)+sl('Sacudida de cámara','shake',0,1,.25)
+  +sl('Volumen general','master',0,100,5)+sl('Música','music',0,100,5)+sl('Efectos','sfx',0,100,5)+sl('Sacudida de cámara','shake',0,1,.25)
   +'<h2>Controles</h2><button class="oath" onclick="CFG.touch=CFG.touch===\'auto\'?\'on\':CFG.touch===\'on\'?\'off\':\'auto\';saveCfg();applyCfg();openSettings()"><b>Botones táctiles</b>'+tl[CFG.touch]+'</button>'
   +sl('Tamaño de botones','tsize',.8,1.4,.1)+sl('Opacidad de botones','topac',30,100,5)
   +tg('Modo zurdo','lefty')+tg('Vibración','vib')
@@ -29,7 +29,7 @@ function openPause(){
   +'<button class="oath" onclick="save();showTitle()"><b>Guardar y salir al título</b></button></div>'}
 function showTitle(){
  G.mode='title';relAll();$('dlg').style.display='none';const m=$('menu'),has=!!load();m.style.display='flex';m.classList.add('tt');
- m.innerHTML='<div class="tbtns"><button class="tb" onclick="tPlay()">Jugar</button><button class="tb" onclick="openSettings(\'title\')">Ajustes</button><button class="tb'+(has?'':' off')+'" onclick="tLoad()">Cargar partida</button><div id="tmsg"></div></div>'}
+ m.innerHTML='<div class="tstage"><button class="tb3" onclick="tPlay()">Jugar</button><button class="tb3" onclick="openSettings(\'title\')">Ajustes</button><button class="tb3'+(has?'':' off')+'" onclick="tLoad()">Cargar<br>partida</button><div id="tmsg"></div></div>'}
 function tMsg(t){const e=$('tmsg');if(e){e.textContent=t;clearTimeout(tMsg.t);tMsg.t=setTimeout(()=>{e.textContent=''},2200)}}
 function tLoad(){if(!load())return tMsg('No hay partida guardada');m_off();cont()}
 function askName(){G.mode='title';const m=$('menu');m.style.display='flex';m_off();
@@ -44,6 +44,11 @@ function startGame(){if(_sg)return;const er=$('nerr');
 function tPlay(){const sv=load();if(!sv){return askName()}
  $('menu').innerHTML='<div class="tbtns"><div id="tq">Ya tienes una partida guardada ('+esc(sv.name||'Sin nombre')+').<br>¿Empezar una nueva y borrarla?</div><button class="tb" onclick="askName()">Sí, empezar de nuevo</button><button class="tb" onclick="m_off();cont()">Continuar la guardada</button><button class="tb" onclick="showTitle()">Volver</button></div>'}
 const m_off=()=>$('menu').classList.remove('tt');
+// vídeo de fondo del título: solo se reproduce mientras el título está visible
+(function(){const v=$('tv');if(!v)return;v.muted=true;const go=()=>{const p=v.play();if(p&&p.catch)p.catch(()=>{})};
+ const sync=()=>{if($('menu').classList.contains('tt')&&$('menu').style.display!=='none')go();else v.pause()};
+ new MutationObserver(sync).observe($('menu'),{attributes:true,attributeFilter:['class','style']});
+ addEventListener('pointerdown',()=>{if(v.paused)sync()},{passive:true});v.addEventListener('canplay',sync);sync()})();
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if((k==='escape'||k==='p')&&!e.repeat){if(G.mode==='play')openPause();else if(G.mode==='menu'&&$('menu').querySelector('h1')&&$('menu').querySelector('h1').textContent==='Pausa')closeM()}});
 $('pause').addEventListener('click',openPause);
 $('pause').addEventListener('touchstart',e=>e.stopPropagation());

@@ -89,7 +89,19 @@ p{margin:6px 0;font-size:14px;color:#cbbfe8;font-style:italic}.hint{font-size:11
 details.rg{text-align:left;border:1px solid #3a3450;border-left:3px solid var(--gold);border-radius:5px;margin:5px 0;padding:7px 11px;background:rgba(10,6,20,.55)}details.rg summary{cursor:pointer;color:#f0e6ff;font-size:13px}details.rg summary small{color:var(--dim)}details.rg ul,ul.nt{margin:6px 0 2px;padding-left:18px;font-size:12px;color:var(--mut);text-align:left}details.rg p{font-size:12px;color:#6a6088;margin:6px 0 2px}
 
 /* ---------- título ---------- */
-#menu.tt{background:#04030c url(fondo.webp) center/cover no-repeat;align-items:flex-start;justify-content:center;overflow:hidden}
+#menu.tt{background:transparent;align-items:flex-start;justify-content:center;overflow:hidden;padding:0}
+#tvw{position:fixed;inset:0;z-index:19;display:none;background:#04030c;overflow:hidden}
+body:has(#menu.tt:not([style*="display: none"])) #tvw{display:block}
+#tvw:before{content:'';position:absolute;inset:-30px;background:url(fondo-titulo.webp) center/cover no-repeat;filter:blur(22px) brightness(.65)}
+#tv{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100vw,calc(100vh*16/9));height:auto;aspect-ratio:16/9;object-fit:fill;background:url(fondo-titulo.webp) center/100% 100% no-repeat}
+.tstage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;container-type:inline-size}
+.tb3{position:absolute;top:78.67%;height:14.64%;width:15.92%;padding:0;margin:0;background:transparent;border:0;border-radius:2%;cursor:pointer;
+ font:400 1.45cqw/1.5 'Press Start 2P',monospace;letter-spacing:.12cqw;text-transform:uppercase;color:var(--gold2);text-shadow:0 0 .8cqw rgba(255,200,90,.7),0 .25cqw 0 #000;
+ touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,box-shadow .2s,transform .12s}
+.tb3:nth-child(1){left:23.23%}.tb3:nth-child(2){left:42.36%;width:15.66%}.tb3:nth-child(3){left:61.13%;width:15.8%}
+.tb3:hover,.tb3:focus-visible{color:#fff;outline:0;background:radial-gradient(ellipse at center,rgba(255,200,90,.22),rgba(255,150,50,.06) 70%);box-shadow:0 0 2cqw rgba(255,170,60,.55),inset 0 0 1.2cqw rgba(255,220,140,.35)}
+.tb3:active{transform:translateY(.3cqw);filter:brightness(1.3)}.tb3.off{opacity:.45;filter:saturate(.4)}
+.tstage #tmsg{position:absolute;left:0;right:0;top:72%;font-size:1.3cqw;text-shadow:0 1px 4px #000,0 0 8px #000}
 .tbtns{position:absolute;left:50%;top:58%;transform:translateX(-50%);width:min(320px,80vw);display:flex;flex-direction:column;gap:12px}
 .tb{position:relative;height:52px;font:400 13px 'Press Start 2P',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);cursor:pointer;padding:0 14px;touch-action:manipulation;
  background:linear-gradient(180deg,rgba(40,24,72,.92),rgba(10,5,22,.94));border:1px solid var(--gold);border-radius:4px;text-shadow:0 0 10px rgba(255,200,90,.7),0 2px 0 #000;
@@ -100,8 +112,8 @@ details.rg{text-align:left;border:1px solid #3a3450;border-left:3px solid var(--
 .tb:active{transform:translateY(1px);filter:brightness(1.2)}.tb.off{opacity:.5;filter:saturate(.4)}
 #tmsg{min-height:16px;text-align:center;font:400 10px 'Press Start 2P',monospace;line-height:1.5;color:var(--gold2);text-shadow:0 1px 3px #000}
 #tq{text-align:center;font:400 10px 'Press Start 2P',monospace;line-height:1.6;color:#fff3c4;text-shadow:0 1px 4px #000;background:rgba(6,4,22,.75);padding:8px;border:1px solid #4a3a1e;border-radius:4px}
-@media (orientation:portrait){#menu.tt{background:url(fondo.webp) top center/100% auto no-repeat,radial-gradient(ellipse at 50% 34%,rgba(90,60,180,.35),transparent 60%),linear-gradient(#0a0b2e 0,#05030f 38%,#03020a 100%)}.tbtns{top:24%}}
-@media (max-height:520px){.tbtns{top:60.5%;gap:8px}.tb{height:36px;font-size:10px}#tq{font-size:8px;padding:5px}}
+@media (orientation:portrait){.tbtns{top:24%}}
+@media (max-height:520px){.tbtns{top:50%;transform:translate(-50%,-50%);gap:8px}.tb{height:36px;font-size:10px}#tq{font-size:8px;padding:5px}}
 
 /* ---------- nombre ---------- */
 #menu input[type=text],#menu input#nm{width:100%;box-sizing:border-box;margin:12px 0 4px;padding:14px;font:inherit;font-size:20px;text-align:center;letter-spacing:3px;color:#fff;background:linear-gradient(#0e0720,#1a0f30);border:1px solid var(--gold);border-radius:6px;outline:none;user-select:text;-webkit-user-select:text;touch-action:auto;box-shadow:inset 0 2px 8px #000}
@@ -158,3 +170,45 @@ body.gp #ui{display:none}
 #gpCal h3{margin:0 0 12px;font-size:10px;color:#ffd36a;font-weight:normal}
 #gpCal p{margin:0 0 8px;font-size:14px;line-height:1.5}
 #gpCal small{display:block;margin-bottom:12px;font-size:7px;color:#7f759f}
+.ilu{position:relative;width:100%;aspect-ratio:3/2;border-radius:8px;overflow:hidden;border:2px solid #4a2a9a;touch-action:auto;background:#05030a}
+.ilu img{width:100%;height:100%;display:block;image-rendering:pixelated}
+.ilu canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ilu .pin{position:absolute;width:20px;min-width:0;height:20px;margin:-10px 0 0 -10px;padding:0;border-radius:50%;background:#ffd24a;border:2px solid #fff;box-shadow:0 0 8px #000}
+.ilu .pin.me{background:#fff;border-color:#ff9a3c;box-shadow:0 0 0 5px rgba(255,154,60,.45)}.ilu .pin.sel{outline:2px solid #7df9ff}
+
+/* ---------- diálogo y cartel de lugar transparentes ---------- */
+#dlg{background:rgba(8,4,16,.28);border-color:rgba(201,165,74,.4);box-shadow:none;backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px)}
+#dlg>b{background:rgba(20,12,38,.5);box-shadow:none;text-shadow:0 1px 3px #000}
+#dlg p{color:#fff;text-shadow:0 1px 3px #000,0 0 8px #000}
+#dlg button{background:rgba(20,12,40,.32);border-color:rgba(201,165,74,.35);color:#fff;text-shadow:0 1px 2px #000}
+
+/* ---------- v19.1: globo de diálogo separado de los bordes y nombre sin recortar ---------- */
+#dlg{
+ left:calc(28px + env(safe-area-inset-left,0px));
+ right:calc(28px + env(safe-area-inset-right,0px));
+ bottom:calc(22px + env(safe-area-inset-bottom,0px));
+ max-height:calc(100% - 60px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+ padding:12px 16px 14px;
+}
+/* el nombre va dentro del cuadro, en el flujo normal, así el scroll no lo corta */
+#dlg>b{
+ position:static;transform:none;display:inline-block;max-width:100%;
+ margin:0 0 4px;padding:3px 12px;box-sizing:border-box;
+ white-space:normal;overflow-wrap:anywhere;line-height:1.3;
+}
+#dlg p{margin:4px 0 12px}
+
+/* ---------- v19.3: menús (ajustes, pausa, diario…) con aire alrededor y zonas seguras ---------- */
+#menu:not(.tt){
+ padding:calc(30px + env(safe-area-inset-top,0px)) calc(32px + env(safe-area-inset-right,0px)) calc(34px + env(safe-area-inset-bottom,0px)) calc(32px + env(safe-area-inset-left,0px));
+}
+#menu:not(.tt) .card{margin:auto;max-width:480px}
+/* pantallas apaisadas bajas (móvil/tablet): tarjeta más ancha y compacta para que quepa más sin pegarse a los bordes */
+@media (orientation:landscape) and (max-height:700px){
+ #menu:not(.tt) .card{max-width:580px;padding:16px 22px}
+ #menu:not(.tt) .card h1{font-size:22px!important;letter-spacing:5px;margin-bottom:4px}
+ #menu:not(.tt) .card h1:after{margin-top:4px}
+ #menu:not(.tt) .card h2{margin:12px 0 5px}
+ #menu:not(.tt) .card .oath{padding:8px 14px 8px 18px;margin:4px 0}
+ #menu:not(.tt) .card #go{height:44px;margin-top:10px}
+}

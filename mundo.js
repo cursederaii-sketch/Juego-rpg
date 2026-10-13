@@ -1,5 +1,5 @@
 // ===== MUNDO: mapa en baldosas, colisión, búsqueda de caminos y horneado del terreno =====
-const GW=384,GH=216;
+const GW=480,GH=270; // zona visible (antes 384x216): más lejos del jugador, mismo 16:9
 const WALLISH=new Set(['wall','roof','hwall']);
 // rectángulos de colisión dentro de la baldosa (1 = baldosa completa)
 const COL={wall:1,roof:1,hwall:1,gate:1,tree:[4,3,12,16],dtree:[5,3,11,16],pillar:[3,4,13,16],bpillar:[3,5,13,16],statue:[3,4,13,16],tomb:[3,5,13,16],cross:[5,6,11,16],barrel:[3,5,13,16],crate:[2,4,14,16],rock:[2,5,14,16],brazier:[3,6,13,16],well:[0,4,16,16],barr:[1,6,15,16],urn:[4,5,12,16]};

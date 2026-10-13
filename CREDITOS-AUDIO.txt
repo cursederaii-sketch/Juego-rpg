@@ -1,0 +1,9 @@
+AUDIO DE JURAMENTO
+==================
+Música (carpeta musica/): composiciones originales hechas para este juego (ambiente oscuro, ambiente calmado,
+combate y jefe), interpretadas con instrumentos muestreados reales (cuerdas, coro, arpa, flauta, metales, timbales)
+del soundfont FluidR3_GM (Frank Wen, licencia permisiva que permite distribuir el audio generado).
+
+Efectos de sonido (sfxdata.js):
+- Kenney "RPG Audio" (kenney.nl) — licencia CC0 (dominio público): golpes, espadas, tela, puertas, monedas, metal, pasos.
+- Campanas, coro, timbales, arpa y platillos: renderizados con el mismo soundfont FluidR3_GM.

@@ -82,6 +82,6 @@ const _lighting=lighting;lighting=function(L){_lighting(L);const T=W.th;g.save()
  if(PERF.lv<2)for(const l of L)if(l.c)glow(l.x,l.y,l.r*1.3,l.c,(l.a||.16)*.45);
  const sh=SHAFT[T.k];if(sh&&PERF.lv<1){g.globalCompositeOperation='lighter';const sw=GW+180;for(let i=0;i<4;i++){const bx=(((i*118+TM*7-cam.x*.35)%sw)+sw)%sw-90,al=sh[1]*(.7+.3*Math.sin(TM*.7+i*1.7));g.globalAlpha=al;g.drawImage(shaftSpr(sh[0],i),Math.round(bx),0)}g.globalAlpha=1}
  g.globalCompositeOperation='source-over';
- if(PERF.lv<1){const sp=fogSpr(T.fog,95,4,.07);for(let i=0;i<3;i++){const fx=(((i*190+TM*(5+i*2)-cam.x*.5)%(GW+240))+GW+240)%(GW+240)-120,fy=GH-26-i*16+Math.sin(TM*.5+i)*4;g.drawImage(sp,0,35,190,120,Math.round(fx-95),Math.round(fy-60),190,120)}}
- g.drawImage(vigSpr('a',GH*.38,'0,0,0',.48),0,0);
+ if(PERF.lv<1){const sp=fogSpr(T.fog,95,4,.04);for(let i=0;i<3;i++){const fx=(((i*190+TM*(5+i*2)-cam.x*.5)%(GW+240))+GW+240)%(GW+240)-120,fy=GH-26-i*16+Math.sin(TM*.5+i)*4;g.drawImage(sp,0,35,190,120,Math.round(fx-95),Math.round(fy-60),190,120)}}
+ g.drawImage(vigSpr('a',GH*.38,'0,0,0',(rg.day||(rg.out&&window.skyD&&skyD()>.6))?.12:.34),0,0);
  g.restore()};

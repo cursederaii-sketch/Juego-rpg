@@ -13,12 +13,15 @@ function finish(c,ol,rim=true){const w=c.width,h=c.height,x=c.getContext('2d'),i
  const a=(X,Y)=>X<0||Y<0||X>=w||Y>=h?0:o[(Y*w+X)*4+3];
  if(rim)for(let Y=0;Y<h;Y++)for(let X=0;X<w;X++){const i=(Y*w+X)*4;if(o[i+3]<200)continue;
   const up=a(X,Y-1)<100,lf=a(X-1,Y)<100,dn=a(X,Y+1)<100,rt=a(X+1,Y)<100;
+  const vg=1.07-.16*(Y/h);for(let j=0;j<3;j++)d[i+j]*=vg; // volumen: más luz arriba, más sombra abajo
   let k=0;if(up)k+=.2;if(lf)k+=.1;if(dn)k-=.18;if(rt)k-=.12;
-  if(k>0){for(let j=0;j<3;j++)d[i+j]=Math.min(255,d[i+j]+(255-d[i+j])*k)}else if(k<0){for(let j=0;j<3;j++)d[i+j]*=1+k}}
+  if(k>0){const T=[255,240,210];for(let j=0;j<3;j++)d[i+j]=Math.min(255,d[i+j]+(T[j]-d[i+j])*k)} // luces cálidas
+  else if(k<0){const S=[1.1,1,.78];for(let j=0;j<3;j++)d[i+j]*=1+k*S[j]}} // sombras frías
  const oc=hx(ol||'#0b0714');const od=new Uint8ClampedArray(d);
  for(let Y=0;Y<h;Y++)for(let X=0;X<w;X++){const i=(Y*w+X)*4;if(od[i+3]>40)continue;
   const n=(X>0&&od[i-4+3]>150)||(X<w-1&&od[i+4+3]>150)||(Y>0&&od[i-w*4+3]>150)||(Y<h-1&&od[i+w*4+3]>150);
-  if(n){d[i]=oc[0];d[i+1]=oc[1];d[i+2]=oc[2];d[i+3]=255}}
+  if(n){let r=0,gg=0,b=0,c=0;const nb=[X>0&&-4,X<w-1&&4,Y>0&&-w*4,Y<h-1&&w*4];for(const q of nb){if(q===false)continue;const p_=i+q;if(od[p_+3]>150){r+=od[p_];gg+=od[p_+1];b+=od[p_+2];c++}}
+   d[i]=oc[0]*.8+(c?r/c*.14:0);d[i+1]=oc[1]*.8+(c?gg/c*.14:0);d[i+2]=oc[2]*.8+(c?b/c*.14:0);d[i+3]=255}}
  x.putImageData(im,0,0);return c}
 // silueta blanca (destello de golpe)
 function flashOf(c){return cached('fl'+(c._id||(c._id=Math.random())),()=>{const f=mkc(c.width,c.height),x=f.getContext('2d');x.drawImage(c,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#fff';x.fillRect(0,0,f.width,f.height);return f})}

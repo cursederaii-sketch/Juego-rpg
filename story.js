@@ -11,8 +11,9 @@ const giveKey=id=>{if(!S.keys[id]){S.keys[id]=1;toast('Obtienes: '+KEYN[id])}};
 const nNotes=()=>Object.keys(S.notes).length,nTruth=()=>Object.keys(S.tr).length,nMem=()=>Object.keys(S.mem).length;
 const doneQ=()=>{S.st.quests++;ach('quest')};
 
-const INTRO=()=>D('','Despiertas sobre piedra fría. No recuerdas quién eres ni cómo llegaste a esta cripta. Solo un nombre te viene a los labios, y lo repites sin saber si es el tuyo: «'+S.name+'». En el muro, raspada con una espada, una inscripción: «No permitas que el mundo vuelva a olvidarte».',null,
+const INTRO0=()=>D('','Despiertas sobre piedra fría. No recuerdas quién eres ni cómo llegaste a esta cripta. Solo un nombre te viene a los labios, y lo repites sin saber si es el tuyo: «'+S.name+'». En el muro, raspada con una espada, una inscripción: «No permitas que el mundo vuelva a olvidarte».',null,
  D('','El reino de Valdora se borra de la memoria de quienes lo habitaron. Para saber quién fuiste deberás llegar a la capital y averiguar por qué regresaste de entre los muertos. Cada jefe guarda un recuerdo tuyo... pero los recuerdos no siempre coinciden. Descansa en las hogueras con «Actuar».'));
+const INTRO=()=>PROLOGO();
 
 // ---- RECUERDOS (uno por jefe; se contradicen hasta el final) ----
 const MEM={

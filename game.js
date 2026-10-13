@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id),cv=$('cv'),g=cv.getContext('2d',{alpha:f
 const R=Math.random,cl=(v,a,b)=>Math.max(a,Math.min(b,v)),sgn=v=>v<0?-1:1,hash=k=>{const h=Math.sin(k*12.9898)*43758.5453;return h-Math.floor(h)};
 // ---- ajustes (se editan en inicio.js) ----
 const KEYD={up:['w','arrowup'],down:['s','arrowdown'],left:['a','arrowleft'],right:['d','arrowright'],light:['j'],heavy:['k'],dodge:['l',' '],block:['shift','i'],flask:['f'],act:['e']};
-const CFGD={master:80,sfx:100,shake:1,vib:1,touch:'auto',tsize:1,topac:100,lefty:0,crt:0,smooth:0,fps:0,hints:1,text:1,mini:1,dmg:1,keys:KEYD};
+const CFGD={master:80,sfx:100,music:70,shake:1,vib:1,touch:'auto',tsize:1,topac:100,lefty:0,crt:0,smooth:0,fps:0,hints:1,text:1,mini:1,dmg:1,keys:KEYD};
 const CFG=(()=>{try{const s=JSON.parse(localStorage.getItem('jur_cfg')||'{}');return Object.assign({},CFGD,s,{keys:Object.assign({},KEYD,s.keys||{})})}catch(e){return Object.assign({},CFGD,{keys:Object.assign({},KEYD)})}})();
 const saveCfg=()=>{try{localStorage.setItem('jur_cfg',JSON.stringify(CFG))}catch(e){}};
 const buzz=ms=>{if(CFG.vib&&navigator.vibrate)try{navigator.vibrate(ms)}catch(e){}};
@@ -44,7 +44,7 @@ const mhp=()=>100+10*S.A.vig,mst=()=>100+8*S.A.res,WPN=()=>WP[S.weapon],toast=s=
 const spark=(x,y,c,n,z=10,sp=1)=>{for(let i=0;i<n;i++){const a=R()*6.283,v=(20+R()*70)*sp;PT.push({k:'s',x,y,z,vx:Math.cos(a)*v,vy:Math.sin(a)*v*.6,vz:20+R()*60,l:.3+R()*.3,c})}};
 const ftext=(x,y,t,c)=>{if(CFG.dmg)FT.push({x:x+(R()-.5)*8,y,t:String(t),l:.9,c})};
 // ---- sonido ----
-let AC;const sfx=(f,d,t,v,f2)=>{try{const V=CFG.master/100*CFG.sfx/100;if(V<=0)return;AC=AC||new AudioContext();AC.resume();const T=AC.currentTime,o=AC.createOscillator(),a=AC.createGain();o.type=t||'square';o.frequency.setValueAtTime(f,T);if(f2)o.frequency.exponentialRampToValueAtTime(f2,T+d);a.gain.setValueAtTime((v||.04)*V,T);a.gain.exponentialRampToValueAtTime(.0001,T+d);o.connect(a);a.connect(AC.destination);o.start();o.stop(T+d)}catch(e){}};
+let AC;let sfx=(f,d,t,v,f2)=>{try{const V=CFG.master/100*CFG.sfx/100;if(V<=0)return;AC=AC||new AudioContext();AC.resume();const T=AC.currentTime,o=AC.createOscillator(),a=AC.createGain();o.type=t||'square';o.frequency.setValueAtTime(f,T);if(f2)o.frequency.exponentialRampToValueAtTime(f2,T+d);a.gain.setValueAtTime((v||.04)*V,T);a.gain.exponentialRampToValueAtTime(.0001,T+d);o.connect(a);a.connect(AC.destination);o.start();o.stop(T+d)}catch(e){}};
 // ---- entidades ----
 const ERAD={soldier:[6,9],hollow:[5,8],archer:[5,8],brute:[8,12],warden:[6,9]};
 function mk(t,x,y,id){const b=id?BS[id]:null,d=b||TY[t],m=b?1:rg.m,er=b?[Math.min(9,d.w*.5),d.w*.8]:ERAD[t];
@@ -257,7 +257,7 @@ const eqO=k=>{S.oath=k;W.applyDyn();W.bake();openRest()},eqW=w=>{S.weapon=w;open
 const buy=a=>{const lv=60+40*(S.A.vig+S.A.res+S.A.fue);if(S.souls>=lv){S.souls-=lv;S.A[a]++;P.mhp=mhp();P.mst=mst();P.hp=P.mhp;P.st=P.mst;openRest()}};
 const trav=(r,x)=>{S.flasks=S.fmax;loadRegion(r,x);closeM()};
 function newGame(name){S=DEF();S.name=name||'Sin nombre';W=null;loadRegion(0,0);S.seen={};closeM();say(INTRO())}
-function cont(){S=load();W=null;loadRegion(S.bf.r,S.bf.x);closeM()}
+function cont(){S=load();if(S.bk&&S.bk.rey){S.reyDone=1;delete S.bk.rey}W=null;loadRegion(S.bf.r,S.bf.x);closeM()}
 function fin(k){const e=typeof ENDS[k]==='function'?ENDS[k]():ENDS[k];ach('fin');save();G.mode='end';const m=$('menu');m.style.display='flex';
  m.innerHTML='<div class="card"><h2>Final</h2><h1>'+e[0]+'</h1><p>'+e[1]+'</p><button id="go" onclick="showTitle()">Volver al título</button></div>'}
 // efectos de sonido en acciones clave
