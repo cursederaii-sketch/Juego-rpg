@@ -212,3 +212,6 @@ body.gp #ui{display:none}
  #menu:not(.tt) .card .oath{padding:8px 14px 8px 18px;margin:4px 0}
  #menu:not(.tt) .card #go{height:44px;margin-top:10px}
 }
+
+/* ---------- cinemática del Rey, victorias de jefes y finales: sin pausa, pantalla completa ni controles ---------- */
+body.cine #pause,body.cine #fs,body.cine #ui,body.cine #ui *,body.fincine #pause,body.fincine #fs,body.fincine #ui,body.fincine #ui *,body.vcine #pause,body.vcine #fs,body.vcine #ui,body.vcine #ui *{visibility:hidden!important;pointer-events:none!important}

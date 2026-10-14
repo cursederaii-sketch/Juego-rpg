@@ -7,12 +7,20 @@
 (function(){
 const C=v=>v<0?0:v>1?1:v,rp=(p,a,b)=>C((p-a)/(b-a)),ez=t=>{t=C(t);return t*t*(3-2*t)},rn=(a,b)=>a+R()*(b-a);
 const hsh=i=>{const s=Math.sin(i*127.1+311.7)*43758.5453;return s-Math.floor(s)};
+const AIR=[2.9,3.15,3.4,3.6,3.8,4.0,4.2,4.4];
 const CA={on:0,cut:null,hz:[],ch:[],gv:[],sc:[],dr:[],sub:null,dec:null,sen:null,ap:0,free:0,p2:0,b1:0,apS:0,dk:0,sh:0,tm:{},musOld:null};
 window.CAIDA=CA;
 const RY=()=>S.rey||(S.rey={});
 const CRI=()=>RG.findIndex(r=>r.id==='crater');
 const snd=(k,gn,f,d,t,v,f2)=>{try{if(window.playSfx&&playSfx(k,gn))return}catch(e){}sfx(f||100,d||.3,t||'square',v||.05,f2)};
 const lerp=(a,b,t)=>a+(b-a)*t;
+// encuadre de la llegada al cráter: la cámara baja FRM px para que el Rey (y su silueta) quede entero en pantalla, sin cortarse arriba
+const FRM=37,FIGX=GW/2,FIGY=GH/2-76+FRM;
+// durante la cinemática se ocultan pausa, pantalla completa y todos los controles táctiles (body.cine en style.css)
+let cineOn=false;function cineUI(on){if(on===cineOn)return;cineOn=on;document.body.classList.toggle('cine',on)}
+// sin botones en pantalla: un toque en cualquier sitio cuenta como pulsación para saltar la cinemática
+try{$('stage').addEventListener('pointerdown',()=>{if(CA.cut&&G.mode==='caida')CA.tap=1},{passive:true})}catch(e){}
+function lockCam(){const c=CA.cut;if(c&&c.lk&&c.t<c.end){cam.x=c.lk.x;cam.y=c.lk.y}}
 // glow con radio cuantizado: el juego cachea un sprite por radio entero; con radios que cambian cada fotograma se creaban cientos de degradados (tirones)
 const glowQ=(x,y,r,c,a)=>{const st=r>90?24:8;glow(x,y,Math.max(st,Math.round(r/st)*st),c,a)};
 const WARM=[['255,224,130',8,136,8],['255,120,60',120,216,24],['255,120,50',48,48,8],['255,220,140',32,32,8],['255,240,190',8,40,8],['255,246,200',24,24,8],['255,246,210',24,40,8]];
@@ -21,7 +29,9 @@ const hx=c=>[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slic
 const mixc=(a,b,t)=>{const A=hx(a),B=hx(b);return 'rgb('+A.map((v,i)=>Math.round(lerp(v,B[i],t))).join(',')+')'};
 
 // ---------- datos: el Rey con cuatro fases, el cráter y los finales ----------
-Object.assign(BS.rey,{hp:480,pf:r=>r>.75?0:r>.35?1:2,
+// vida y resistencia del Rey: REY_HP es la vida total; REY_RES es el daño que recibe en cada fase (1 = normal)
+const REY_HP=1400,REY_RES=[.75,.7,.65];
+Object.assign(BS.rey,{hp:REY_HP,pf:r=>(rg&&rg.id==='trono')?0:r>.75?0:r>.35?1:2,
  ph:[{a:['bsl','bov','bstab'],s:1.05},
      {a:['bsl','blink','bstab','bov','cinder'],s:1.35,hold:.3,msg:'El juramento lo devora'},
      {a:['blink','bov','bstab','cinder','bsl'],s:1.55,hold:.35,msg:'Azrael empuña su voluntad'}]});
@@ -59,7 +69,7 @@ function wrap(s,w,sz){g.font=(sz||6)+'px '+FONT;const ws=s.split(' '),L=[];let c
 // ---------- el Rey en el cráter ----------
 function resetHaz(){CA.hz=[];CA.ch=[];CA.gv=[];CA.dr=[];CA.sc=[];CA.dec=null;CA.sen=null;CA.ap=0;CA.free=0;CA.b1=0;CA.apS=0;CA.sub=null;CA.tm={cr:2.6,ch:6,gv:8,dr:4.5,dc:7,sn:9}}
 function mkBoss(){const R_=RY();if(R_.done)return;resetHaz();CA.on=1;CA.p2=(R_.hpf||.75)<=.35?1:0;
- const be=mk('boss',20*16+8,12*16+8,'rey');be.arena=1;be.hp=Math.max(1,Math.round(be.mhp*(R_.hpf||.75)));see(be);be.s='stg';be.tm=0;be.stgT=1.3;be.cd=1.2;be.fell=1;E.push(be);G.bossOn=true;W.setGate(true);
+ const be=mk('boss',20*16+8,12*16+8,'rey');be.arena=1;be.hp=Math.max(1,Math.round(be.mhp*(R_.hpf||.75)));be.ph=CA.p2?2:1;see(be);be.s='stg';be.tm=0;be.stgT=1.3;be.cd=1.2;be.fell=1;E.push(be);G.bossOn=true;W.setGate(true);
  if(P)P.sur=R_.oath===1?1:0}
 {const se=spawnEn;spawnEn=function(){se();CA.on=0;if(rg&&rg.id==='crater')mkBoss()}}
 {const lr=loadRegion;loadRegion=function(i,fi,at){if(RG[i].id!=='crater')CA.on=0;const r_=lr(i,fi,at);if(rg.id==='crater'&&CA.on)P.sur=RY().oath===1?1:0;return r_}}
@@ -127,6 +137,8 @@ function rey(dt){const e=E.find(q=>q.id==='rey'&&q.b);if(!e||e.s==='dead')return
 
 // ---------- daño al Rey: autoridad de Azrael y aperturas del vínculo ----------
 {const h=hitE;hitE=function(e,d,k,v){if(e&&e.id==='rey'&&e.b&&rg.id==='crater'&&e.ph===2&&RY().oath===1&&!CA.free)d*=CA.ap>0?1.8:.3;return h.call(this,e,d,k,v)}}
+// resistencia del Rey: recibe menos daño según la fase y los golpes pesados ya no lo aturden (la parada y la contra sí)
+{const h=hitE;hitE=function(e,d,k,v){if(!(e&&e.id==='rey'&&e.b))return h.call(this,e,d,k,v);const s0=e.s,t0=e.tm,g0=e.stgT,r0=e.rip;d*=REY_RES[Math.min(2,e.ph|0)];const o=h.call(this,e,d,k,v);if(s0!=='stg'&&e.s==='stg'&&!r0&&e.hp>0){e.s=s0;e.tm=t0;e.stgT=g0}return o}}
 {const b=bossDown;bossDown=function(e){if(e&&e.id==='rey'){CA.on=0;CA.hz=[];CA.ch=[];CA.gv=[];CA.sen=null;CA.dec=null;RY().done=1}return b.apply(this,arguments)}}
 
 // ---------- cinemática: el poder desborda, la caída y el impacto ----------
@@ -135,12 +147,12 @@ function startCut(e){const f=!RY().seenFall;relAll();if(P.s!=='idle'&&P.s!=='dea
  if(CFG.music!=null){CA.musOld=CFG.music}}
 function arrive(){const c=CA.cut,hp=P.hp,st=P.st,i=CRI(),R_=RY();R_.hpf=c.hpf>.75?.75:c.hpf;R_.done=0;
  const k=i+':0';if(!S.fires.includes(k))S.fires.push(k);S.bf={r:i,x:0};
- loadRegion(i,0);P.hp=Math.max(1,Math.min(P.mhp,hp));P.st=st;P.x=20*16+8;P.y=17*16+4;P.fx=0;P.fy=-1;P.ax=0;P.ay=-1;cam.x=cl(P.x-GW/2,0,W.cols*16-GW);cam.y=cl(P.y-GH/2,0,W.rows*16-GH);save()}
+ loadRegion(i,0);P.hp=Math.max(1,Math.min(P.mhp,hp));P.st=st;P.x=20*16+8;P.y=17*16+4;P.fx=0;P.fy=-1;P.ax=0;P.ay=-1;cam.x=cl(P.x-GW/2,0,W.cols*16-GW);cam.y=cl(P.y-GH/2-FRM,0,W.rows*16-GH);c.lk={x:cam.x,y:cam.y};save()}
 function endDialog(){
  say(D('La Voz','«El juramento está devorándolo.»<br><i>'+nm()+':</i> «¿Qué le hizo?»<br>«Le concedió el poder para preservar su reino. Nunca le prometió que sabría salvarlo.»',null,()=>D('El Rey sin Nombre','«Yo juré que Valdorra jamás caería.»<br><i>La Voz:</i> «Y nosotros juramos que jamás seríamos olvidados.»<br>«No comprendéis lo que ocurrirá cuando él se marche.»<br><i>La Voz:</i> «Lo comprendemos. Fuimos nosotros quienes tuvimos que vivirlo.»')))}
 function tickCut(dt){const c=CA.cut;c.re+=dt;
  for(let i=0;i<3&&c.wq.length;i++){const w=c.wq.shift();try{glowSpr(w[0],w[1])}catch(e){}}c.t+=dt*c.spd;let t=c.t;const once=(k,t0)=>{if(c.st[k]||t<t0)return false;c.st[k]=1;return true};
- {const any=!!(held.light||held.heavy||held.dodge||held.act||buf.light||buf.heavy||buf.dodge||buf.act);if(c.sk>0)c.sk-=dt;
+ {const any=!!(held.light||held.heavy||held.dodge||held.act||buf.light||buf.heavy||buf.dodge||buf.act||CA.tap);CA.tap=0;if(c.sk>0)c.sk-=dt;
   if(any&&!c.pr&&c.re>3&&t<7){if(c.sk>0){c.t=t=7;c.sk=0;relAll()}else c.sk=2}c.pr=any}
  if(t<2.45)G.shake=Math.max(G.shake,.6+4.6*rp(t,0,2.3));
  if(once('s0',0)){snd('rumble',.7,60,2,'sine',.09,40)}
@@ -150,7 +162,7 @@ function tickCut(dt){const c=CA.cut;c.re+=dt;
  if(t<2.4&&t>.2){c.acc=(c.acc||0)+dt;if(c.acc>.07){c.acc=0;PT.push({k:'s',x:cam.x+R()*GW,y:cam.y+R()*GH*.7,z:90+R()*90,vx:(R()-.5)*20,vy:0,vz:-30,l:.9,c:R()<.5?'#5a4a62':'#8a7a92'})}}
  if(once('c0',2.7)){snd('metal',.5,1200,.3,'square',.04,500)}
  if(once('c1',3.4)){snd('roar',.7,90,.6,'sawtooth',.08,60)}
- for(const q of[['k0',5.4],['k1',5.85],['k2',6.3],['k3',6.75]])if(once(q[0],q[1]))snd('parry',.7,1000,.15,'triangle',.05,1500);
+ AIR.forEach((q,i)=>{if(once('k'+i,q+2.5)){if(i%2)snd('parry',.7,1000,.15,'triangle',.05,1500);else snd('slam',.6,120,.2,'sawtooth',.07,60)}});
  if(once('imp',7)){G.shake=0;snd('boom_long',1,50,1.4,'sawtooth',.14,28);snd('slam',.9,70,.4,'sawtooth',.1,40);try{CFG.music=0}catch(e){}}
  if(once('arr',8)){arrive()}
  if(once('mus',8.6)){try{if(CA.musOld!=null)CFG.music=CA.musOld}catch(e){}}
@@ -159,6 +171,40 @@ function tickCut(dt){const c=CA.cut;c.re+=dt;
  if(t>=9.2&&G.mode==='caida'){G.mode='play';relAll();endDialog()}
  if(t>=c.end){CA.cut=null;try{if(CA.musOld!=null)CFG.music=CA.musOld}catch(e){}}}
 // ---- dibujo de la cinemática ----
+// ---------- cráter en el suelo (se dibuja DEBAJO de los personajes) y figura blanca de la nueva fase ----------
+const CR={x:20*16+8,y:15*16+12,rx:92,ry:44};
+let crSpr=null;
+function craterSpr(){if(crSpr)return crSpr;const W_=CR.rx*2+40,H_=CR.ry*2+30,c=mkc(W_,H_),x=c.getContext('2d'),cx=W_/2,cy=H_/2;
+ x.fillStyle='rgba(36,24,26,.55)';x.beginPath();x.ellipse(cx,cy,CR.rx+14,CR.ry+8,0,0,6.283);x.fill();            // polvo y escombro alrededor
+ for(let i=0;i<70;i++){const a=hsh(i)*6.283,r=.85+hsh(i+3)*.25,px=cx+Math.cos(a)*(CR.rx+6)*r,py=cy+Math.sin(a)*(CR.ry+3)*r;x.fillStyle=hsh(i+9)<.5?'#4a3a38':'#2a1c1e';x.fillRect(Math.round(px),Math.round(py),2+hsh(i+5)*3|0,2)}
+ for(let i=0;i<16;i++){const a=i/16*6.283+hsh(i)*.3,l=18+hsh(i+7)*30;x.strokeStyle='#08030a';x.lineWidth=2;x.beginPath();let X=cx+Math.cos(a)*CR.rx*.8,Y=cy+Math.sin(a)*CR.ry*.8;x.moveTo(X,Y);
+  for(let s_=1;s_<=6;s_++){X+=Math.cos(a)*l/6+(hsh(i*7+s_)-.5)*5;Y+=Math.sin(a)*l/6*.5+(hsh(i*5+s_)-.5)*3;x.lineTo(X,Y)}x.stroke();x.strokeStyle='rgba(255,140,70,.55)';x.lineWidth=1;x.stroke()}
+ const q=x.createRadialGradient(cx,cy,4,cx,cy,CR.rx);q.addColorStop(0,'#05020a');q.addColorStop(.7,'#14080c');q.addColorStop(1,'#2a1a1c');
+ x.fillStyle=q;x.beginPath();x.ellipse(cx,cy,CR.rx*.84,CR.ry*.84,0,0,6.283);x.fill();
+ x.strokeStyle='#6a4a44';x.lineWidth=2;x.beginPath();x.ellipse(cx,cy,CR.rx*.84,CR.ry*.84,0,0,6.283);x.stroke();
+ x.strokeStyle='rgba(255,150,80,.5)';x.lineWidth=1;x.beginPath();x.ellipse(cx,cy,CR.rx*.84-2,CR.ry*.84-1,0,0,6.283);x.stroke();
+ return crSpr=c}
+function drawCrater(){if(!CA.on||!rg||rg.id!=='crater')return;const s=craterSpr();g.drawImage(s,Math.round(CR.x-s.width/2),Math.round(CR.y-s.height/2));
+ g.save();g.globalCompositeOperation='lighter';g.fillStyle='rgba(255,110,50,'+(.05+.03*Math.sin(TM*3))+')';g.beginPath();g.ellipse(CR.x,CR.y,CR.rx*.6,CR.ry*.6,0,0,6.283);g.fill();g.restore()}
+window.GROUND=drawCrater;
+// cráter que se abre en el polvo durante la cinemática (coordenadas de pantalla; centro = donde quedará el real)
+function craterFx(t,al){const k=ez(rp(t,7.0,7.9)),cx=GW/2,cy=GH/2+(CR.y-276)+FRM,rx=CR.rx*k,ry=CR.ry*k;if(k<=0||al<=0)return;
+ g.save();g.globalAlpha=al;const q=g.createRadialGradient(cx,cy,2,cx,cy,Math.max(3,rx));q.addColorStop(0,'#05020a');q.addColorStop(.8,'#14080c');q.addColorStop(1,'#3a2a2a');
+ g.fillStyle=q;g.beginPath();g.ellipse(cx,cy,rx*.84,ry*.84,0,0,6.283);g.fill();g.strokeStyle='#8a6a5e';g.lineWidth=2;g.stroke();
+ g.strokeStyle='rgba(255,150,80,.6)';g.lineWidth=1;for(let i=0;i<14;i++){const a=i/14*6.283+hsh(i)*.3,l=(16+hsh(i+7)*34)*k;g.beginPath();g.moveTo(cx+Math.cos(a)*rx*.84,cy+Math.sin(a)*ry*.84);g.lineTo(cx+Math.cos(a)*(rx*.84+l),cy+Math.sin(a)*(ry*.84+l*.5));g.stroke()}
+ g.restore()}
+// la figura blanca y brillante que sale del cráter: anuncia la nueva fase del jefe
+function figFx(t,fx,fy){const a=rp(t,7.5,8.3)*(1-rp(t,9.0,9.8));if(a<=0)return;const pu=.5+.5*Math.sin(t*14),sc=1+.12*rp(t,7.5,9),up=rp(t,7.5,9)*10;
+ g.save();g.globalCompositeOperation='lighter';
+ const col=g.createLinearGradient(0,fy-220,0,fy+4);col.addColorStop(0,'rgba(255,255,255,0)');col.addColorStop(.7,'rgba(255,250,235,'+.32*a+')');col.addColorStop(1,'rgba(255,255,255,'+.55*a+')');
+ g.fillStyle=col;g.fillRect(fx-16-8*pu,fy-220,32+16*pu,224);g.fillStyle='rgba(255,255,255,'+.5*a+')';g.fillRect(fx-3,fy-220,6,224);
+ for(let i=0;i<3;i++){const r=((t*1.1+i/3)%1);g.strokeStyle='rgba(255,252,240,'+.7*a*(1-r)+')';g.lineWidth=2;g.beginPath();g.ellipse(fx,fy,10+90*r,4+34*r,0,0,6.283);g.stroke()}
+ g.restore();glowQ(fx,fy-28,72+30*pu,'255,255,255',.55*a);
+ g.save();g.globalAlpha=a;g.translate(fx,fy);g.scale(sc,sc);g.translate(-fx,-fy);body('rey1',fx,fy-up/sc,0,1,'idle',(t*3|0),{tint:'#ffffff'});g.restore();
+ g.save();g.globalCompositeOperation='lighter';g.globalAlpha=a*.6;g.translate(fx,fy);g.scale(sc,sc);g.translate(-fx,-fy);body('rey1',fx,fy-up/sc,0,1,'idle',(t*3|0),{tint:'#ffffff'});g.restore();
+ for(let i=0;i<22;i++){const ph=(t*.9+hsh(i))%1,x=fx+(hsh(i+3)-.5)*70,y=fy-ph*150;g.fillStyle='rgba(255,252,235,'+a*(1-ph)*.9+')';g.fillRect(Math.round(x),Math.round(y),2,2)}
+ if(a>.15)cap('FASE III',a,GH-34)}
+
 function bars(h){if(h>0){g.fillStyle='#000';g.fillRect(0,0,GW,h);g.fillRect(0,GH-h,GW,h);fr(0,h,GW,1,'rgba(201,165,74,.5)');fr(0,GH-h-1,GW,1,'rgba(201,165,74,.5)')}}
 function cap(s,a,y){if(a<=0)return;g.globalAlpha=a;tx(s,GW/2,y||GH-8,'#f4e2b0','center',7);g.globalAlpha=1}
 function house(x,by,w,h,col,roof,lit,sd){fr(x,by-h,w,h,col);g.fillStyle=roof;g.beginPath();g.moveTo(x-2,by-h);g.lineTo(x+w/2,by-h-w*.38);g.lineTo(x+w+2,by-h);g.fill();
@@ -173,7 +219,7 @@ function drawA(c){const t=c.t,e=E.find(q=>q.id==='rey'),sx=e?e.x-cam.x:GW/2,sy=e
  cap('El trono se rompe.',rp(t,.5,.7)*(1-rp(t,1.5,1.7)));cap('Una onda de energía atraviesa el salón.',rp(t,1.7,1.9)*(1-rp(t,2.2,2.4)));
  const fl=rp(t,2.1,2.4)*(t<2.5?1:0);if(fl>0){g.fillStyle='rgba(255,252,235,'+fl+')';g.fillRect(0,0,GW,GH)}}
 function drawFull(c){const t=c.t,u=Math.min(4.5,Math.max(0,t-2.5)),k=u/4.5,gk=ez(k);
- g.save();const shk=t>=7&&t<7.4?9*(1-(t-7)/.4):0,cl_=[2.9,3.35,3.8,4.25].reduce((a,x)=>a+Math.max(0,1-Math.abs(u-x)*8),0);g.translate(Math.round((hsh(TM*37)-.5)*(shk*2+cl_*3)),Math.round((hsh(TM*53)-.5)*(shk*2+cl_*3)));
+ g.save();const shk=t>=7&&t<7.4?9*(1-(t-7)/.4):0,cl_=AIR.reduce((a,x)=>a+Math.max(0,1-Math.abs(u-x)*8),0);g.translate(Math.round((hsh(TM*37)-.5)*(shk*2+cl_*3)),Math.round((hsh(TM*53)-.5)*(shk*2+cl_*3)));
  const q=g.createLinearGradient(0,0,0,GH);q.addColorStop(0,'#0c0618');q.addColorStop(.55,'#2a1030');q.addColorStop(1,mixc('#6a2a22','#d0602a',k));g.fillStyle=q;g.fillRect(-12,-12,GW+24,GH+24);
  glowQ(GW*.55,GH,120+80*k,'255,120,60',.15+.25*k);
  // ceniza y brasas que suben (velocidad de caída)
@@ -191,37 +237,50 @@ function drawFull(c){const t=c.t,u=Math.min(4.5,Math.max(0,t-2.5)),k=u/4.5,gk=ez
   for(let i=0;i<14;i++){const x=(i-7)*40+(hsh(i+L*9)-.5)*10,h=34+hsh(i+L*4)*50;house(x,0,32,h,L?'#1a0e20':'#100816',L?'#24122c':'#160c1e','#ffb050',i*13+L)}
   g.restore()}
  if(k>.45){const pk=rp(k,.45,1);g.save();g.translate(GW*.55,GH-8-(1-gk)*20);g.strokeStyle='rgba(255,170,100,'+.5*pk+')';g.lineWidth=1;g.beginPath();g.ellipse(0,0,60*pk,16*pk,0,0,6.283);g.stroke();g.restore()}
- // los dos cuerpos
- const px=lerp(104,GW*.55,ez(u/2.8)),py=lerp(60,GH*.4,gk)+Math.sin(u*6)*3,met=rp(u,.9,2.9),kx=lerp(88,px,ez(met))+(u>2.9?Math.sin(u*9)*14:0),ky=u>2.9?py-8+Math.sin(u*7)*5:lerp(-50,py-8,ez(met)),dive=u>4.1?Math.pow(u-4.1,2)*260:0;
+ // los dos cuerpos: el Rey en fase III (sin arma) y nosotros se baten en el aire mientras caen
+ const FS=AIR,fight=u>=2.9,met=rp(u,.9,2.9);
+ const lung=w=>{let m=0;for(let i=0;i<FS.length;i++){if(i%2!==w)continue;const d=u-FS[i];if(d>=0&&d<.3)m=Math.max(m,Math.sin(d/.3*Math.PI))}return m};
+ const lk=fight?lung(0):0,lp=fight?lung(1):0;
+ let sw=0;for(let i=1;i<FS.length;i+=2){const d=u-FS[i];if(d>=0&&d<.3)sw=C(d/.2)}
+ const px0=lerp(104,GW*.55,ez(u/2.8)),py0=lerp(70,GH*.64,gk)+Math.sin(u*6)*3,
+  px=px0-(fight?14:0)+lp*20-lk*5,py=py0+(fight?Math.sin(u*9)*3-lp*3:0),
+  kx=lerp(88,px0+16,ez(met))-lk*20+lp*5,ky=fight?py0-4+Math.sin(u*7)*4-lk*3:lerp(-50,py0-4,ez(met)),
+  dive=u>4.1?Math.pow(u-4.1,2)*260:0;
  const SZ=2.1,big=(x,y,f)=>{g.save();g.translate(x,y);g.scale(SZ,SZ);g.translate(-x,-y);f();g.restore()};
- if(u>.8)big(kx,ky+dive,()=>{body('rey',kx,ky+dive,-1,0,'act',(TM*8|0),{rot:u>2.9?Math.sin(u*5)*.35:.55});weapon('greatsword',kx-6,ky+dive-12,-.7+Math.sin(u*9)*.4,27,{glow:'255,230,109'})});
- big(px,py+dive,()=>{body('player',px,py+dive,1,0,'hit',(TM*6|0),{rot:u*1.3});weapon('sword',px+5,py+dive-11,.5+Math.sin(u*8)*.5,14,{glow:'125,249,255'})});
- for(const ct of[2.9,3.35,3.8,4.25]){const d=u-ct;if(d<0||d>.35)continue;const f=1-d/.35,mx=(px+kx)/2,my=(py+ky)/2-6;glowQ(mx,my,30*f+8,'255,240,190',.6*f);g.strokeStyle='rgba(255,246,210,'+f+')';g.lineWidth=1;for(let s=0;s<9;s++){const a=s*.7+ct*3;g.beginPath();g.moveTo(mx+Math.cos(a)*5,my+Math.sin(a)*5);g.lineTo(mx+Math.cos(a)*(10+30*(1-f)),my+Math.sin(a)*(10+30*(1-f)));g.stroke()}}
+ if(u>.8)big(kx,ky+dive,()=>body('rey1',kx,ky+dive,-1,0,lk>.05?'act':'wind',(TM*8|0),{rot:lerp(.55,-.12,met)-lk*.4+(fight?Math.sin(u*6)*.08:0)}));
+ big(px,py+dive,()=>{body('player',px,py+dive,1,0,lp>.05?'act':'hit',(TM*6|0),{rot:(1-met)*Math.sin(u*3)*1.2+(fight?.12+lp*.35+Math.sin(u*5)*.06:0)});
+  weapon('sword',px+5,py+dive-11,fight?(sw>0?-1.3+2.4*sw:.2+Math.sin(u*8)*.3):.5+Math.sin(u*8)*.5,14,{glow:'125,249,255'})});
+ // choques en el aire: destello, rayos y arco del golpe (par = golpe del Rey, impar = el nuestro)
+ for(let i=0;i<FS.length;i++){const d=u-FS[i];if(d<0||d>.35)continue;const f=1-d/.35,mx=(px+kx)/2,my=(py+ky)/2-6+dive,kg=i%2===0;
+  glowQ(mx,my,30*f+8,kg?'255,200,120':'200,245,255',.6*f);g.strokeStyle='rgba(255,246,210,'+f+')';g.lineWidth=1;
+  for(let s_=0;s_<9;s_++){const a=s_*.7+FS[i]*3;g.beginPath();g.moveTo(mx+Math.cos(a)*5,my+Math.sin(a)*5);g.lineTo(mx+Math.cos(a)*(10+30*(1-f)),my+Math.sin(a)*(10+30*(1-f)));g.stroke()}
+  g.save();g.globalCompositeOperation='lighter';g.strokeStyle=kg?'rgba(255,170,90,'+f+')':'rgba(150,240,255,'+f+')';g.lineWidth=3*f+1;g.beginPath();
+  g.arc(kg?px:kx,kg?py+dive-8:ky+dive-8,26+10*(1-f),kg?-.9:Math.PI-.9+1.8*0,kg?.9:Math.PI+.9);g.stroke();g.restore()}
  for(let i=0;i<10;i++){const x=hsh(i+40)*GW,y=((hsh(i+50)*GH*2-u*420)%(GH+80)+GH+80)%(GH+80)-40;fr(x,y,1,18+hsh(i)*16,'rgba(255,255,255,.1)')}
  g.restore();
- cap('LA CAÍDA DE VALDORRA',rp(u,.5,.9)*(1-rp(u,2.2,2.6)),44);
+ cap('LA CAÍDA DE VALDORRA',rp(u,.5,.9)*(1-rp(u,2.2,2.6)),44);cap('El Rey los alcanza en el aire.',rp(u,3,3.2)*(1-rp(u,4.2,4.4)),GH-30);
  const fa=t<2.9?1-rp(t,2.5,2.9):0;if(fa>0){g.fillStyle='rgba(255,252,235,'+fa+')';g.fillRect(0,0,GW,GH)}
  bars(22);
  if(t>=7){const f=1-rp(t,7,7.4);if(f>0){g.fillStyle='rgba(255,252,235,'+f+')';g.fillRect(0,0,GW,GH)}}
- if(t>=7.4){const a=rp(t,7.4,7.7);g.fillStyle='rgba(58,44,40,'+a+')';g.fillRect(0,0,GW,GH);dustFx(t,a);bars(22)}}
+ if(t>=7.4){const a=rp(t,7.4,7.55);g.fillStyle='rgba(58,44,40,'+a+')';g.fillRect(0,0,GW,GH);craterFx(t,a);dustFx(t,a*.7);bars(22);figFx(t,FIGX,FIGY)}}
 function drawFallback(c){const t=c.t,k=rp(t,2.5,7);g.setTransform&&0;g.fillStyle='#0c0618';g.fillRect(0,0,GW,GH);const q=g.createLinearGradient(0,0,0,GH);q.addColorStop(0,'#0c0618');q.addColorStop(1,mixc('#6a2a22','#d0602a',k));g.fillStyle=q;g.fillRect(0,0,GW,GH);
  cap('LA CAÍDA DE VALDORRA',rp(t,2.8,3.2)*(1-rp(t,4.6,5)),GH/2);bars(22);if(CA.derr)tx(CA.derr.slice(0,60),4,GH-26,'#ff8080','left',5);if(t>=7){const f=1-rp(t,7,7.4);if(f>0){g.fillStyle='rgba(255,252,235,'+f+')';g.fillRect(0,0,GW,GH)}}if(t>=7.4){const a=rp(t,7.4,7.7);g.fillStyle='rgba(58,44,40,'+a+')';g.fillRect(0,0,GW,GH)}}
 function skipHint(c){if(c.sk>0&&c.t<7)cap('Pulsa de nuevo para saltar',Math.min(1,c.sk*2),GH-34)}
 function dustFx(t,a){for(let i=0;i<70;i++){const x=((hsh(i)*GW+t*(8+hsh(i+5)*14))%(GW+40))-20,y=hsh(i+9)*GH+Math.sin(t*1.3+i)*5,s=2+hsh(i+2)*5;g.fillStyle='rgba(120,98,86,'+a*.35+')';g.fillRect(Math.round(x),Math.round(y),s,Math.max(1,s*.6))}}
 function overlayCut(c){const t=c.t;
  if(t<2.5){drawA(c);return}
- if(t>=8){const a=t<8.5?1:1-rp(t,8.5,10);g.fillStyle='rgba(58,44,40,'+a+')';g.fillRect(0,0,GW,GH);dustFx(t,a);bars(Math.round(22*(1-ez(rp(t,8.5,9.2)))))}}
-{const d=draw;draw=function(){const c=CA.cut;
+ if(t>=8){const a=t<8.5?1:1-rp(t,8.5,10),e=E.find(q=>q.id==='rey'&&q.b);g.fillStyle='rgba(58,44,40,'+a+')';g.fillRect(0,0,GW,GH);craterFx(t,a);dustFx(t,a*.7);bars(Math.round(22*(1-ez(rp(t,8.5,9.2)))));figFx(t,FIGX,FIGY)}}
+{const d=draw;draw=function(){const c=CA.cut;cineUI(!!(c&&c.hide&&G.mode==='caida'));
   if(c&&c.t>=2.5&&c.t<8.0){const tf=g.getTransform(),ga=g.globalAlpha,gc=g.globalCompositeOperation;try{drawFull(c)}catch(er){CA.derr=String(er&&er.message||er);if(!draw.err){draw.err=1;console.error(er)}g.setTransform(tf);g.globalAlpha=ga;g.globalCompositeOperation=gc;g.setLineDash([]);try{drawFallback(c)}catch(e2){}}skipHint(c);return}
   d.apply(this,arguments);
   if(c){try{overlayCut(c);skipHint(c)}catch(er){if(!draw.err2){draw.err2=1;console.error(er)}}}
   try{if(CA.on&&!c)overlayHud()}catch(er){if(!draw.err3){draw.err3=1;console.error(er)}}}}
 {const h=hud;hud=function(){if(CA.cut&&CA.cut.hide)return;return h.apply(this,arguments)}}
 {const u=update;update=function(dt){const c=CA.cut;
-  if(c&&G.mode==='caida'){u(dt);tickCut(dt);return}
+  if(c&&G.mode==='caida'){u(dt);tickCut(dt);lockCam();return}
   if(c&&G.mode!=='caida'){c.t+=dt*c.spd;if(c.t>=c.end){CA.cut=null;try{if(CA.musOld!=null)CFG.music=CA.musOld}catch(e){}}}
   if(CA.dec&&CA.dec.k==='flask'&&buf.flask){buf.flask=0;toast('Azrael prohíbe los frascos')}
-  u(dt);
+  u(dt);lockCam();
   if(G.mode==='play'&&G.hs<=0)rey(dt)}}
 
 // ---------- peligros dibujados en el mundo (dentro de la transformación de cámara) ----------

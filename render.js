@@ -79,6 +79,7 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='ti
  if(W.exitP){const e=W.exitP,open=!!S.bk[rg.boss];Dr.push({y:e.y+6,f:()=>drawPortal(e.x,e.y+6,open)});if(open)Lt.push({x:e.x-cx,y:e.y-cy-8,r:70,i:.8,c:'150,90,255',a:.2})}
  // compuertas del jefe
  if(W.gateOn&&W.arena)Dr.push({y:99999,f:()=>drawGates()});
+ if(window.GROUND)Dr.push({y:-99999,f:window.GROUND});
  // enemigos y jefe
  for(const e of E){Dr.push({y:e.y+(e.s==='dead'?-40:0),f:()=>drawE(e)});if(e.s!=='dead'&&e.aw&&TY[e.t]&&e.t==='hollow')Lt.push({x:e.x-cx,y:e.y-cy-12,r:20,i:.3,c:'255,60,90',a:.1});if(e.b&&e.s!=='dead')Lt.push({x:e.x-cx,y:e.y-cy-14,r:60,i:.7,c:e.ph===2?'255,60,90':'200,120,255',a:.14})}
  RK.forEach(r=>Dr.push({y:r.y+(r.t>.6?20:-30),f:()=>{const p=r.t;g.fillStyle='rgba(255,70,90,'+(.18+.3*Math.sin(p*28)**2)+')';g.beginPath();g.ellipse(r.x,r.y,16*(1-p*.3),8*(1-p*.3),0,0,6.283);g.fill();g.strokeStyle='rgba(255,120,140,.6)';g.lineWidth=1;g.beginPath();g.ellipse(r.x,r.y,16*(1.2-p),8*(1.2-p),0,0,6.283);g.stroke();

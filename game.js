@@ -169,7 +169,7 @@ function bossDown(e){S.bk[e.id]=1;G.bossOn=false;G.wv=null;W.setGate(false);G.wi
 function patrol(e,dt,dist,ux,uy,sh){const pt=e.pat;e.mvg=0;
  if(pt.length===1){e.pa=(e.pa||0)+dt*.7;e.fx=Math.cos(e.pa);e.fy=Math.sin(e.pa)}
  else if(e.pw>0)e.pw-=dt;
- else{const T=pt[e.pi],dx=T[0]-e.x,dy=T[1]-e.y,l=Math.hypot(dx,dy);if(l<3){e.pi=(e.pi+1)%pt.length;e.pw=1.4}else{W.move(e,dx/l*24*dt,dy/l*24*dt,e.hw,e.hh);e.mvg=1;const k=Math.min(1,dt*6);e.fx+=(dx/l-e.fx)*k;e.fy+=(dy/l-e.fy)*k;const f=Math.hypot(e.fx,e.fy)||1;e.fx/=f;e.fy/=f}}
+ else{const T=pt[e.pi],dx=T[0]-e.x,dy=T[1]-e.y,l=Math.hypot(dx,dy);if(l<3){e.pi=(e.pi+1)%pt.length;e.pw=1.4}else{const pm=W.move(e,dx/l*24*dt,dy/l*24*dt,e.hw,e.hh);e.mvg=1;if(pm<24*dt*.3){e.ps=(e.ps||0)+dt;if(e.ps>1){e.pi=(e.pi+1)%pt.length;e.ps=0;e.pw=.4}}else e.ps=0;const k=Math.min(1,dt*6);e.fx+=(dx/l-e.fx)*k;e.fy+=(dy/l-e.fy)*k;const f=Math.hypot(e.fx,e.fy)||1;e.fx/=f;e.fy/=f}}
  const seen=dist<110*sh&&W.los(e.x,e.y,P.x,P.y)&&((ux*e.fx+uy*e.fy)>.5||dist<22*sh);
  e.det=cl((e.det||0)+(seen?(dist<50?2.4:1.4):-.5)*dt,0,1);
  if(e.det>=1){wake(e);toast('¡Te vieron!');E.forEach(o=>{if(o.pat&&!o.aw&&Math.hypot(o.x-e.x,o.y-e.y)<110)wake(o)})}}
@@ -184,7 +184,7 @@ function updE(e,dt){e.tm+=dt;e.fl-=dt;e.mvg=0;if(e.s==='dead')return;const b=e.b
   if(dist<56*sh||(dist<120*sh&&W.los(e.x,e.y,P.x,P.y)))wake(e);return}
  if(!b&&dist>340){e.aw=false;return}
  let ph=null,sp=d.sp*(G.chase?1.2:1);
- if(b){const r=e.hp/e.mhp,n=r>.66?0:r>.33?1:2;
+ if(b){const r=e.hp/e.mhp,n=b.pf?b.pf(r):(r>.66?0:r>.33?1:2);
   if(n!==e.ph){e.ph=n;const q=b.ph[n];G.shake=6;G.hs=.2;spark(e.x,e.y,'#ff4d6d',34,16,1.4);FX.push({k:'ring',x:e.x,y:e.y,l:.9,m:.9,c:'255,60,90',big:1});sfx(100,.6,'sawtooth',.07,50);if(q.msg)toast(q.msg);
    for(let i=0;i<(q.adds||0);i++){let ax=e.x+(i?-48:48);if(e.arena&&W.arena)ax=cl(ax,(W.arena.x+2)*16,(W.arena.x+W.arena.w-2)*16);const a=mk(q.addT||(e.id==='rey'&&S.cab==='tom'?'soldier':'hollow'),ax,e.y+(i?30:-30));a.aw=true;a.ad=1;a.amb=e.amb;E.push(a)}}
   ph=b.ph[e.ph];sp*=ph.s;
@@ -194,7 +194,8 @@ function updE(e,dt){e.tm+=dt;e.fl-=dt;e.mvg=0;if(e.s==='dead')return;const b=e.b
  if(e.s==='walk'){e.cd-=dt;
   if(!e.nk){const l=b?ph.a:d.at;e.nk=l[Math.floor(R()*l.length)]}
   const at=ATK[e.nk];
-  if(d.kite&&dist<60&&P.s!=='dead'){W.move(e,-ux*sp*dt,-uy*sp*dt,e.hw,e.hh);e.mvg=1}
+  if(e.ck>0)e.ck-=dt;
+  if(d.kite&&dist<60&&P.s!=='dead'&&!(e.ck>0)){const mv=W.move(e,-ux*sp*dt,-uy*sp*dt,e.hw,e.hh);if(mv<sp*dt*.3){e.kc=(e.kc||0)+dt;if(e.kc>.4){e.ck=1.5;e.kc=0}}else e.kc=0;e.mvg=1}
   else if(dist>at.sd*.9&&P.s!=='dead')chase(e,P.x,P.y,sp,dt);
   else if(e.cd<=0&&P.s!=='dead'){e.cur=at;e.nk=null;e.s='wind';e.tm=0;e.wt=at.w/(b?Math.min(1.25,ph.s):1)+(ph&&ph.hold?R()*ph.hold:0)+(b?0:R()*.28);e.ax=ux;e.ay=uy}}
  else if(e.s==='wind'){if(e.tm<e.wt*.7){e.ax=ux;e.ay=uy}
