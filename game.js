@@ -36,9 +36,11 @@ addEventListener('blur',relAll);addEventListener('pagehide',relAll);document.add
 const DEF=()=>({souls:0,frag:0,ri:0,bf:{r:0,x:0},fires:['0:0'],weapon:'corta',wpns:['corta'],up:{},A:{vig:0,res:0,fue:0},oath:'',oaths:[],mir:0,dorn:0,cab:'',bk:{},tk:{},drop:null,flasks:3,fmax:3,name:'Sin nombre',ab:{},keys:{},rel:[],relOwn:[],mem:{},tr:{},notes:{},rv:{},lv:{},pz:{},am:{},dl:{},q:{mir:0,dorn:0,bre:0,ys:0},rt:0,est:0,aldric:0,bre0:0,st:{kills:0,hollow:0,parries:0,deaths:0,sneak:0,quests:0,falls:0},ach:{},be:{},seen:{},night:0});
 let S=DEF(),P,E=[],PR=[],RK=[],PT=[],FX=[],FT=[],W,rg=RG[0],TM=0;
 const cam={x:0,y:0},G={mode:'title',hs:0,shake:0,msg:'',msgT:0,banner:null,win:0,dieT:0,bossOn:false,nd:null,flash:0,fade:0};
-const SK='jur_s2';
-const save=()=>{try{if(W&&W.seen&&rg)S.seen[rg.id]=W.packSeen();localStorage.setItem(SK,JSON.stringify(S))}catch(e){}};
-const load=()=>{try{const s=localStorage.getItem(SK);return s?Object.assign(DEF(),JSON.parse(s)):null}catch(e){return null}};
+// ---- slots de partida (3): el 1 conserva la clave original 'jur_s2', así las partidas existentes quedan en el slot 1 sin migrar ----
+let SLOT=1;const skey=n=>n>1?'jur_s2_'+n:'jur_s2';const SLOTS=3;
+const slotData=n=>{try{const s=localStorage.getItem(skey(n));return s?Object.assign(DEF(),JSON.parse(s)):null}catch(e){return null}};
+const save=()=>{try{if(W&&W.seen&&rg)S.seen[rg.id]=W.packSeen();localStorage.setItem(skey(SLOT),JSON.stringify(S))}catch(e){}};
+const load=()=>slotData(SLOT);
 const hasR=k=>S.rel.includes(k),AB=()=>rg.boss||rg.mini;
 const mhp=()=>100+10*S.A.vig,mst=()=>100+8*S.A.res,WPN=()=>WP[S.weapon],toast=s=>{G.msg=s;G.msgT=2.4};
 const spark=(x,y,c,n,z=10,sp=1)=>{for(let i=0;i<n;i++){const a=R()*6.283,v=(20+R()*70)*sp;PT.push({k:'s',x,y,z,vx:Math.cos(a)*v,vy:Math.sin(a)*v*.6,vz:20+R()*60,l:.3+R()*.3,c})}};
@@ -59,7 +61,9 @@ function loadRegion(i,fi,at){if(W&&W.seen&&rg)S.seen[rg.id]=W.packSeen();
  const f=W.fires[fi]||W.fires[0];if(sx===undefined){sx=f.x;sy=f.y+22}newP(sx,sy);W.reveal(P.x,P.y);cam.x=cl(P.x-GW/2,0,W.cols*16-GW);cam.y=cl(P.y-GH/2,0,W.rows*16-GH);G.banner={t:rg.act,s:rg.n,l:3.5};G.fade=1}
 // ---- jugador ----
 const mult=()=>{let m=(1+.08*S.A.fue)*(1+.12*(S.up[S.weapon]||0));if(S.oath==='blood'&&P.bonus<=0)m*=1+(1-P.hp/P.mhp)*.9;if(S.oath==='oblivion')m*=.85;return m};
-const spend=n=>{P.st-=n;P.sd=.7;if(P.st<=0){P.st=0;P.ex=.9}};
+const spend=n=>{P.st-=n;P.sd=DIF.on?DIF.regenDelay:.7;if(P.st<=0){P.st=0;P.ex=.9}};
+// [DIF] coste extra al encadenar esquivas seguidas (se acumula hasta dodgeChainMax escalones)
+const dChain=()=>{if(!DIF.on)return 0;const c=P.clk;if(P.dcT!==undefined&&c-P.dcT<DIF.dodgeChainWin)P.dcN=Math.min(DIF.dodgeChainMax,(P.dcN||0)+1);else P.dcN=0;P.dcT=c;return P.dcN*DIF.dodgeChainCost};
 const dodging=()=>P.s==='dodge'&&P.t>.03&&P.t<(hasR('paso')?.36:.26);
 const inp=()=>{let x=(held.right?1:0)-(held.left?1:0),y=(held.down?1:0)-(held.up?1:0);if(joy.on)return{x:joy.x,y:joy.y};if(x&&y){x*=.7071;y*=.7071}return{x,y}};
 function takeHit(d,fx,fy){const p=P;if(p.s==='dead')return;p.hp-=d;p.sk=0;G.shake=4;G.hs=.08;G.flash=.25;p.sd=.5;buzz(40);spark(p.x,p.y,'#ff4d6d',12);spark(p.x,p.y,'#8a1428',6);ftext(p.x,p.y-24,d,'#ff6b7a');
@@ -121,7 +125,7 @@ function updP(dt){const p=P,w=WPN(),L=w.l,H=w.h;p.t+=dt;p.clk=(p.clk||0)+dt;if(p
  if(p.s==='idle'&&p.ex<=0){
   if(buf.act>0){buf.act=0;const o=near();if(o){o.f();return}}
   const aim=()=>{if(mag>.3){p.ax=v.x/mag;p.ay=v.y/mag;if(Math.abs(p.ax)>Math.abs(p.ay)*1.2){p.fx=sgn(p.ax);p.fy=0}else if(Math.abs(p.ay)>Math.abs(p.ax)*1.2){p.fx=0;p.fy=sgn(p.ay)}}else{p.ax=p.fx;p.ay=p.fy}};
-  if(buf.dodge>0&&p.st>0&&!(p.dl>0)){spend(hasR('paso')?17:24);p.s='dodge';p.t=0;buf.dodge=0;if(mag>.3){p.dd={x:v.x/mag,y:v.y/mag}}else p.dd={x:-p.fx,y:-p.fy};sfx(300,.12,'triangle',.03,160);for(let i=0;i<5;i++)PT.push({k:'d',x:p.x,y:p.y,z:2,vx:(R()-.5)*30,vy:(R()-.5)*20,vz:10+R()*20,l:.4,c:'rgba(200,190,230,.5)'})}
+  if(buf.dodge>0&&p.st>0&&!(p.dl>0)){spend((hasR('paso')?17:24)+dChain());p.s='dodge';p.t=0;buf.dodge=0;if(mag>.3){p.dd={x:v.x/mag,y:v.y/mag}}else p.dd={x:-p.fx,y:-p.fy};sfx(300,.12,'triangle',.03,160);for(let i=0;i<5;i++)PT.push({k:'d',x:p.x,y:p.y,z:2,vx:(R()-.5)*30,vy:(R()-.5)*20,vz:10+R()*20,l:.4,c:'rgba(200,190,230,.5)'})}
   else if(buf.heavy>0&&p.st>=H.c*.5){spend(H.c*1.25);p.cn=0;p.s='heavy';p.t=0;p.hd=false;aim();buf.heavy=0}
   else if(buf.light>0&&p.st>=L.c*.6){p.cn=(p.clk-(p.lastAtk||-9)<.6)?Math.min(3,(p.cn||0)+1):0;p.lastAtk=p.clk;spend(L.c*1.6*(1+.45*p.cn));if(p.cn>=2)ftext(p.x,p.y-30,'cansado','#ffb060');p.s='light';p.t=0;p.hd=false;aim();buf.light=0}
   else if(buf.flask>0&&S.flasks>0){buf.flask=0;if(S.oath==='guardian'&&G.bossOn)toast('El Guardián no puede curarse');else{p.s='flask';p.t=0;p.hd=false}}}
@@ -131,16 +135,16 @@ function updP(dt){const p=P,w=WPN(),L=w.l,H=w.h;p.t+=dt;p.clk=(p.clk||0)+dt;if(p
    else{p.ax=p.fx;p.ay=p.fy}}
   p.mvg=mag>.05?1:0}
  else if(p.s==='light'){p.mvg=0;if(p.t<L.a[1]){const lg=w.fx==='lunge'?110:40;vx=p.ax*lg;vy=p.ay*lg}if(p.t>L.t*(p.hd?1:1.45))p.s='idle'}
- else if(p.s==='heavy'){p.mvg=0;if(p.t>H.t*(p.hd?1:1.35))p.s='idle'}
+ else if(p.s==='heavy'){p.mvg=0;if(p.t>H.t*(p.hd?1:(DIF.on?DIF.heavyWhiff:1.35)))p.s='idle'}
  else if(p.s==='dodge'){const sp=170*(1-p.t/.38*.6)*(S.ab.dash?1.6:1);vx=p.dd.x*sp;vy=p.dd.y*sp;if(p.t>.38){p.s='idle';p.dl=.14}if(R()<.5)PT.push({k:'d',x:p.x,y:p.y,z:2,vx:(R()-.5)*10,vy:(R()-.5)*10,vz:8,l:.3,c:'rgba(190,180,220,.45)'})}
- else if(p.s==='flask'){p.mvg=0;if(p.t>.5&&!p.hd){p.hd=true;S.flasks--;p.hp=Math.min(p.mhp,p.hp+45);p.bonus=6;spark(p.x,p.y,'#7dff9a',18,16,.6);ftext(p.x,p.y-26,'+45','#7dff9a');sfx(440,.35,'sine',.05,880)}if(p.t>.9)p.s='idle'}
+ else if(p.s==='flask'){p.mvg=0;if(p.t>(DIF.on?DIF.flaskHeal:.5)&&!p.hd){p.hd=true;S.flasks--;p.hp=Math.min(p.mhp,p.hp+45);p.bonus=6;spark(p.x,p.y,'#7dff9a',18,16,.6);ftext(p.x,p.y-26,'+45','#7dff9a');sfx(440,.35,'sine',.05,880)}if(p.t>(DIF.on?DIF.flaskEnd:.9))p.s='idle'}
  else if(p.s==='hit'){p.mvg=0;if(p.t>.3)p.s='idle'}
  vx+=p.kx;vy+=p.ky;p.kx*=Math.pow(.0008,dt);p.ky*=Math.pow(.0008,dt);
  const inD=p.s==='dodge';W.fly=inD&&!!S.ab.leap;W.move(p,vx*dt,vy*dt);W.fly=false;
  if(inD&&W.fly===false&&S.ab.leap&&p.t>.05&&(W.chasmAt(p.x,p.y)))p.cr=1;
  if(p.wasD&&p.s!=='dodge'){if(W.hit(p.x,p.y,p.hw,p.hh)||W.chasmAt(p.x,p.y))fall();else if(p.cr)ach('salto');p.cr=0}p.wasD=p.s==='dodge';
  if(p.mvg&&p.s==='idle'){p.ft-=dt;if(p.ft<=0){p.ft=.26;PT.push({k:'d',x:p.x,y:p.y+1,z:1,vx:(R()-.5)*8,vy:0,vz:6,l:.35,c:'rgba(170,160,200,.35)'})}}
- if(p.sd<=0&&p.st<p.mst&&p.s!=='dodge')p.st=Math.min(p.mst,p.st+(blk?9:25)*dt);
+ if(p.sd<=0&&p.st<p.mst&&p.s!=='dodge')p.st=Math.min(p.mst,p.st+(DIF.on?(blk?DIF.regenBlock:DIF.regen):(blk?9:25))*dt);
  const sw=w.fx==='sweep';const A=p.s==='light'?[L.a[0],L.a[1],L.d,L.r,3,0,.45]:p.s==='heavy'?[H.a[0],H.a[1],H.d,H.r,8,1,sw?-1:.1]:null;
  if(A&&p.t>=A[0]&&!p.fxd){p.fxd=true;FX.push({k:'arc',x:p.x,y:p.y-10,a:Math.atan2(p.ay,p.ax),rho:A[5]?(sw?3.1:1.5):1.15,r:A[3]+4,l:.2,m:.2,heavy:A[5]});sfx(A[5]?170:260,.12,'sawtooth',.025,A[5]?90:140)}
  if(!A||p.t<.02)p.fxd=false;
@@ -172,7 +176,7 @@ function patrol(e,dt,dist,ux,uy,sh){const pt=e.pat;e.mvg=0;
  else{const T=pt[e.pi],dx=T[0]-e.x,dy=T[1]-e.y,l=Math.hypot(dx,dy);if(l<3){e.pi=(e.pi+1)%pt.length;e.pw=1.4}else{const pm=W.move(e,dx/l*24*dt,dy/l*24*dt,e.hw,e.hh);e.mvg=1;if(pm<24*dt*.3){e.ps=(e.ps||0)+dt;if(e.ps>1){e.pi=(e.pi+1)%pt.length;e.ps=0;e.pw=.4}}else e.ps=0;const k=Math.min(1,dt*6);e.fx+=(dx/l-e.fx)*k;e.fy+=(dy/l-e.fy)*k;const f=Math.hypot(e.fx,e.fy)||1;e.fx/=f;e.fy/=f}}
  const seen=dist<110*sh&&W.los(e.x,e.y,P.x,P.y)&&((ux*e.fx+uy*e.fy)>.5||dist<22*sh);
  e.det=cl((e.det||0)+(seen?(dist<50?2.4:1.4):-.5)*dt,0,1);
- if(e.det>=1){wake(e);toast('¡Te vieron!');E.forEach(o=>{if(o.pat&&!o.aw&&Math.hypot(o.x-e.x,o.y-e.y)<110)wake(o)})}}
+ if(e.det>=1){wake(e);toast('¡Te vieron!');E.forEach(o=>{if(o.pat&&!o.aw&&Math.hypot(o.x-e.x,o.y-e.y)<(DIF.on?DIF.alertR:110))wake(o)})}}
 function chase(e,tx,ty,sp,dt){let dx=tx-e.x,dy=ty-e.y,l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
  if(!W.los(e.x,e.y,tx,ty)){e.pt-=dt;if(e.pt<=0||!e.wp){e.pt=.35;e.wp=W.next(Math.floor(e.x/16),Math.floor(e.y/16),Math.floor(tx/16),Math.floor(ty/16))}
   if(e.wp){dx=e.wp.x-e.x;dy=e.wp.y-e.y;l=Math.hypot(dx,dy)||1;if(l<3){e.pt=0}dx/=l;dy/=l}}else e.wp=null;

@@ -63,7 +63,7 @@ $$('gpR').addEventListener('click',e=>{e.stopPropagation();try{if(curId)localSto
 $$('gpX').addEventListener('click',()=>endCal(false));
 $$('gpK').addEventListener('click',()=>{if(!cal)return;cal.i++;cal.wait=true;cal.tw=performance.now();kq.length=0;if(cal.i>=STEPS.length){endCal(true)}else calUI()});
 const inTitle=()=>typeof G!=='undefined'&&G.mode==='title';
-function render(){help.classList.toggle('open',isOpen);help.classList.toggle('on',gpOn||keyMode||inTitle())}
+function render(){help.classList.toggle('open',isOpen);help.classList.toggle('on',gpOn||keyMode||(inTitle()&&!window.IS_PC)) /* en PC sin mando se muestra el panel de teclado (controles_pc.js), no el de PS4 */}
 const nPads=()=>navigator.getGamepads?rawPads().length:-1;
 const padInfo=()=>rawPads().map(x=>'['+x.index+'] '+String(x.id).slice(0,22)+' b'+x.buttons.length+' e'+x.axes.length+(x.mapping==='standard'?' std':'')).join(' · ');
 

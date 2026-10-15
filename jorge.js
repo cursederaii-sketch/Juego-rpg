@@ -1,0 +1,79 @@
+// ===== JORGE: la hormiga. Jefe opcional del Valle Sereno (Hormiguero del Valle). No habla: solo "..." =====
+// Se carga al FINAL (después de bauti.js). Usa los mismos enganches que el resto del juego:
+//   BS (jefe) · KITS/WK (respaldo de dibujo) · body (sprite propio con animación) · RG (región) · valle (portal de entrada)
+//   CUT / PRES / BEST / NOTES / REGINFO / LAY / LNK (textos y mapa). La entrada animada vive en jefes.js (ENT.jorge).
+(function(){
+// ---- sprites (frente / perfil derecho / espalda), ya reducidos al tamaño del juego ----
+const SRC={"f": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAAeCAYAAAC16ufeAAAI8ElEQVR42q2XS2wdZxXHf+f7ZuY+7eu3nfqRxHk1adrSJG2qNpGpKGqBlhWmErQs6A4WsGAHqlXYgcQCNkioQkgVQkKgLqhaSgW4lLakbYIStYndNA/Hjd04vr7X9zH33pn5Dgs7bfNw4gSONNJIZ+Z8//nPOf9zDtzAJiZgfHz82r5P7lJAwPC2jO49uFn3HNyudz8wrAObsrriAwQmJiauGWd8fHzNMz5rsqZDBCNC4hwAOXIIjqzEOtSeQ7r7ePfUtOTI0Xmnpxu3Nbn/oVE2b92NjXycH3PsnX/y1mtFzk/luDCzKAAHtm4nWl7U4xeXqDmRhD5gDgBjDKqKql4Tk7cWWFUlUWWws1vbcimaS2V6nGWq2cJzsDnjYHhQj0mdex9tsWmwQVifonZ6kbH2LUzOTiHeEp//suO94Sxvvdyvg0lMhjrVxJEo3NffozOtBrnCBlyS4uS5M3I9Zq8Ca0TIpnLsu2uzbhzqIxVbZmYv8PZShfmkKaFzHKqUOHeuyY6eTt3qpbhQEWxRiOKYe2udBCeaxDnDvOeRbvgsJx7buyy2anhj9qLUGg0Q4US5SiJOd+8c5vbRYUq1bXp6dp43jpyUJGlcxbBcyWZKUjz28D165+ggrx+e4vRckVMfzcmVufrs6v2o8VU3tDN7YJQ44zNaa7KlqhzqDqikPEy9xaa/f0Bjvsw5nACMjcHk5OUkDfV26LaRYR66Zyf/OjrN5NETEoYhIrJ2zqZI0d2TU6OW2cUFWclfuDKNdgHLm7rUbhCyH1RxWZ+BR1MkgVJOhDYnxC1L5ZU6qajFwrY8+pHScWZA3uf9K+rj0/hb+jdovdWgtNSQkJB128TEBGNja+RPEOjAvl7tHsjobYW8jomnt6eMHswbHc+L7s+KDvvoAd/Xvs689g1ldWh/v/rGv2a8sTEuY/EmQK5c17NMIU/Qn9HtJqVPPP64Pl7I6P1eSn814ut7d1v96Uigd4jRxwa69aknn9StiOZua9Mgk7luXFVFb1a61rI+GxAjFJMm/X5K96SVlyotvrc5wxc7YrISIQYSA7WGxx/mlOcXlM+3eRyqOeoukTYsFqFEdFNnrxusATroYshUNS1w1DeSc7E+t0044wx3FBJyYUyS7iVf6KM4d5qsrVP2Pd4pCT1W+M6JWLpTeUbihrZUOO+asgS4m8Bw/S/xfTA+jiFqJPSoMuhgWzPRxVYg/z4Pj+RjqCvTHwv5jiHSbSPg55k6D9kWfKtbmVtQHFkGkroOAV3AIh04NoLxSV3qdLfMbCZDTxTpfRjKBt6JE4axDGLIaMLbGPLEPJ03TLXgwd6E3QOWlvOwGnJ2yeOV84aRtPLbZYfxfHa4mFA8quK46JSdgUWc491EKSW3CZy9OWYv1da+ONa7BGY14SCOb1tDIAmT1pe6GAaNI+xI87tIiXMJfy0JR5d8LkiW46U0Ly5CttPxUgTlvE+Pi6gby5tiyUvCN31lj0uYjxP2erDbn9fLZ451MKurjv3Waq8R/hxb9hDzgFEGPOGFxHA8FkZ9oVhIM9Ba5uUvjfDVVxeYXWxRsIZaonS3CX95YgvfePEUh5sBhXLIYuKxN0g4oAnnHLyuwpQavh7AMec4HiWiawDz1s6BAmlbo+ogpWk5nE6oRqGmIyUMHF/ossw2hcAaKvhMN4RdeWGxCFmriIONGeX4Up2ZBhgrpNssB72Y/5SVWiQsWpj28+I1y9TV03YxQAEorj8NBMiYkF1GqGFo0mC3VWIHdw94jGaEh3H8YMjR4RpcrCnP/e0MqWqDoiglUWrG0dVQfv7yDMW6Y4cf8cNB4X4HW7KWri5LpPA5PyEmoOSUnaIYSmsW0ppqIC5mOoETiQOahLWmDmYsX8sJM1Xl1xdgfibhFwMx3+2Hiw2fQyWIA4O3ocCyZzhcUc6Elu8PCD/rijlyNuKXRSVpOZ7qgYIVompTocWxRDiXmOvq05quNhFtOcWtqmAAWAv1RoxGjmP5Hvl9TXj1Q8dQqHjiOGuE7X1tDASGjb05ZixsTUG2GPObqYQ/VQ1zqS6Jm45GbWUmCD6Tj6rQboyue0SU1QLrWf0XTTGgjjSCcw5rwTcC1XkOZTJyqB5ppgHDovj5gKY6wkqC9Q0m43Ok1uSFhqElQlemTSRcQK3FiQMEEQO6kdDO4WHo1YQS7QjLV7XdazKbJo0Yw4cYYpdIHsghNFURFS5FsWGIEAupdpl2gvU80p5HLhOQshbreXygBi/TKeJiKYXFFaUREGuwCFl1ZFmgHrfkQ8AXjyzx+phVlE4vUGOEBc2IJC2qgCcBnX4eqx+jqyUQr/6JMCxiQC6WodGsKgZQoVyxYkio1y/CaluV1feyCqHxQVrUtY4AH4HsRDVlI60nV9eZuVp0s2wQWIxjoqiM0sku8dQIVEyW6ZrFiqxOtJ+aA8K4wkK1IQvLDVmohNKielnft0A//eQFjlXhvBoE2CGeKgUa8X6KqgwbuWYTuAzsM0CXB1VVEvFkDBiRZc0izNLgH/VT8seKQawhbaZV1pA9WUPUHVAxC1oWn+eXYSnXLzVjyCOMSE1hEjW+1IF8EPDMjYaF271A7/I9hTF2AF3GU/au+L7Sk9enBzMKHmnPU27B0saAl2G8P6372lOrMbrJGA+z+ol3pjzd6vtXxTftJk3B+NrlBbolW8B4QhkLTDIFFF0s9vBKvzbEeOoYIiZ88EG5FbAtdWTikJxx+OJW4y4Suhi3WrkhKayBLYUeer1AC8Zomw0wkcbabjyxKLWopiUxnI2alwH5kcKzTOASJU6UWcB7bZJbtZAVNfA9w7PAPVf4TzZrUlLLclhWK9BmUhLj1As1lnNx/Gk+R1fLxk8Aw4+BAFH+L2YR4sQhwJFrDVKtxmrL6AQ+BhCzjo0MR4CjjVpTOVsBGCK+RdCJArRzfDEmjgUlhfukj105CrYuAV3fWtNlU7rJVwb8lUffbHhSimr8LwSvjIBZHuk16jeanGkqJxOhkURyy2sNQM3FLKkn87HjuPNkKardWFLWtZ7Ueb9uZKalFB0SuRtvYv8FN3QXaAPpyI8AAAAASUVORK5CYII=", "s": "data:image/png;base64,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", "b": "data:image/png;base64,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"};
+const CV={};
+for(const k in SRC){const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.width;c.height=im.height;c.getContext('2d').drawImage(im,0,0);CV[k]=c};im.src=SRC[k]}
+
+// ---- datos del jefe ----
+BS.jorge={n:'Jorge',mini:1,hp:480,w:26,h:26,c:'#8a2a16',tr:'#8ad04a',sp:46,so:2200,fr:4,dm:1.3,wl:24,drop:{w:'mandibula'},
+ ph:[{a:['pounce','bsl','bstab'],s:1.1},
+     {a:['pounce','bstab','bsl','bov'],s:1.4,hold:.2,adds:3,msg:'...'},
+     {a:['pounce','pounce','blink','bstab','bov'],s:1.7,hold:.35,rocks:1,msg:'...'}]};
+// respaldo (si el sprite aún no cargó) + arma invisible (las mandíbulas ya están en el sprite)
+KITS.jorge=Object.assign({},KITS.sepulturero,{A:['#8a2a16','#b84a2a','#4a160a'],hc:['#4a7a2a','#6aa83a','#2a4a18'],eye:'#111',head:'helm',cape:null,capeE:null,wp:'none'});
+WK.jorge=['none',0];
+
+// ---- arma que suelta ----
+WP.mandibula={n:'Mandíbula de Jorge',d:'Pinza de quitina: tus golpes pesados cierran en círculo y alcanzan a todos a tu alrededor.',fx:'sweep',wl:22,
+ l:{d:14,c:12,r:34,t:.38,a:[.1,.2]},h:{d:34,c:30,r:42,t:.85,a:[.32,.46]},
+ lore:['Una mandíbula de hormiga del tamaño de una espada. Corta mejor de lo que debería.','No tiene nombre grabado. No tiene lema. Solo hay un casco verde dibujado con carbón en la empuñadura.','Quien la empuña no escucha nada. Y, aun así, siente que alguien le hace compañía.']};
+
+// ---- textos (Jorge no habla) ----
+CUT.jorge=()=>D('Jorge','...');
+PRES.jorge=()=>[['Jorge','...']];
+BEST.jorge=['Jorge','Embestidas rápidas, mordiscos y estocadas. Llama a su colonia y se esconde bajo tierra.','Es una hormiga. Lleva un casco verde con una estrella dorada que nadie le dio y que nunca se quita. No dice nada.','Sus embestidas recorren mucha distancia: esquiva de lado, no hacia atrás. Cuando se yergue sobre las patas traseras, va a morder.'];
+Object.assign(NOTES,{
+ hormiguero1:['Fila interminable','Cientos de hormigas cruzan el camino llevando migas hacia el norte. Ninguna se detiene. Ninguna dice nada.'],
+ hormiguero2:['Casco diminuto','Un casco verde, demasiado pequeño para una persona. Dentro hay una estrella dorada pintada con mucho cuidado. Alguien la quiso mucho.']});
+Object.assign(REGINFO,{hormiguero:['Claro sellado por matorral denso','Jefe opcional: Jorge (hormiga)','Recompensa: Mandíbula de Jorge','Hoguera antes de la arena','Salida al Valle Sereno']});
+
+// ---- cuerpo: sprite propio con animación (reposo, paso, aviso, golpe, recuperación) ----
+{const b0=body;body=function(id,x,y,fx,fy,pose,fr_,o){
+  if(id!=='jorge')return b0.apply(this,arguments);
+  o=o||{};const dk=dirOf(fx,fy),k=dk==='d'?'f':dk==='u'?'b':'s',c=CV[k];
+  if(!c)return b0.apply(this,arguments);
+  let sp=c;if(o.flash)sp=flashOf(c);else if(o.tint)sp=tint(c,o.tint);
+  const w=c.width,h=c.height,t=(typeof TM!=='undefined'?TM:0),side=k==='s',dir=dk==='l'?-1:1;
+  let sx=1,sy=1,rot=0,dx=0,dy=o.dy||0;
+  if(pose==='walk'){const q=Math.sin(t*(side?20:15));sy=1+.035*q;sx=1-.02*q;dy-=Math.abs(q)}
+  else if(pose==='wind'){sy=1.1;sx=.96;rot=side?-.22*dir:0;dy-=1}            // se yergue sobre las patas traseras
+  else if(pose==='act'){sx=1.14;sy=.9;rot=side?.16*dir:0;dx=side?3*dir:0}   // se lanza
+  else if(pose==='rec'){sy=.93;sx=1.04}
+  else if(pose==='stg'){sx=1.05;sy=.95}
+  else sy=1+.018*Math.sin(t*3);
+  if(o.rot)rot=o.rot;
+  if(o.al!=null)g.globalAlpha=o.al;
+  g.save();g.translate(Math.round(x+dx),Math.round(y-2+dy));if(rot)g.rotate(rot);g.scale((side?dir:1)*sx,sy);
+  g.drawImage(sp,-(w>>1),-(h-3)+2);g.restore();g.globalAlpha=1}}
+
+// ---- región: Hormiguero del Valle (se entra desde el Valle Sereno) ----
+RG.push({id:'hormiguero',n:'Hormiguero del Valle',act:'Donde la ceniza no llegó',th:'valle',cols:52,rows:40,m:1.9,dm:1.4,mini:'jorge',out:1,fl:['',' · antes de Jorge'],build(W){
+ W.fillO('dtree');
+ W.room(3,31,9,7,'g');W.path([[8,34],[20,34],[20,24]],3,'p');
+ W.room(14,16,16,9,'g');
+ W.path([[22,20],[39,20],[39,14]],3,'p');
+ W.room(30,3,19,11,'p');W.setArena({x:30,y:3,w:19,h:11},[[38,14,3,1]],39,8);
+ W.fire(6,36);W.fire(39,18);
+ W.portal('back',5,34,{to:'valle',at:'hormiguero',k:'Salir',sy:22});
+ W.en('hollow',18,19);W.en('hollow',26,18);W.en('soldier',22,22);W.en('archer',27,22);W.en('archer',16,22);W.en('brute',21,17);
+ W.en('hollow',15,34);W.en('soldier',20,29);W.en('warden',34,20,{pat:[[31,20],[37,20]]});
+ W.item(16,17,{sou:400});W.item(28,23,{n:2});W.item(9,36,{sou:250});
+ W.o('crate',12,32,1,1);W.note(12,32,'hormiguero1');W.o('rock',28,17,1,1);W.note(28,17,'hormiguero2');
+ [[32,5],[46,5],[32,11],[46,11]].forEach(([x,y])=>W.o('rock',x,y,1,1));
+ W.o('brazier',31,4,1,1);W.o('brazier',47,4,1,1);W.o('brazier',37,15,1,1);W.o('brazier',41,15,1,1);
+ W.o('brazier',4,32,1,1);W.o('brazier',10,32,1,1);
+}});
+
+// ---- acceso desde el Valle Sereno ----
+{const v=RG.find(r=>r.id==='valle'),b=v.build;
+ v.build=function(W){b.call(this,W);
+  W.room(51,15,6,5,'p');W.portal('hormiguero',54,17,{to:'hormiguero',at:'back',k:'Hormiguero',sy:22});
+  W.o('rock',52,16,1,1);W.o('rock',56,16,1,1);W.o('bush',52,19,1,1);W.o('bush',56,19,1,1)}}
+
+// ---- mapa del reino ----
+LAY.hormiguero=[270,1150];LNK.push(['valle','hormiguero',1]);
+})();

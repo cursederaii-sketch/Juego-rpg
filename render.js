@@ -86,7 +86,7 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,GW,GH);if(!W||!P||G.mode==='ti
   if(p>.6){const h=(1-p)*260;shadow(r.x,r.y,16,.35);fr(r.x-7,r.y-h-14,14,14,'#5a4a42');fr(r.x-7,r.y-h-14,14,3,'#8a7868');fr(r.x+3,r.y-h-11,4,11,'#3a2e28');fr(r.x-7,r.y-h-14,2,14,'#7a6a5a')}}}));
  PR.forEach(q=>Dr.push({y:q.y,f:()=>{const y=q.y-10,hot=q.c==='#ffe66d';shadow(q.x,q.y,6,.2);if(hot){const a=Math.atan2(q.vy,q.vx);glow(q.x,y,12,'255,230,109',.4);pline(g,q.x-Math.cos(a)*9,y-Math.sin(a)*9,q.x,y,'rgba(255,230,109,.6)',1);pline(g,q.x-Math.cos(a)*3,y-Math.sin(a)*3,q.x+Math.cos(a)*3,y+Math.sin(a)*3,'#fff2b0',2)}
   else{glow(q.x,y,16,'255,110,40',.6);disc(g,Math.round(q.x),Math.round(y),3,'#ff7a1c');fr(q.x-1,y-1,2,2,'#ffe9a0');if(R()<.5)PT.push({k:'s',x:q.x,y:q.y,z:10,vx:(R()-.5)*20,vy:(R()-.5)*20,vz:5,l:.3,c:'#ff7a1c'})}}}));
- Dr.push({y:P.y,f:drawP});Lt.push({x:P.x-cx,y:P.y-cy-14,r:56,i:.5,c:'140,170,255',a:.07});
+ Dr.push({y:P.y,f:drawP});if(window.netDrawPlayers)netDrawPlayers(Dr,Lt,cx,cy);Lt.push({x:P.x-cx,y:P.y-cy-14,r:56,i:.5,c:'140,170,255',a:.07});
  // indicador de interacción
  if(G.mode==='play'&&P.s==='idle'&&CFG.hints){const o=near();if(o)Dr.push({y:99998,f:()=>promptUI(o,ts)})}
  Dr.sort((a,b)=>a.y-b.y);for(const d of Dr)d.f();

@@ -52,6 +52,13 @@ const ENT={
   fx(e,p,dt,I){const r=rp(p,0,.55);if(r<1&&I.every('d',dt,.06))dust(e.x+I.dir*110*(1-eo(r)),e.y,2,'#8a7a62',.7,1);
    if(I.once('s',0))sfx(110,.9,'square',.05,70);
    if(I.once('k',.5)){G.shake=4;dust(e.x,e.y,12,'#8a7a62',1.2);spark(e.x,e.y-6,'#ffb347',12,6,1.2);ring(e.x,e.y,'255,179,71',1,.7);sfx(160,.3,'square',.08,60);const d=Math.hypot(P.x-e.x,P.y-e.y)||1;e.fx=(P.x-e.x)/d;e.fy=(P.y-e.y)/d}}},
+ jorge:{d:3.4,ep:'Soldado del hormiguero',
+  v:(p,e,I)=>{const r=ez(rp(p,.1,.62));return{ty:(1-r)*(e.b.h+12),clip:[-44,-90,88,92],tx:p>.62&&p<.86?Math.sin(I.t*70)*.5:0,sy:p>.62?1+.1*Math.sin(Math.PI*rp(p,.62,.86)):1}},
+  fx(e,p,dt,I){if(I.once('s',0)){sfx(60,1.6,'sawtooth',.07,28);G.shake=2}
+   if(I.once('r1',.1))ring(e.x,e.y,'122,90,58',1,.9);if(I.once('r2',.35))ring(e.x,e.y,'122,90,58',1,.9);
+   if(p>.05&&p<.62&&I.every('d',dt,.045)){dust(e.x+(R()-.5)*34,e.y+1,3,'#7a5a3a',.9,1);spark(e.x+(R()-.5)*30,e.y,'#4a3524',2,2,.6)}
+   if(I.once('t',.62)){G.shake=8;I.fl=.3;dust(e.x,e.y,16,'#8a6a46',1.4);spark(e.x,e.y-12,'#ff6a3a',12,10,1.2);ring(e.x,e.y,'255,90,50',1,.8);ring(e.x,e.y,'138,208,74',1,1.1);sfx(90,.35,'square',.12,40)}
+   [.74,.82,.9].forEach((t,i)=>{if(I.once('c'+i,t)){sfx(2200+i*300,.06,'square',.03,1400);sfx(1800+i*250,.05,'square',.025,2400);spark(e.x,e.y-26,'#ffe66d',3,6,.6)}})}},
  madre:{d:3,ep:'Señora de las marismas',
   v:p=>{const r=ez(rp(p,.1,.78));return{a:rp(p,.1,.35),sy:.12+.88*r+.06*Math.sin(Math.PI*rp(p,.7,.95)),sx:1+(1-r)*.5}},
   fx(e,p,dt,I){if(I.once('s',0))sfx(90,1.4,'sine',.07,45);

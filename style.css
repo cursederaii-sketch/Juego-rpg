@@ -215,3 +215,30 @@ body.gp #ui{display:none}
 
 /* ---------- cinemática del Rey, victorias de jefes y finales: sin pausa, pantalla completa ni controles ---------- */
 body.cine #pause,body.cine #fs,body.cine #ui,body.cine #ui *,body.fincine #pause,body.fincine #fs,body.fincine #ui,body.fincine #ui *,body.vcine #pause,body.vcine #fs,body.vcine #ui,body.vcine #ui *{visibility:hidden!important;pointer-events:none!important}
+
+/* ---- controles de teclado (PC) ---- */
+#pcHelp{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));z-index:70;width:150px;box-sizing:border-box;padding:6px 8px;border:1px solid #6a5226;border-radius:6px;background:rgba(10,6,20,.82);color:#e8e0ff;font-family:inherit;cursor:pointer;opacity:.92}
+#pcHelp.on{display:block}
+#pcHelp .ph{font-size:7px;color:#ffd36a;line-height:1.5}
+#pcHelp .pg{display:grid;gap:3px;margin-top:6px}
+#pcHelp.min .pg{display:none}
+#pcHelp .pr{display:grid;grid-template-columns:42% 1fr;gap:6px;align-items:center;font-size:7px;line-height:1.3}
+#pcHelp .pr b{font-weight:normal;color:#ffd36a;text-align:right}
+
+/* ---- intro animada ---- */
+#introAnim{position:fixed;inset:0;z-index:500;background:#000;display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;user-select:none;cursor:pointer}
+#introAnim canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+#introAnim .itx{position:absolute;left:0;right:0;bottom:0;padding:48px max(16px,env(safe-area-inset-right)) max(26px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:linear-gradient(to top,rgba(0,0,0,.92),rgba(0,0,0,.6) 60%,rgba(0,0,0,0));text-align:center}
+#introAnim .itx p{margin:0 auto 10px;max-width:640px;font-size:clamp(8px,1.9vw,12px);line-height:1.8;color:#ece4ff;text-shadow:0 1px 0 #000;opacity:0}
+#introAnim .isk{position:absolute;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));font:inherit;font-size:8px;padding:6px 9px;border:1px solid #6a5226;border-radius:4px;background:rgba(10,6,20,.7);color:#ffd36a;cursor:pointer}
+#introAnim .ihint{position:absolute;top:max(14px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));font-size:7px;color:#7f759f}
+
+/* ---- slots de partida ---- */
+.tb.slot{height:auto;min-height:52px;padding:8px 26px;text-transform:none;font-size:11px;line-height:1.6;letter-spacing:1px}
+.tb.slot small{font-size:8px;color:#cfc6ff;letter-spacing:0}
+.tb.slot b{font-weight:normal;color:#fff3c4;margin-right:6px}
+@media (max-height:520px){.tb.slot{min-height:36px;padding:4px 22px;font-size:9px}}
+.tbtns.sl{top:50%;transform:translate(-50%,-50%);gap:8px;max-height:96vh}
+.tbtns.sl .tb{min-height:44px;height:auto}
+.tbtns.sl .tb.slot{padding:5px 24px}
+@media (orientation:portrait){.tbtns.sl{top:50%}}

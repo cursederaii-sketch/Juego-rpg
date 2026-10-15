@@ -28,10 +28,21 @@ function openPause(){
   +'<button class="oath" onclick="openSettings(\'pause\')"><b>Ajustes</b>Sonido, controles y pantalla</button>'
   +'<button class="oath" onclick="save();showTitle()"><b>Guardar y salir al título</b></button></div>'}
 function showTitle(){
- G.mode='title';relAll();$('dlg').style.display='none';const m=$('menu'),has=!!load();m.style.display='flex';m.classList.add('tt');
+ G.mode='title';relAll();$('dlg').style.display='none';const m=$('menu'),has=[1,2,3].some(n=>!!slotData(n));m.style.display='flex';m.classList.add('tt');
  m.innerHTML='<div class="tstage"><button class="tb3" onclick="tPlay()">Jugar</button><button class="tb3" onclick="openSettings(\'title\')">Ajustes</button><button class="tb3'+(has?'':' off')+'" onclick="tLoad()">Cargar<br>partida</button><div id="tmsg"></div></div>'}
 function tMsg(t){const e=$('tmsg');if(e){e.textContent=t;clearTimeout(tMsg.t);tMsg.t=setTimeout(()=>{e.textContent=''},2200)}}
-function tLoad(){if(!load())return tMsg('No hay partida guardada');m_off();cont()}
+// ---- selector de slots (3) ----
+function slotLbl(s){const r=RG[s.bf&&s.bf.r];return esc(s.name||'Sin nombre')+'<br><small>'+(r?esc(r.n):'')+' · Jefes '+Object.keys(s.bk||{}).length+'</small>'}
+function slotPick(mode){G.mode='title';const m=$('menu');m.style.display='flex';m_off();
+ let h='<div class="tbtns sl"><div id="tq">'+(mode==='load'?'Elige la partida a cargar':'Elige un slot')+'</div>';
+ for(let n=1;n<=SLOTS;n++){const s=slotData(n);
+  h+='<button class="tb slot'+(!s&&mode==='load'?' off':'')+'" onclick="slotGo('+n+',\''+mode+'\')"><b>Slot '+n+'</b> '+(s?slotLbl(s):'<small>Vacío'+(mode==='load'?'':' · Nueva partida')+'</small>')+'</button>'}
+ m.innerHTML=h+'<button class="tb" onclick="showTitle()">Volver</button></div>'}
+function slotGo(n,mode){const s=slotData(n);
+ if(!s){if(mode==='load')return;SLOT=n;return askName()}
+ if(mode==='load'){SLOT=n;m_off();return cont()}
+ $('menu').innerHTML='<div class="tbtns sl"><div id="tq">Slot '+n+': '+esc(s.name||'Sin nombre')+'</div><button class="tb" onclick="SLOT='+n+';m_off();cont()">Continuar</button><button class="tb" onclick="SLOT='+n+';askName()">Nueva (borra la guardada)</button><button class="tb" onclick="slotPick(\'play\')">Volver</button></div>'}
+function tLoad(){if(![1,2,3].some(n=>!!slotData(n)))return tMsg('No hay partida guardada');slotPick('load')}
 function askName(){G.mode='title';const m=$('menu');m.style.display='flex';m_off();
  m.innerHTML='<form id="nf" class="card nmcard" autocomplete="off" onsubmit="startGame();return false"><h1>Tu nombre</h1><p>Despiertas sin recordar quién eres. Un nombre te viene a los labios... ¿cuál?</p>'
   +'<div class="nrow"><input id="nm" type="text" maxlength="14" placeholder="Sin nombre" enterkeyhint="go" autocomplete="off" autocapitalize="words" spellcheck="false"><button type="submit" class="tb" id="nok">Despertar</button></div>'
@@ -41,8 +52,7 @@ let _sg=0;
 function startGame(){if(_sg)return;const er=$('nerr');
  try{const v=(($('nm')||{}).value||'').trim().replace(/[<>&"'`]/g,'').slice(0,14);_sg=1;newGame(v||'Sin nombre');setTimeout(()=>{_sg=0},1000)}
  catch(e){_sg=0;console.error(e);if(er)er.textContent='Error al empezar: '+(e&&e.message||e)}}
-function tPlay(){const sv=load();if(!sv){return askName()}
- $('menu').innerHTML='<div class="tbtns"><div id="tq">Ya tienes una partida guardada ('+esc(sv.name||'Sin nombre')+').<br>¿Empezar una nueva y borrarla?</div><button class="tb" onclick="askName()">Sí, empezar de nuevo</button><button class="tb" onclick="m_off();cont()">Continuar la guardada</button><button class="tb" onclick="showTitle()">Volver</button></div>'}
+function tPlay(){slotPick('play')}
 const m_off=()=>$('menu').classList.remove('tt');
 // vídeo de fondo del título: solo se reproduce mientras el título está visible
 (function(){const v=$('tv');if(!v)return;v.muted=true;const go=()=>{const p=v.play();if(p&&p.catch)p.catch(()=>{})};
