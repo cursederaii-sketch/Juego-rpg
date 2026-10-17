@@ -174,7 +174,7 @@ window.netHub = async function () {
   HB.slot = v.slot; HB.name = v.name || (sd && sd.name) || 'Sin nombre'; HB.err = '';
   const e = $('mpe'); const say = (t, ok) => { if (e) { e.style.color = ok ? '#c9b8ff' : '#ff7a8a'; e.textContent = t; } };
   if (!v.url) return say('Escribe la dirección del servidor');
-  say('Conectando al servidor global… si estaba dormido puede tardar hasta 1 minuto', 1);
+  say('Conectando al servidor global…', 1);
   try { localStorage.setItem('jur_mp_url', v.url); localStorage.setItem('jur_mp_name', v.name); } catch (er) {}
   try { await NET.openSocket(v.url, 0, 70000); } catch (er) { return say(er.message + ' · revisa la dirección y que el servidor esté encendido'); }
   const w = NET.ws, prev = w.onclose; HB.ws = w;
@@ -182,7 +182,7 @@ window.netHub = async function () {
   send({ t: 'hub', n: HB.name });
   clearTimeout(HB.wt); HB.wt = setTimeout(() => { // el servidor viejo no conoce el lobby y nunca contesta
     if (HB.on || HB.ws !== w) return; HB.ws = null; w.onclose = null; try { w.close(); } catch (er) {} NET.ws = null;
-    say('Conectó, pero el servidor no responde al lobby: tiene la versión vieja. Sube el nuevo server/server.js a Render y reintenta.');
+    say('El servidor conectó, pero no respondió al lobby. Comprueba que el backend esté actualizado y vuelve a intentarlo.');
   }, 10000);
 };
 const toast_ = t => { try { tMsg(t); } catch (e) {} };

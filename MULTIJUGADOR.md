@@ -1,5 +1,11 @@
 # Juramento · cooperativo online (2-4 jugadores)
 
+## Publicarlo gratis en Cloudflare
+
+El paquete ahora incluye un backend compatible con Cloudflare Workers + Durable Objects. Sigue **[CLOUDFLARE_MULTIJUGADOR.md](CLOUDFLARE_MULTIJUGADOR.md)** para desplegar el juego y el multijugador en el mismo dominio. Necesitas iniciar sesión en tu propia cuenta Cloudflare; el ZIP no se publica automáticamente.
+
+El servidor Node.js descrito más abajo sigue disponible para pruebas locales o como alternativa.
+
 ## Arrancar
     cd server
     npm install
@@ -22,7 +28,7 @@ Para jugar por internet pon el servidor detrás de HTTPS (el navegador usará ws
 - Solo el anfitrión viaja entre regiones; si muere el anfitrión se recarga la región para todos.
 - Los ataques propios de Ormund Cineris, los de la grieta (caida.js) y otros peligros del escenario solo alcanzan al anfitrión.
 - Las hogueras de un invitado no reaparecen enemigos; descansa el anfitrión para eso.
-- Sin chat ni reconexión: si se cae la conexión hay que volver a unirse.
+- No hay reconexión automática: si se cae la conexión hay que volver a unirse.
 
 ## Chat (v8)
 - Texto: Enter o T para escribir, Enter para enviar, Esc para cancelar (o el botón 💬). Máx. 120 caracteres; el anfitrión limita el ritmo.

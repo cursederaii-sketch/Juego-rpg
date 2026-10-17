@@ -13,8 +13,12 @@ Object.assign(NOTES,{
  campos3:['Carreta volcada','Sacos de grano, vacíos. Las marcas en la madera cuentan días, no kilómetros.'],
  campos5:['Muro sin musgo','Todo el muro del norte está cubierto de líquen, menos este tramo. Alguien lo cerró con prisa y lo limpió con las manos.'],
  campos6:['Plano del carpintero','«Primero el cabrestante, que levanta el peso. Después la viga, que lo sostiene. Al final se engrasa el mecanismo, o se atasca. Y ojo: el puente aguanta a uno más, no a tres.»'],
- ribera1:['Baranda arrastrada','Un trozo de baranda con restos de cuerda atada. El río devuelve lo que no se quedó.'],
- ribera2:['Compuerta del molinero','«Si el canal se desborda, alzad la compuerta. No la toquéis si alguien duerme río abajo.»'],
+ ribera1:['Baranda arrastrada','Un trozo de baranda con restos de cuerda atada. Alguien grabó en la madera: «Lo que brilla llega primero. El agua no sabe lo que vale.»'],
+ ribera2:['Caja del barquero','«Cuatro llamas marcan lo que trae el río. Se encienden como llegó todo: el cielo antes que el musgo.»'],
+ ribera3:['Urna agrietada','«Lo rojo, lo que aún sangra, llega el último. Si enciendes algo en desorden, el sello te dirá cuántas llamas estaban en su sitio.»'],
+ ribera4:['Mojón del vigía','«Cuatro velas, una por esquina, y el viento las gasta deprisa. La primera es la dorada, al sureste. La última es la verde, al suroeste. Por esta orilla nadie cruza en diagonal.»'],
+ ribera5:['Registro de esclusas','«Se alzan de arriba abajo: norte, centro, sur. El que alce una de abajo antes que las de arriba inunda la sala, y entonces hay que empezar de nuevo.»'],
+ ribera6:['Tabla con nombres','Una tabla clavada en la orilla, con nombres cortados a cuchillo. Los más recientes están sin terminar. Quedan dos huecos libres, uno junto al otro.'],
  campos4:['Piedra con grabados','Tres juramentos distintos, tallados por tres manos distintas. Los tres dicen «volveré por ti».']});
 
 RG.push({id:'campos',n:'Campos del Exilio',act:'Un puente cortado y tres promesas rotas',th:'valle',cols:56,rows:40,m:1.4,dm:1.2,out:1,fl:['',' · Orilla este'],mini:'daren',build(W){
@@ -213,23 +217,58 @@ Object.assign(REGINFO,{campos:['Río con puente bloqueado','Jefe: Capitán Daren
 
 // ---- mapa del reino ----
 LAY.campos=[536,1150];LNK.push(['valle','campos',1]);
-// ---- Remanso del Río: donde despiertas si el puente cae. Mapa pequeño, sin atajos: la única ruta a la orilla este ----
-RG.push({id:'ribera',n:'Remanso del Río',act:'Lo que el río devuelve',th:'valle',cols:50,rows:24,m:1.5,dm:1.25,out:1,fl:['',''],build(W){
+// ---- Remanso del Río: donde despiertas si el puente cae (v8.24: nivel propio, puzzle y no combate) ----
+// Tres obstáculos en cadena, de oeste a este, con solo tres enemigos y UNA hoguera (a mitad de camino):
+//   1) Orilla oeste  · 4 llamas (Mastermind). Tres notas dan el orden por deducción; el sello dice cuántas están en su sitio. Abre el puente del canal oeste.
+//   2) Orilla central · 4 velas con tiempo, una por esquina; sin diagonales y con un arquero apuntándote. Abre la sala de esclusas.
+//   3) Tres esclusas en orden norte → centro → sur. Si alzas una de abajo antes, la sala se inunda y se deshace TODO. Abre la compuerta del canal este.
+// Después: hoguera, un bruto que guarda la salida y la subida a la orilla este. Pierdes a tus compañeros y el río no te regala nada.
+RG.push({id:'ribera',n:'Remanso del Río',act:'Lo que el río devuelve',th:'valle',cols:56,rows:32,m:1.6,dm:1.3,out:1,fl:['',''],build(W){
  W.fillG('g');W.ring('wall',2);
- W.g('w',2,2,46,5);                                       // el río que te trajo
- W.path([[4,8],[16,8]],3,'p');W.path([[16,8],[16,15]],3,'p');W.path([[5,15],[46,15]],3,'p');
- W.g('w',33,8,2,13);W.g('b',33,14,2,3);W.sgate(33,14,2,3,['r1'],{msg:'La compuerta se alza'});   // canal con compuerta cerrada
- W.path([[26,15],[26,10]],3,'p');W.lever(26,10,'r1',{k:'Alzar la compuerta',m:'Compuerta alzada'});
- W.room(37,11,10,9,'p');
- W.fire(20,12);
- W.o('cross',6,9,1,1);W.note(6,9,'ribera1');W.o('crate',28,10,1,1);W.note(28,10,'ribera2');
- W.en('hollow',12,15);W.en('archer',30,13);W.en('hollow',23,18);W.en('soldier',29,12);W.en('soldier',41,13);
- W.item(8,9,{sou:200});W.item(27,18,{sou:400});W.item(44,18,{n:1});
- W.portal('oeste',4,15,{to:'campos',at:'ribera_o',k:'Subir a la orilla oeste',sx:22,sy:0});
- W.portal('este',46,15,{to:'campos',at:'ribera_e',k:'Subir a la orilla este',sx:-22,sy:0});
- W.sc('tree',16,3,10,44,11,{avoid:'pfwbk',seed:51,gap:2});W.sc('bush',14,3,10,44,11,{avoid:'pwb',seed:52,gap:1});W.sc('rock',8,3,10,44,11,{avoid:'pfwb',seed:53,gap:2});
+ // --- caminos primero (el agua y los puentes los pisan después) ---
+ W.path([[4,8],[10,8]],3,'p');W.path([[10,8],[10,27]],3,'p');                        // arranque y columna de la orilla oeste
+ W.path([[10,10],[16,10]],3,'p');W.path([[10,19],[6,19]],3,'p');W.path([[10,25],[16,25]],3,'p');W.path([[10,27],[8,27]],3,'p');W.path([[4,27],[10,27]],3,'p');
+ W.path([[10,16],[18,16]],3,'p');                                                   // hacia el canal oeste
+ W.path([[22,16],[36,16]],3,'p');W.path([[24,8],[24,26]],3,'p');W.path([[35,8],[35,26]],3,'p');W.path([[24,26],[35,26]],3,'p');W.path([[24,14],[35,14]],3,'p');
+ W.path([[30,13],[30,16]],3,'p');W.path([[24,20],[27,20]],3,'p');W.path([[35,24],[32,24]],3,'p');
+ W.path([[40,16],[52,16]],3,'p');W.room(41,11,5,3,'p');W.room(48,18,5,4,'p');
+ // --- agua: el río del norte y dos canales que parten el remanso en tres orillas ---
+ W.g('w',2,2,52,3);
+ W.g('w',19,5,3,25);W.g('b',19,15,3,3);                                              // canal oeste (puente con puerta de sello)
+ W.g('w',37,5,3,25);W.g('b',37,15,3,3);                                              // canal este (compuerta de esclusa)
+ // --- 1) ORILLA OESTE: cuatro llamas, orden por deducción ---
+ W.puzzle('ribera_a',[[6,19,0],[16,10,1],[8,27,2],[16,25,3]],[2,0,3,1],[20,15,1,3]);
+ {const z=W.pzs[W.pzs.length-1];z.kind='mm';z.punish=null}
+ W.o('cross',6,10,1,1);W.note(6,10,'ribera1');W.o('crate',13,13,1,1);W.note(13,13,'ribera2');W.o('urn',13,23,1,1);W.note(13,23,'ribera3');
+ W.en('hollow',13,19);
+ W.item(7,8,{sou:150});W.item(14,27,{sou:250});
+ W.portal('oeste',4,27,{to:'campos',at:'ribera_o',k:'Subir a la orilla oeste',sx:22,sy:0});
+ // --- 2) ORILLA CENTRAL: cuatro velas con tiempo y sala de esclusas cerrada ---
+ chamber(W,28,8,6,4,'f');W.g('f',30,12,1,1);
+ W.puzzle('ribera_b',[[24,8,0],[35,8,1],[35,26,2],[24,26,3]],[2,1,0,3],[30,12,1,1]);
+ {const z=W.pzs[W.pzs.length-1];z.kind='timed';z.limit=28;z.punish=null}
+ W.o('rock',23,13,1,1);W.note(23,13,'ribera4');
+ W.en('archer',32,20);
+ // --- 3) ESCLUSAS: norte (dentro de la sala), centro y sur; solo valen en ese orden ---
+ W.lever(30,9,'r1',{k:'Alzar la esclusa del norte',m:'Esclusa norte alzada'});
+ W.lever(27,20,'r2',{k:'Alzar la esclusa del centro',m:'Esclusa central alzada'});
+ W.lever(32,24,'r3',{k:'Alzar la esclusa del sur',m:'Esclusa sur alzada'});
+ W.o('crate',26,19,1,1);W.note(26,19,'ribera5');
+ W.sgate(38,15,1,3,['r1','r2','r3'],{msg:'La compuerta del canal este se alza'});
+ // --- ORILLA ESTE: respiro, un guardián y la salida ---
+ W.fire(43,12);
+ W.o('tomb',45,12,1,1);W.note(45,12,'ribera6');
+ W.en('brute',48,15);
+ W.item(50,19,{n:2});W.item(51,21,{sou:600});
+ W.portal('este',52,16,{to:'campos',at:'ribera_e',k:'Subir a la orilla este',sx:-22,sy:0});
+ W.sc('tree',34,3,5,50,24,{avoid:'pfwbk',seed:51,gap:2});W.sc('bush',22,3,5,50,24,{avoid:'pwb',seed:52,gap:1});W.sc('rock',10,3,5,50,24,{avoid:'pfwb',seed:53,gap:2});
 }});
-Object.assign(REGINFO,{ribera:['Remanso aguas abajo del puente caído','Compuerta cerrada · un solo camino','Hoguera junto al cruce','Salida a la orilla oeste y a la orilla este de los Campos del Exilio']});
+// esclusas: alzar una de abajo antes que las de arriba inunda la sala y deshace todo el progreso
+{const p1=pull;pull=function(l){if(rg.id==='ribera'&&/^r[123]$/.test(l.id)&&!S.lv['ribera:'+l.id]){const req={r2:'r1',r3:'r2'}[l.id];
+  if(req&&!S.lv['ribera:'+req]){['r1','r2','r3'].forEach(i=>{S.lv['ribera:'+i]=0});toast('La esclusa de abajo inunda la sala: todo vuelve a su sitio');G.shake=6;sfx(70,.6,'sawtooth',.07,40);
+   spark(l.x,l.y-8,'#9fd0ff',16,10);FX.push({k:'ring',x:l.x,y:l.y,l:.8,m:.8,c:'200,230,255',big:1});save();return}}
+ p1(l)}}
+Object.assign(REGINFO,{ribera:['Remanso aguas abajo del puente caído','Tres obstáculos en cadena: llamas, velas con tiempo y esclusas en orden','Hoguera solo tras cruzar el canal este','Salida a la orilla oeste y a la orilla este de los Campos del Exilio']});
 LAY.ribera=[536,1308];LNK.push(['campos','ribera',1]);
 
 })();

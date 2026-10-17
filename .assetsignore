@@ -1,0 +1,10 @@
+server/
+cloudflare/
+wrangler.toml
+MULTIJUGADOR.md
+CLOUDFLARE_MULTIJUGADOR.md
+package.json
+package-lock.json
+.env
+.dev.vars
+.git/

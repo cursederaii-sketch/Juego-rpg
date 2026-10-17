@@ -225,7 +225,8 @@ function clientMsg(m) {
   }
 }
 function sendIn(dt) {
-  inAcc += dt; if (inAcc < .05 || !P) return; inAcc = 0; send({ k: 'in', a: pState(P) });
+  // Estado del invitado a 10 Hz: mantiene la interpolación y reduce el consumo de cuota en servicios gratuitos.
+  inAcc += dt; if (inAcc < .1 || !P) return; inAcc = 0; send({ k: 'in', a: pState(P) });
 }
 
 // ---------------------------------------------------------------- enganches al motor
@@ -406,7 +407,9 @@ function openSocket(url, first, ms) {
   });
 }
 const isApp = () => !/^https?:$/.test(location.protocol) || /androidplatform\.net$|^localhost$/.test(location.hostname) && location.protocol === 'https:';
-const SERVIDOR = 'https://juramento-servidor.onrender.com'; // dirección global del servidor (se convierte a wss:// al conectar)
+// Si el juego está servido por Cloudflare Workers, el backend WebSocket vive en el mismo origen.
+// En localhost también permite probar el servidor Node local; para APK/file: queda el endpoint anterior.
+const SERVIDOR = /^https?:$/.test(location.protocol) ? location.origin : 'https://juramento-servidor.onrender.com';
 const defUrl = () => SERVIDOR;
 const isLan = h => /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(h) || /^[\w-]+(\.local)?(:\d+)?$/.test(h);
 function normUrl(u) {
