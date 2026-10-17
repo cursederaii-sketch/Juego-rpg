@@ -57,7 +57,7 @@ Object.assign(ENDS,{
  pacto:['Romper el pacto','El vínculo entre el Rey y Azrael se parte. Valdorra queda libre de la autoridad divina, pero pierde la protección artificial que la sostenía. La memoria regresa con la verdad y con todo lo que costó. La victoria no borra el sufrimiento que hizo falta para mantenerla.'],
  manten:['Mantener el pacto','Decides preservar el juramento. Valdorra sobrevivirá bajo el mismo orden, pero el ciclo del olvido continúa. Has vencido con la espada y no has resuelto nada: la estabilidad tiene un precio, y lo sabes mientras lo pagas.'],
  guarda:['Guardián de los recuerdos','Cargas con lo que el reino quiso olvidar. No dejas que Azrael conserve su autoridad ni devuelves toda la carga a Valdorra: te conviertes en quien recuerda, para que el mismo pacto no vuelva a firmarse. El coste es tuyo, y es el centro de tu final.']});
-CUT.rey=()=>{const o=RY().oath;return D('El Rey sin Nombre',o===1?'«Yo juré que Valdorra jamás caería... y la derribé yo mismo. Ahora que su voz calla, solo oigo las calles que rompí.»<br>Decide qué quedará del reino.':'«Yo juré que Valdorra jamás caería. Cumplí el juramento, y el reino cayó igual.»<br>Decide qué quedará del reino.',null,()=>memD('rey',finalChoice()))};
+CUT.rey=()=>{const o=RY().oath;return D('Ormund Cineris',o===1?'«Yo juré que Valdorra jamás caería... y la derribé yo mismo. Ahora que su voz calla, solo oigo las calles que rompí.»<br>Decide qué quedará del reino.':'«Yo juré que Valdorra jamás caería. Cumplí el juramento, y el reino cayó igual.»<br>Decide qué quedará del reino.',null,()=>memD('rey',finalChoice()))};
 {const fc=finalChoice;finalChoice=function(){const d=fc(),o=RY().oath,add=[['Romper el pacto: que Valdorra recuerde',()=>fin('pacto')],['Mantener el pacto: preservar el orden',()=>fin('manten')]];
  if(o===1)add.push(['Guardián de los recuerdos: cargarlos tú',()=>fin('guarda')]);
  d.n='El cráter de Valdorra';d.o=add.concat(d.o||[]);return d}}
@@ -149,9 +149,9 @@ function arrive(){const c=CA.cut,hp=P.hp,st=P.st,i=CRI(),R_=RY();R_.hpf=c.hpf>.7
  const k=i+':0';if(!S.fires.includes(k))S.fires.push(k);S.bf={r:i,x:0};
  loadRegion(i,0);P.hp=Math.max(1,Math.min(P.mhp,hp));P.st=st;P.x=20*16+8;P.y=17*16+4;P.fx=0;P.fy=-1;P.ax=0;P.ay=-1;cam.x=cl(P.x-GW/2,0,W.cols*16-GW);cam.y=cl(P.y-GH/2-FRM,0,W.rows*16-GH);c.lk={x:cam.x,y:cam.y};save()}
 function endDialog(){
- say(D('La Voz','«El juramento está devorándolo.»<br><i>'+nm()+':</i> «¿Qué le hizo?»<br>«Le concedió el poder para preservar su reino. Nunca le prometió que sabría salvarlo.»',null,()=>D('El Rey sin Nombre','«Yo juré que Valdorra jamás caería.»<br><i>La Voz:</i> «Y nosotros juramos que jamás seríamos olvidados.»<br>«No comprendéis lo que ocurrirá cuando él se marche.»<br><i>La Voz:</i> «Lo comprendemos. Fuimos nosotros quienes tuvimos que vivirlo.»')))}
+ say(D('La Voz','«El juramento está devorándolo.»<br><i>'+nm()+':</i> «¿Qué le hizo?»<br>«Le concedió el poder para preservar su reino. Nunca le prometió que sabría salvarlo.»',null,()=>D('Ormund Cineris','«Yo juré que Valdorra jamás caería.»<br><i>La Voz:</i> «Y nosotros juramos que jamás seríamos olvidados.»<br>«No comprendéis lo que ocurrirá cuando él se marche.»<br><i>La Voz:</i> «Lo comprendemos. Fuimos nosotros quienes tuvimos que vivirlo.»')))}
 function tickCut(dt){const c=CA.cut;c.re+=dt;
- for(let i=0;i<3&&c.wq.length;i++){const w=c.wq.shift();try{glowSpr(w[0],w[1])}catch(e){}}c.t+=dt*c.spd;let t=c.t;const once=(k,t0)=>{if(c.st[k]||t<t0)return false;c.st[k]=1;return true};
+ for(let i=0;i<3&&c.wq.length;i++){const w=c.wq.shift();try{glowSpr(w[0],w[1])}catch(e){}}c.t+=dt*c.spd;if(stillTick(c,dt))return;let t=c.t;const once=(k,t0)=>{if(c.st[k]||t<t0)return false;c.st[k]=1;return true};
  {const any=!!(held.light||held.heavy||held.dodge||held.act||buf.light||buf.heavy||buf.dodge||buf.act||CA.tap);CA.tap=0;if(c.sk>0)c.sk-=dt;
   if(any&&!c.pr&&c.re>3&&t<7){if(c.sk>0){c.t=t=7;c.sk=0;relAll()}else c.sk=2}c.pr=any}
  if(t<2.45)G.shake=Math.max(G.shake,.6+4.6*rp(t,0,2.3));
@@ -218,46 +218,115 @@ function drawA(c){const t=c.t,e=E.find(q=>q.id==='rey'),sx=e?e.x-cam.x:GW/2,sy=e
  const b=Math.round(22*ez(t/.4));bars(b);
  cap('El trono se rompe.',rp(t,.5,.7)*(1-rp(t,1.5,1.7)));cap('Una onda de energía atraviesa el salón.',rp(t,1.7,1.9)*(1-rp(t,2.2,2.4)));
  const fl=rp(t,2.1,2.4)*(t<2.5?1:0);if(fl>0){g.fillStyle='rgba(255,252,235,'+fl+')';g.fillRect(0,0,GW,GH)}}
-function drawFull(c){const t=c.t,u=Math.min(4.5,Math.max(0,t-2.5)),k=u/4.5,gk=ez(k);
- g.save();const shk=t>=7&&t<7.4?9*(1-(t-7)/.4):0,cl_=AIR.reduce((a,x)=>a+Math.max(0,1-Math.abs(u-x)*8),0);g.translate(Math.round((hsh(TM*37)-.5)*(shk*2+cl_*3)),Math.round((hsh(TM*53)-.5)*(shk*2+cl_*3)));
- const q=g.createLinearGradient(0,0,0,GH);q.addColorStop(0,'#0c0618');q.addColorStop(.55,'#2a1030');q.addColorStop(1,mixc('#6a2a22','#d0602a',k));g.fillStyle=q;g.fillRect(-12,-12,GW+24,GH+24);
- glowQ(GW*.55,GH,120+80*k,'255,120,60',.15+.25*k);
- // ceniza y brasas que suben (velocidad de caída)
- for(let i=0;i<48;i++){const sp=140+hsh(i+7)*260,x=hsh(i)*GW,y=((hsh(i+3)*GH*2-u*sp*(.5+k))%(GH+50)+GH+50)%(GH+50)-20;g.fillStyle='rgba(255,'+(170+hsh(i)*60|0)+',120,'+(.1+hsh(i+9)*.2)+')';g.fillRect(Math.round(x),Math.round(y),1,Math.round(4+sp*.04))}
- // castillo que se derrumba (a la izquierda, sube y desaparece)
- const cy=-(u*u*26+u*80);
- for(let j=0;j<6;j++){const x=j*30-14,w=28,h=150+hsh(j+4)*90,top=cy+(j%2?44:0)-(j===2?30:0);fr(x,top,w,h+400,'#12081e');fr(x,top,2,h+400,'#2a1840');for(let s=0;s<4;s++)if(hsh(j*5+s)<.7)fr(x+s*7,top-4,5,4,'#12081e');
-  for(let wy=0;wy<9;wy++)for(let wx=0;wx<3;wx++){if(hsh(j*31+wy*3+wx)<.45)continue;fr(x+4+wx*9,top+16+wy*22,3,6,hsh(j*13+wy)<.3?'#ff9a3c':'#2a1a3a')}
-  glowQ(x+w/2,top+h*.4,48,'255,120,50',.08+.1*k)}
- const wxp=92,wyp=cy+120;if(u<1.4){g.fillStyle='#05020a';g.beginPath();g.moveTo(wxp-9,wyp+36);g.lineTo(wxp-9,wyp+8);g.arc(wxp,wyp+8,9,Math.PI,0);g.lineTo(wxp+9,wyp+36);g.fill();glowQ(wxp,wyp+16,34,'255,220,140',.35*(1-u/1.4))}
- for(let i=0;i<18;i++){const ti=hsh(i)*3.4;if(u<ti)continue;const dt_=u-ti,x=20+hsh(i+2)*170+dt_*16,y=40+hsh(i+8)*130+dt_*dt_*70-(cy<0?cy*.35:0),s=4+hsh(i+5)*7;g.save();g.translate(x,y);g.rotate(dt_*(2+hsh(i)*3));fr(-s/2,-s/2,s,s*.8,'#3a2a44');fr(-s/2,-s/2,s,1,'#6a5a7a');g.restore()}
- for(let i=0;i<10;i++){const ti=.05+hsh(i+20)*.5,dt_=u-ti;if(dt_<0||dt_>1.4)continue;const ang=hsh(i)*6.283,sp=60+hsh(i+3)*120,x=wxp+Math.cos(ang)*sp*dt_,y=wyp+8+Math.sin(ang)*sp*dt_*.6+dt_*dt_*50;g.fillStyle='rgba(220,235,255,'+(1-dt_/1.4)+')';g.fillRect(Math.round(x),Math.round(y),3,2)}
- // la capital que sube al encuentro
- for(let L=0;L<2;L++){const sc=(L?1:.6)*(1+gk*(L?1.7:1)),by=GH+(L?60:20)*(1-gk*.0)+(1-gk)*(L?170:110)+gk*(L?40:0);g.save();g.translate(GW*.55,by);g.scale(sc,sc);
-  for(let i=0;i<14;i++){const x=(i-7)*40+(hsh(i+L*9)-.5)*10,h=34+hsh(i+L*4)*50;house(x,0,32,h,L?'#1a0e20':'#100816',L?'#24122c':'#160c1e','#ffb050',i*13+L)}
-  g.restore()}
- if(k>.45){const pk=rp(k,.45,1);g.save();g.translate(GW*.55,GH-8-(1-gk)*20);g.strokeStyle='rgba(255,170,100,'+.5*pk+')';g.lineWidth=1;g.beginPath();g.ellipse(0,0,60*pk,16*pk,0,0,6.283);g.stroke();g.restore()}
- // los dos cuerpos: el Rey en fase III (sin arma) y nosotros se baten en el aire mientras caen
+// ---------- caída: sprites cacheados (nubes de humo con luz naranja arriba, cascotes, esquirlas de cristal violeta) ----------
+let fallSpr=null;
+function fallSprites(){if(fallSpr)return fallSpr;
+ const put=(x,cx,cy,r,col)=>{x.fillStyle=col;const ry=Math.max(2,Math.round(r*.56));for(let dy=-ry;dy<=ry;dy++){const hw=Math.floor(r*Math.sqrt(1-dy*dy/(ry*ry)));x.fillRect(Math.round(cx-hw),Math.round(cy+dy),hw*2,1)}};
+ const clouds=[];
+ for(let v=0;v<4;v++){const w=150,h=54,cv_=mkc(w,h),x=cv_.getContext('2d'),n=10+v*2,bl=[];
+  for(let i=0;i<n;i++)bl.push([14+hsh(v*17+i)*(w-28),h*.6+(hsh(v*29+i+3)-.5)*h*.3,7+hsh(v*7+i+9)*13]);
+  bl.forEach(b=>put(x,b[0],b[1],b[2],'#140a22'));
+  bl.forEach(b=>put(x,b[0]-1,b[1]-2,b[2]-2,'#221134'));
+  bl.forEach(b=>put(x,b[0]-2,b[1]-b[2]*.3,Math.max(3,b[2]*.6),'#341a48'));
+  x.globalCompositeOperation='source-atop';
+  const gr=x.createLinearGradient(0,0,0,h*.62);gr.addColorStop(0,'rgba(255,150,70,.85)');gr.addColorStop(.5,'rgba(255,110,60,.25)');gr.addColorStop(1,'rgba(255,110,60,0)');x.fillStyle=gr;x.fillRect(0,0,w,h);
+  clouds.push(cv_)}
+ const rocks=[];
+ for(let v=0;v<5;v++){const s=18,cv_=mkc(s,s),x=cv_.getContext('2d'),n=6+(v%3),pts=[];
+  for(let i=0;i<n;i++){const a=i/n*6.283,r=s*.3+hsh(v*11+i)*s*.17;pts.push([s/2+Math.cos(a)*r,s/2+Math.sin(a)*r*.82])}
+  const poly=(col,dx,dy)=>{x.fillStyle=col;x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p[0]+dx,p[1]+dy):x.moveTo(p[0]+dx,p[1]+dy));x.closePath();x.fill()};
+  poly('#12081c',0,0);poly('#2e2040',-.5,-.5);poly('#4a3a5e',-1.2,-1.4);
+  x.fillStyle='#ff8a3c';for(let i=0;i<3;i++)x.fillRect(Math.round(5+hsh(v*5+i)*8),Math.round(6+hsh(v*3+i+2)*7),1,1);
+  rocks.push(cv_)}
+ const shards=[];
+ for(let v=0;v<3;v++){const s=20,cv_=mkc(s,s),x=cv_.getContext('2d'),a0=hsh(v+60)*6.283;
+  const P=[0,1,2].map(i=>{const a=a0+i*2.1+hsh(v*4+i)*.5,r=i===0?9:4+hsh(v*9+i)*4;return[10+Math.cos(a)*r,10+Math.sin(a)*r]});
+  const gr=x.createLinearGradient(0,0,s,s);gr.addColorStop(0,'rgba(210,170,255,.95)');gr.addColorStop(1,'rgba(110,50,220,.7)');
+  x.fillStyle=gr;x.beginPath();x.moveTo(P[0][0],P[0][1]);x.lineTo(P[1][0],P[1][1]);x.lineTo(P[2][0],P[2][1]);x.closePath();x.fill();
+  x.strokeStyle='rgba(245,232,255,.95)';x.lineWidth=1;x.stroke();
+  x.strokeStyle='rgba(255,255,255,.5)';x.beginPath();x.moveTo(P[0][0],P[0][1]);x.lineTo((P[1][0]+P[2][0])/2,(P[1][1]+P[2][1])/2);x.stroke();
+  shards.push(cv_)}
+ return fallSpr={clouds,rocks,shards}}
+// nube: se desplaza hacia arriba (porque caemos) con paralaje; sc = escala, sp = velocidad
+function smokeLayer(S_,u,n,seed,sp,sc,al){g.globalAlpha=al;for(let i=0;i<n;i++){const w=150*sc,h=54*sc,span=GH+h*2,x=hsh(seed+i)*(GW+w)-w*.6+Math.sin(u*.7+i)*4,y=GH+h-((u*sp+hsh(seed+i+7)*span)%span);g.drawImage(S_.clouds[(seed+i)&3],Math.round(x),Math.round(y),Math.round(w),Math.round(h))}g.globalAlpha=1}
+function drawFull(c){const t=c.t,u=Math.min(4.5,Math.max(0,t-2.5)),k=u/4.5,gk=ez(k),S_=fallSprites();
  const FS=AIR,fight=u>=2.9,met=rp(u,.9,2.9);
  const lung=w=>{let m=0;for(let i=0;i<FS.length;i++){if(i%2!==w)continue;const d=u-FS[i];if(d>=0&&d<.3)m=Math.max(m,Math.sin(d/.3*Math.PI))}return m};
  const lk=fight?lung(0):0,lp=fight?lung(1):0;
  let sw=0;for(let i=1;i<FS.length;i+=2){const d=u-FS[i];if(d>=0&&d<.3)sw=C(d/.2)}
+ let hit=0,punch=0;for(let i=0;i<FS.length;i++){const d=u-FS[i];hit=Math.max(hit,Math.max(0,1-Math.abs(d)*8));if(d>=0&&d<.3)punch=Math.max(punch,Math.pow(1-d/.3,2))}
+ const shk=t>=7&&t<7.4?9*(1-(t-7)/.4):0,ns=shk*2+hit*3.2;
+ g.save();
+ // cámara: acerca poco a poco, se inclina con cada golpe y da un tirón de zoom en cada choque
+ const zoom=1.07+.07*ez(rp(u,2.2,4.5))+.035*punch,roll=Math.sin(u*1.9)*.016+(fight?(lp-lk)*.022:0);
+ g.translate(GW/2+Math.round((hsh(TM*37)-.5)*ns),GH/2+Math.round((hsh(TM*53)-.5)*ns));g.rotate(roll);g.scale(zoom,zoom);g.translate(-GW/2,-GH/2);
+ // cielo: violeta oscuro arriba, brasa de la capital abajo
+ const q=g.createLinearGradient(0,0,0,GH);q.addColorStop(0,'#0a0414');q.addColorStop(.4,mixc('#1c0c2c','#241032',k));q.addColorStop(.78,mixc('#4a1c34','#7a3030',k));q.addColorStop(1,mixc('#6a2a22','#e0702c',k));
+ g.fillStyle=q;g.fillRect(-40,-40,GW+80,GH+80);
+ // la explosión del castillo queda arriba y se aleja; halo violeta lateral
+ const ex=GW*.42,ey=-40-u*46;
+ glowQ(ex,ey,220,'255,110,40',.62*(1-k*.55));glowQ(ex,ey+10,120,'255,236,190',.55*(1-rp(u,0,1.6)));glowQ(GW*.12,GH*.45,150,'130,70,230',.2);glowQ(GW*.88,GH*.3,130,'160,60,220',.14);
+ // onda expansiva de la explosión
+ {const r=rp(u,0,1.8);if(r>0&&r<1){g.strokeStyle='rgba(255,226,170,'+.6*(1-r)+')';g.lineWidth=3*(1-r)+1;g.beginPath();g.ellipse(100,92+u*20,20+230*r,10+110*r,0,0,6.283);g.stroke()}}
+ // humo lejano
+ smokeLayer(S_,u,5,3,70,.75,.55);
+ // castillo que se derrumba (a la izquierda, sube y desaparece) con fuego y piedra incandescente
+ const cy=-(u*u*26+u*80);
+ for(let j=0;j<6;j++){const x=j*30-14,w=28,h=150+hsh(j+4)*90,top=cy+(j%2?44:0)-(j===2?30:0);fr(x,top,w,h+400,'#12081e');fr(x,top,2,h+400,'#2a1840');fr(x+w-2,top,2,h+400,'#0a0412');
+  for(let s=0;s<4;s++)if(hsh(j*5+s)<.7){fr(x+s*7,top-4,5,4,'#12081e');if(hsh(j*7+s)<.4)fr(x+s*7+1,top-6,2,2,'#ff8a3c')}
+  for(let wy=0;wy<9;wy++)for(let wx=0;wx<3;wx++){if(hsh(j*31+wy*3+wx)<.45)continue;const hot=hsh(j*13+wy)<.3;fr(x+4+wx*9,top+16+wy*22,3,6,hot?'#ff9a3c':(hsh(j*3+wy+wx)<.35?'#8a4aff':'#2a1a3a'))}
+  glowQ(x+w/2,top+h*.4,56,'255,120,50',.1+.12*k);glowQ(x+w/2,top+8,40,'255,170,80',.18*(1-k*.6))}
+ // el hueco de la ventana por la que salimos (destello que se apaga)
+ const wxp=92,wyp=cy+120;if(u<1.6){g.fillStyle='#05020a';g.beginPath();g.moveTo(wxp-9,wyp+36);g.lineTo(wxp-9,wyp+8);g.arc(wxp,wyp+8,9,Math.PI,0);g.lineTo(wxp+9,wyp+36);g.fill();glowQ(wxp,wyp+16,54,'255,220,140',.5*(1-u/1.6))}
+ // esquirlas de cristal violeta (vidrieras) con destellos
+ for(let i=0;i<11;i++){const ti=hsh(i+30)*2.2,dt_=u-ti;if(dt_<0)continue;const dep=.55+hsh(i+2)*.9,x=GW*.12+hsh(i+8)*GW*.8+Math.sin(dt_*2+i)*10,y=GH+30-(dt_*(90+hsh(i)*120)*dep)%(GH+80),sz=(.5+hsh(i+4)*.7)*dep,gl=.5+.5*Math.sin(u*9+i*1.7);
+  g.save();g.translate(Math.round(x),Math.round(y));g.rotate(dt_*(1.5+hsh(i+1)*3));g.scale(sz,sz);g.drawImage(S_.shards[i%3],-10,-10);g.restore();if(gl>.8)glowQ(x,y,10*sz+4,'210,170,255',.35)}
+ // cascotes incandescentes con estela de fuego
+ for(let i=0;i<26;i++){const ti=hsh(i)*3.6,dt_=u-ti;if(dt_<0)continue;const dep=.6+hsh(i+5)*.9,x=16+hsh(i+2)*GW*.7+dt_*(10+hsh(i+7)*26),y=30+hsh(i+8)*150+dt_*dt_*60-(cy<0?cy*.4:0)-dt_*60*dep*.4,s=(.55+hsh(i+5)*.8)*dep;
+  for(let tr=1;tr<=4;tr++){const a=.35*(1-tr/5)*(hsh(i+3)<.6?1:.4);g.fillStyle='rgba('+(tr<3?'255,150,60':'200,70,50')+','+a+')';g.fillRect(Math.round(x-dt_*8*tr*.3),Math.round(y-tr*5*s),Math.max(1,Math.round(3*s)),Math.max(1,Math.round(4*s)))}
+  g.save();g.translate(Math.round(x),Math.round(y));g.rotate(dt_*(2+hsh(i)*3));g.scale(s,s);g.drawImage(S_.rocks[i%5],-9,-9);g.restore();if(hsh(i+6)<.5)glowQ(x,y,12*s+4,'255,130,50',.28)}
+ // humo medio, iluminado por el fuego de arriba
+ smokeLayer(S_,u,6,19,150,1,.8);
+ // la capital que sube al encuentro (dos capas, con incendios en las calles)
+ for(let L=0;L<2;L++){const sc=(L?1:.6)*(1+gk*(L?1.7:1)),by=GH+(L?60:20)+(1-gk)*(L?170:110)+gk*(L?40:0);g.save();g.translate(GW*.55,by);g.scale(sc,sc);
+  for(let i=0;i<14;i++){const x=(i-7)*40+(hsh(i+L*9)-.5)*10,h=34+hsh(i+L*4)*50;house(x,0,32,h,L?'#1a0e20':'#100816',L?'#24122c':'#160c1e','#ffb050',i*13+L);
+   if(L&&hsh(i+70)<.32){const fl=.6+.4*Math.sin(TM*18+i*3);glowQ(x+16,-h-4,34*fl+14,'255,120,40',.4*gk);fr(x+13,-h-9,6,5,'#ff9a3c');fr(x+14,-h-13-fl*3,4,5,'#ffd070')}}
+  g.restore()}
+ if(k>.45){const pk=rp(k,.45,1);g.save();g.translate(GW*.55,GH-8-(1-gk)*20);g.strokeStyle='rgba(255,170,100,'+.5*pk+')';g.lineWidth=1;g.beginPath();g.ellipse(0,0,60*pk,16*pk,0,0,6.283);g.stroke();g.restore();glowQ(GW*.55,GH+10,170,'255,110,40',.4*pk)}
+ // ---- los dos cuerpos: el Rey (fase III, sin arma) y el jugador luchan en el aire mientras caen ----
  const px0=lerp(104,GW*.55,ez(u/2.8)),py0=lerp(70,GH*.64,gk)+Math.sin(u*6)*3,
   px=px0-(fight?14:0)+lp*20-lk*5,py=py0+(fight?Math.sin(u*9)*3-lp*3:0),
   kx=lerp(88,px0+16,ez(met))-lk*20+lp*5,ky=fight?py0-4+Math.sin(u*7)*4-lk*3:lerp(-50,py0-4,ez(met)),
   dive=u>4.1?Math.pow(u-4.1,2)*260:0;
+ // el Rey cae como un meteoro: estela oscura con brasas hasta que nos alcanza
+ if(u>.8&&met<1){const f=1-met;g.save();g.globalCompositeOperation='lighter';for(let i=0;i<3;i++){g.strokeStyle='rgba('+(i?'255,150,70':'160,70,255')+','+(.35-i*.1)*f+')';g.lineWidth=7-i*2;g.beginPath();g.moveTo(kx+i,ky);g.lineTo(kx-22*f-i*2,ky-70*f-i*8);g.stroke()}g.restore();glowQ(kx,ky,60+30*f,'170,70,255',.35)}
+ // capa del jugador al viento y estela de espada
+ if(true){g.lineCap='round';for(let r=0;r<3;r++){g.strokeStyle=r?'#2a1640':'#140a20';g.lineWidth=r?2:3;g.beginPath();for(let j=0;j<=8;j++){const xx=px-4-r*2+Math.sin(u*15+j*.9+r*2)*(1+j*.55),yy=py+dive-6-j*(5+r);j?g.lineTo(xx,yy):g.moveTo(xx,yy)}g.stroke()}g.lineCap='butt'}
+ if(u>.8){glowQ(kx,ky+dive-4,56,'150,60,255',.3+.18*lk);
+  for(let i=0;i<12;i++){const f=((u*1.7+i*.083)%1),x=kx+Math.sin(i*2.1+u*6)*(5+f*8),y=ky+dive-12-f*84;g.fillStyle=i%3?'rgba(34,10,56,'+(.7*(1-f))+')':'rgba(170,80,255,'+(.8*(1-f))+')';const s=Math.max(1,Math.round(5*(1-f)));g.fillRect(Math.round(x),Math.round(y),s,s)}}
  const SZ=2.1,big=(x,y,f)=>{g.save();g.translate(x,y);g.scale(SZ,SZ);g.translate(-x,-y);f();g.restore()};
  if(u>.8)big(kx,ky+dive,()=>body('rey1',kx,ky+dive,-1,0,lk>.05?'act':'wind',(TM*8|0),{rot:lerp(.55,-.12,met)-lk*.4+(fight?Math.sin(u*6)*.08:0)}));
  big(px,py+dive,()=>{body('player',px,py+dive,1,0,lp>.05?'act':'hit',(TM*6|0),{rot:(1-met)*Math.sin(u*3)*1.2+(fight?.12+lp*.35+Math.sin(u*5)*.06:0)});
   weapon('sword',px+5,py+dive-11,fight?(sw>0?-1.3+2.4*sw:.2+Math.sin(u*8)*.3):.5+Math.sin(u*8)*.5,14,{glow:'125,249,255'})});
- // choques en el aire: destello, rayos y arco del golpe (par = golpe del Rey, impar = el nuestro)
- for(let i=0;i<FS.length;i++){const d=u-FS[i];if(d<0||d>.35)continue;const f=1-d/.35,mx=(px+kx)/2,my=(py+ky)/2-6+dive,kg=i%2===0;
-  glowQ(mx,my,30*f+8,kg?'255,200,120':'200,245,255',.6*f);g.strokeStyle='rgba(255,246,210,'+f+')';g.lineWidth=1;
-  for(let s_=0;s_<9;s_++){const a=s_*.7+FS[i]*3;g.beginPath();g.moveTo(mx+Math.cos(a)*5,my+Math.sin(a)*5);g.lineTo(mx+Math.cos(a)*(10+30*(1-f)),my+Math.sin(a)*(10+30*(1-f)));g.stroke()}
-  g.save();g.globalCompositeOperation='lighter';g.strokeStyle=kg?'rgba(255,170,90,'+f+')':'rgba(150,240,255,'+f+')';g.lineWidth=3*f+1;g.beginPath();
-  g.arc(kg?px:kx,kg?py+dive-8:ky+dive-8,26+10*(1-f),kg?-.9:Math.PI-.9+1.8*0,kg?.9:Math.PI+.9);g.stroke();g.restore()}
- for(let i=0;i<10;i++){const x=hsh(i+40)*GW,y=((hsh(i+50)*GH*2-u*420)%(GH+80)+GH+80)%(GH+80)-40;fr(x,y,1,18+hsh(i)*16,'rgba(255,255,255,.1)')}
+ glowQ(px+8,py+dive-8,26+10*sw,'125,249,255',.18+.3*sw);
+ // choques en el aire: destello, rayos, arco del golpe, onda, chispas con gravedad (par = golpe del Rey, impar = el nuestro)
+ for(let i=0;i<FS.length;i++){const d=u-FS[i];if(d<0||d>.45)continue;const f=1-d/.45,f2=Math.max(0,1-d/.35),mx=(px+kx)/2,my=(py+ky)/2-6+dive,kg=i%2===0;
+  if(f2>0){glowQ(mx,my,44*f2+10,kg?'255,200,120':'200,245,255',.7*f2);g.strokeStyle='rgba(255,246,210,'+f2+')';g.lineWidth=1;
+   for(let s_=0;s_<9;s_++){const a=s_*.7+FS[i]*3;g.beginPath();g.moveTo(mx+Math.cos(a)*5,my+Math.sin(a)*5);g.lineTo(mx+Math.cos(a)*(10+34*(1-f2)),my+Math.sin(a)*(10+34*(1-f2)));g.stroke()}
+   g.save();g.globalCompositeOperation='lighter';g.strokeStyle=kg?'rgba(255,170,90,'+f2+')':'rgba(150,240,255,'+f2+')';g.lineWidth=3*f2+1;g.beginPath();
+   g.arc(kg?px:kx,kg?py+dive-8:ky+dive-8,26+10*(1-f2),kg?-.9:Math.PI-.9,kg?.9:Math.PI+.9);g.stroke();g.restore()}
+  g.strokeStyle='rgba(255,236,190,'+.55*f+')';g.lineWidth=1.5;g.beginPath();g.ellipse(mx,my,6+70*(1-f),3+34*(1-f),0,0,6.283);g.stroke();
+  for(let s_=0;s_<14;s_++){const a=hsh(i*20+s_)*6.283,sp=50+hsh(i*20+s_+3)*110,xx=mx+Math.cos(a)*sp*d,yy=my+Math.sin(a)*sp*d+160*d*d;g.fillStyle=(kg?'rgba(255,'+(170+hsh(s_)*70|0)+',90,':'rgba(170,240,255,')+f+')';g.fillRect(Math.round(xx),Math.round(yy),2,1)}}
+ // humo cercano (pasa rápido) y líneas de viento; en el picado, líneas radiales de velocidad
+ smokeLayer(S_,u,3,41,330+260*rp(u,3.6,4.5),1.7,.5*rp(u,.6,1.4)*(1-rp(u,4.2,4.5)*.5));
+ for(let i=0;i<46;i++){const sp=240+hsh(i+7)*420,x=hsh(i)*GW,len=10+sp*.05,y=GH+len-((u*sp*(.6+k*.9)+hsh(i+3)*(GH+60))%(GH+len+30));g.fillStyle='rgba(255,236,210,'+(.07+.09*hsh(i+9))+')';g.fillRect(Math.round(x),Math.round(y),1,Math.round(len))}
+ for(let i=0;i<54;i++){const sp=120+hsh(i+7)*260,x=hsh(i+90)*GW+Math.sin(u*2+i)*6,y=((hsh(i+3)*GH*2-u*sp*(.5+k))%(GH+50)+GH+50)%(GH+50)-20;g.fillStyle='rgba(255,'+(150+hsh(i)*80|0)+',90,'+(.2+hsh(i+9)*.35)+')';g.fillRect(Math.round(x),Math.round(y),1+(i%7===0),Math.round(3+sp*.03))}
+ {const dv=rp(u,4.0,4.5);if(dv>0){g.save();g.strokeStyle='rgba(255,240,215,'+.32*dv+')';g.lineWidth=1;const cxp=px,cyp=py+dive;for(let i=0;i<34;i++){const a=hsh(i+120)*6.283,r0=48+hsh(i+130)*60,r1=r0+40+hsh(i+140)*110*dv;g.beginPath();g.moveTo(cxp+Math.cos(a)*r0,cyp+Math.sin(a)*r0*.8);g.lineTo(cxp+Math.cos(a)*r1,cyp+Math.sin(a)*r1*.8);g.stroke()}g.restore()}}
  g.restore();
+ // viñeta (más roja al acercarse al suelo) y destello suave en cada choque
+ {const vg=g.createRadialGradient(GW/2,GH/2,GH*.38,GW/2,GH/2,GW*.62),dr=rp(u,3.6,4.5);vg.addColorStop(0,'rgba(8,0,16,0)');vg.addColorStop(1,'rgba(8,0,16,'+(.58-.1*dr)+')');g.fillStyle=vg;g.fillRect(0,0,GW,GH);
+  if(dr>0){const rg_=g.createRadialGradient(GW/2,GH/2,GH*.3,GW/2,GH/2,GW*.6);rg_.addColorStop(0,'rgba(255,70,30,0)');rg_.addColorStop(1,'rgba(255,70,30,'+.3*dr+')');g.fillStyle=rg_;g.fillRect(0,0,GW,GH)}
+  if(punch>0){g.fillStyle='rgba(255,246,225,'+.12*punch+')';g.fillRect(0,0,GW,GH)}}
  cap('LA CAÍDA DE VALDORRA',rp(u,.5,.9)*(1-rp(u,2.2,2.6)),44);cap('El Rey los alcanza en el aire.',rp(u,3,3.2)*(1-rp(u,4.2,4.4)),GH-30);
  const fa=t<2.9?1-rp(t,2.5,2.9):0;if(fa>0){g.fillStyle='rgba(255,252,235,'+fa+')';g.fillRect(0,0,GW,GH)}
  bars(22);
@@ -314,4 +383,86 @@ function overlayHud(){const e=E.find(q=>q.id==='rey'&&q.b&&q.s!=='dead'),R_=RY()
   if(ap){fr(x,y,w*C(CA.ap/3),5,'#ffe66d');tx('VÍNCULO EXPUESTO',GW/2,y-4,'#fff2b0','center',6)}else{fr(x,y,w,5,'rgba(255,170,60,.45)');tx('AUTORIDAD DE AZRAEL',GW/2,y-4,'#c9a54a','center',5)}}
  if(P&&P.sur>0){const x=12,y=76;g.fillStyle='#ffe66d';g.beginPath();g.moveTo(x,y-4);g.lineTo(x+4,y);g.lineTo(x,y+4);g.lineTo(x-4,y);g.fill();glowQ(x,y,10,'255,230,109',.3);tx('Promesa',x+8,y+2,'#ffe66d','left',5)}
  if(CA.sub){const s=CA.sub,al=Math.min(1,s.l*3,(s.m-s.l)*4+.01),L=wrap(s.t,330,6),h=L.length*9+10,col=s.w==='Azrael'?'#ffd070':s.w==='La Voz'?'#9ad0ff':'#c9b8ff',y=GH-62-h;g.globalAlpha=al;fr(GW/2-170,y,340,h,'rgba(8,4,14,.78)');fr(GW/2-170,y,2,h,col);tx(s.w.toUpperCase(),GW/2-162,y+9,col,'left',5);L.forEach((l,i)=>tx(l,GW/2-162,y+19+i*9,'#f4ecff','left',6));g.globalAlpha=1}}
+// ---------- viñeta narrada: tras el blanco de la explosión se muestra la imagen del duelo final ----------
+// Cuando la onda del trono lo vuelve todo blanco (t=2.5) la cinemática se congela, aparece la ilustración de Ormund Cineris con tres líneas
+// del narrador (máquina de escribir) y al terminar un destello blanco enlaza con la animación de la caída (drawFull).
+// Toque / Enter / Espacio / E: completa la línea y pasa a la siguiente. Imagen: ormund_final.webp.
+const ST_SRC='ormund_final.webp',ST_AT=2.5,ST_CPS=30,ST_END=8.4,ST_FLASH=.55;
+const ST_L=[
+ {t:1.3,s:'El castillo de Valdorra estalló en mil pedazos.',k:()=>snd('boom_long',.8,60,1,'sawtooth',.1,30)},
+ {t:3.7,s:'La caída parecía mortal.',k:()=>snd('rumble',.8,90,1.2,'sine',.08,45)},
+ {t:6.0,s:'Y la batalla final comenzaba.',k:()=>{snd('metal',.6,1200,.3,'square',.04,500);snd('boom',.7,70,.6,'sawtooth',.1,40)},big:1}];
+let stImg=null,stDom=null;
+function preStill(){if(stImg)return;try{stImg=new Image();stImg.decoding='async';stImg.src=ST_SRC}catch(e){stImg=null}}
+try{const s0=startCut;startCut=function(){preStill();return s0.apply(this,arguments)}}catch(e){}
+function stFit(){if(!stDom)return;const a=innerWidth/Math.max(1,innerHeight);stDom.main.style.objectFit=a>1.85?'contain':'cover'}
+function beginStill(c){
+ preStill();
+ const ov=document.createElement('div');ov.id='ormundStill';
+ ov.innerHTML='<img class="osbg" alt=""><img class="osimg" alt=""><canvas class="osfx" width="320" height="180"></canvas><div class="osvig"></div><div class="ostx"><p><span class="v"></span><span class="h"></span></p></div><div class="oswh"></div>';
+ document.body.appendChild(ov);
+ const main=ov.querySelector('.osimg'),bg=ov.querySelector('.osbg'),fx=ov.querySelector('.osfx'),p=ov.querySelector('.ostx p');
+ main.src=bg.src=ST_SRC;
+ stDom={ov,main,bg,fx,cx:fx.getContext('2d'),p,v:p.querySelector('.v'),h:p.querySelector('.h'),wh:ov.querySelector('.oswh'),li:-1,n:-1};
+ stDom.cx.imageSmoothingEnabled=false;stFit();
+ ov.addEventListener('pointerdown',e=>{e.stopPropagation();CA.tap=1});
+ return{on:1,t:0,w:0,pr:1,end:0,shk:0,pul:0}}
+function finishStill(c){const s=c.sv;if(!s)return;s.on=0;if(stDom){try{stDom.ov.remove()}catch(e){}stDom=null}}
+function stillTick(c,dt){
+ let s=c.sv;
+ if(!s){if(c.t>=ST_AT&&c.t<7){c.t=ST_AT;s=c.sv=beginStill(c)}else return false}
+ else if(!s.on)return false;
+ c.t=ST_AT;G.shake=0;
+ // esperar a que cargue la imagen (máx. 2 s) sin avanzar el reloj de la viñeta
+ const ready=!!(stImg&&stImg.complete&&stImg.naturalWidth);
+ if(!ready&&s.w<2){s.w+=dt;return true}
+ const k=dt*c.spd;s.t+=k;
+ const any=!!(held.light||held.heavy||held.dodge||held.act||buf.light||buf.heavy||buf.dodge||buf.act||CA.tap);CA.tap=0;
+ if(any&&!s.pr&&s.t>.5&&s.t<ST_END){
+  let li=-1;for(let i=0;i<ST_L.length;i++)if(s.t>=ST_L[i].t)li=i;
+  if(li<0)s.t=ST_L[0].t;
+  else{const L=ST_L[li],done=L.t+L.s.length/ST_CPS+.05;
+   if(s.t<done)s.t=done;else if(li<ST_L.length-1)s.t=ST_L[li+1].t;else s.t=ST_END}}
+ s.pr=any;
+ // sonidos al aparecer cada línea y al estallar el destello final
+ ST_L.forEach((L,i)=>{if(s['k'+i]||s.t<L.t)return;s['k'+i]=1;try{L.k()}catch(e){}s.pul=1;if(L.big)s.shk=1});
+ if(!s.end&&s.t>=ST_END){s.end=1;snd('boom_long',.9,60,1,'sawtooth',.12,30)}
+ if(s.t>=ST_END+ST_FLASH){finishStill(c);return false}
+ return true}
+function stillDraw(c){
+ const s=c.sv,d=stDom;if(!s||!s.on||!d)return;
+ const t=s.t,dtf=1/60;
+ s.pul=Math.max(0,s.pul-dtf*2.6);s.shk=Math.max(0,s.shk-dtf*1.6);
+ // Ken Burns: zoom lento hacia el choque entre el caballero y Ormund + temblor en el último impacto
+ const z=1.02+.09*rp(t,0,ST_END),sh=s.shk*s.shk*7,ox=(hsh(TM*37)-.5)*sh,oy=(hsh(TM*53)-.5)*sh;
+ d.main.style.transform='translate('+ox.toFixed(1)+'px,'+oy.toFixed(1)+'px) scale('+z.toFixed(4)+')';
+ d.bg.style.transform='scale(1.15)';
+ d.main.style.filter='brightness('+(1+.45*s.pul+.15*s.shk).toFixed(3)+') saturate('+(1+.25*s.pul).toFixed(3)+')';
+ // blanco inicial que revela la imagen y destello final que enlaza con la caída
+ const wa=t<ST_END?1-ez(rp(t,.1,1.35)):ez(rp(t,ST_END,ST_END+ST_FLASH));
+ d.wh.style.opacity=wa.toFixed(3);
+ // texto: línea activa con máquina de escribir; la anterior se desvanece
+ let li=-1;for(let i=0;i<ST_L.length;i++)if(t>=ST_L[i].t)li=i;
+ if(li>=0){const L=ST_L[li],n=Math.min(L.s.length,Math.floor((t-L.t)*ST_CPS)+1);
+  if(d.li!==li||d.n!==n){
+   if(d.li===li&&n>d.n&&n%3===0){try{sfx(520+hsh(n)*120,.025,'square',.008)}catch(e){}}
+   d.li=li;d.n=n;d.v.textContent=L.s.slice(0,n);d.h.textContent=L.s.slice(n);
+   d.p.className=L.big?'big':''}
+  const fo=1-rp(t,ST_END-.15,ST_END+.2);
+  d.p.style.opacity=(rp(t,L.t,L.t+.25)*fo).toFixed(3);
+  d.p.style.transform='translateY('+((1-rp(t,L.t,L.t+.35))*8).toFixed(1)+'px)'}
+ else d.p.style.opacity=0;
+ // brasas y esquirlas que suben (canvas 320x180 pixelado)
+ const x=d.cx,W_=320,H_=180;x.clearRect(0,0,W_,H_);
+ for(let i=0;i<70;i++){const sp=10+hsh(i+7)*34,px=(hsh(i)*W_+Math.sin(t*.8+i)*6+W_)%W_,py=((hsh(i+3)*H_-t*sp)%H_+H_)%H_,sz=hsh(i+9)<.18?2:1,
+   col=i%5===0?'196,108,255':i%3===0?'255,214,120':'255,138,60';
+  x.fillStyle='rgba('+col+','+(.25+.6*hsh(i+11))*(.6+.4*Math.sin(t*5+i))+')';x.fillRect(Math.round(px),Math.round(py),sz,sz)}}
+{const d=draw;draw=function(){const c=CA.cut;
+  if(c&&c.sv&&c.sv.on&&G.mode==='caida'){
+   cineUI(true);g.save();g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.globalCompositeOperation='source-over';g.fillStyle='rgb(255,252,235)';g.fillRect(0,0,GW,GH);g.restore();
+   try{stillDraw(c)}catch(er){if(!draw.errS){draw.errS=1;console.error(er)}finishStill(c)}
+   return}
+  return d.apply(this,arguments)}}
+try{addEventListener('resize',stFit)}catch(e){}
+
 })();

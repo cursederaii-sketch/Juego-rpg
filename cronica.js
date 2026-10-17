@@ -27,7 +27,7 @@ const PRES={
  pastora:()=>[['La Pastora de Ceniza','Mi rebaño ya no me reconoce. Dime, '+nm()+': ¿tú te reconoces?']],
  cazador:()=>[['El Cazador Hueco','(Olfatea el aire.) Hueles a alguien que aún conserva su nombre. Qué raro. Qué caro.']],
  caballero:()=>[['El Caballero que No Murió',S.aldric?'Esa voz... Hermano. ¿Vienes a cumplir tu promesa o a romperla otra vez?':'No sé quién eres. Pero mi cadena sí te conoce.']],
- rey:()=>[['El Rey sin Nombre','Llegaste con los recuerdos que quisiste conservar, '+nm()+'. ¿Cuántos son ciertos? '+(nMem()>=5?'Reuniste los cinco. Entonces sabes lo que pediste.':'Te faltan piezas. No importa: la pregunta es la misma.')]],
+ rey:()=>[['Ormund Cineris','Llegaste con los recuerdos que quisiste conservar, '+nm()+'. ¿Cuántos son ciertos? '+(nMem()>=5?'Reuniste los cinco. Entonces sabes lo que pediste.':'Te faltan piezas. No importa: la pregunta es la misma.')]],
  guardiana:()=>[['La Guardiana del Osario','Duerme, forastero. Es lo único que aún sé dar.']],
  capdorn:()=>[['Capitán Dorn','Te lo advertí. Los muertos tampoco perdonan.']]};
 {const sb=startBoss;startBoss=function(){sb();try{const id=AB(),f=PRES[id];if(f&&once('i'+id))say(chain(f()))}catch(e){}}}
@@ -35,7 +35,7 @@ const PRES={
 // ---- REACCIONES DE PNJ: cuando no tienen nada nuevo que ofrecer, comentan cómo avanza la historia ----
 const REA={
  anselmo:[[1,'Antes de fundir las campanas, la reina pidió que una sonara solo si alguien volvía de entre los muertos. No me atrevo a decirte si sonó.'],[3,'Dicen que los Huecos no son monstruos, sino vecinos que pidieron olvidar más de lo que cabía en ellos. Yo toco por ellos, aunque no oigan.']],
- aldea1:[[2,'Anoche soñé con una nana. Mi madre la cantaba. Hacía años que no la recordaba.'],[4,'Dicen que el Rey sin Nombre llora cuando nadie lo ve. Yo no lloraría por quien nos hizo esto. Pero lo entendería.']],
+ aldea1:[[2,'Anoche soñé con una nana. Mi madre la cantaba. Hacía años que no la recordaba.'],[4,'Dicen que Ormund Cineris llora cuando nadie lo ve. Yo no lloraría por quien nos hizo esto. Pero lo entendería.']],
  aldea2:[[1,'Mi hijo ha empezado a decir nombres otra vez. Los dice mal, pero los dice.'],[3,'La ceniza ya no cae. Es raro: casi la echo de menos. Era lo único que nos recordaba que algo había pasado.']],
  ysolde:[[2,'La luna también olvida: por eso cambia cada noche. Pero siempre vuelve. Quizá recordar es solo volver.'],[4,'Leí tu nombre en una piedra, '+'viajero. No te lo diré. Algunas cosas hay que encontrarlas con los propios ojos.']],
  brenna:[[3,'Cacé tantos Huecos... Uno llevaba el anillo de mi hermana. Ya no cuento muertos. Cuento nombres.']],
@@ -55,7 +55,7 @@ const CRO=[
  ['Los juramentos',()=>S.oaths.length,'Pactos con una ventaja y un precio. Nacieron en las criptas, cuando los guardianes aprendieron que la memoria se compra con renuncias.'],
  ['El Archivo',()=>S.keys.archivo||S.tr.archivos,'Allí se escribía todo lo que el reino debía recordar. Tras el decreto se guardó lo que debía callarse. Los vigilantes juraron no dejar salir una sola página.'],
  ['Aldric',()=>S.aldric,'Capitán de la Puerta y hermano de armas del escudero. Prometió cargar con la culpa de quien abriera. Su cadena no es de hierro: es de promesa.'],
- ['El Rey sin Nombre',()=>S.bk.cazador,'Pagó con la memoria de su pueblo para detener la ceniza. Ni él mismo recuerda ya su nombre; solo el peso de la corona.'],
+ ['Ormund Cineris',()=>S.bk.cazador,'Pagó con la memoria de su pueblo para detener la ceniza. Su pueblo ya no recuerda su nombre; él lo repite en voz baja para no perderlo, y solo conserva el peso de la corona.'],
  ['El escudero',()=>S.mem.rey,'Quien giró la llave, quien pidió el olvido y quien raspó la frase en el muro. Un mismo hombre con tres razones y un único miedo: perder a todos.'],
  ['La ceniza',()=>S.mem.rey,'No venía del norte. Venía de dentro: del miedo de un reino que no podía olvidar. Por eso el olvido la apagaba... y por eso volvería si el reino recordara sin aprender a perdonar.']];
 const croHTML=()=>{const n=CRO.filter(c=>c[1]()).length;return '<h2>Crónica · '+n+'/'+CRO.length+'</h2>'+CRO.map(c=>c[1]()?'<div class="ent ok"><b>'+c[0]+'</b><span>'+esc(c[2])+'</span></div>':'<div class="ent lock"><b>???</b><span>Aún no sabes lo suficiente.</span></div>').join('')};

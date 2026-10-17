@@ -20,7 +20,7 @@ Object.assign(NOTES,{
  cantera3:['Picos hacia la compuerta','Las herramientas descansan orientadas hacia la compuerta. Los trabajadores intentaron salir. La compuerta se cerró desde fuera.'],
  torre3:['Aceite repuesto','El depósito del faro fue rellenado después de la hora oficial de apagado. Alguien mantuvo una luz mínima mientras pudo.'],
  puerto3:['Campana rota','Una campana a medio fundir. Su badajo conserva tres golpes de uso: duelo, evacuación y silencio. El último es el más gastado.']});
-const LORE_NOTES={cripta:[[17,33,'cripta5']],valdora:[[16,34,'valdora4'],[7,45,'valdora5'],[6,19,'valdora6']],bosque:[[18,39,'bosque4'],[14,32,'bosque5']],puertas:[[15,26,'puertas3']],
+const LORE_NOTES={cripta:[[17,33,'cripta5']],valdora:[],bosque:[[18,39,'bosque4'],[14,32,'bosque5']],puertas:[[15,26,'puertas3']],
  trono:[[6,33,'trono1'],[49,33,'trono2']],osario:[[10,24,'osario2'],[24,3,'osario3']],archivos:[[12,20,'archivos3']],fosa:[[18,20,'fosa2']],marisma:[[15,26,'marisma3']],
  cantera:[[8,27,'cantera3']],torre:[[26,40,'torre3']],puerto:[[46,26,'puerto3']]};
 RG.forEach(r=>{const L=LORE_NOTES[r.id];if(!L)return;const b=r.build;r.build=function(W){b.call(this,W);L.forEach(([x,y,id])=>W.note(x,y,id))}});
@@ -36,7 +36,7 @@ croSet('La reina Maelis','No era una profeta: escuchaba lo que otros descartaban
 croSet('Los juramentos','Tres respuestas al miedo: resistir sin ceder, convertir el dolor en fuerza o renunciar a ser reconocido. Cada uno tiene un precio, y ninguno es una maldición: son pactos que cambian la relación entre poder, identidad y renuncia.');
 croSet('El Archivo','Allí se escribía lo que el reino debía recordar. Tras el decreto se guardó lo que debía callarse y se quemó el resto. Dos firmas sobrevivieron bajo una misma tapa.');
 croSet('Aldric','Capitán de la Puerta y hermano de armas del escudero. Prometió cargar con la culpa si alguien abría contra la orden. La promesa se volvió inmovilidad: mientras él fuera el culpable, nadie tendría que preguntar por el rey ni por el pacto.');
-croSet('El Rey sin Nombre','Creyó que gobernar era evitar el pánico a cualquier precio. Amaba a Maelis, pero leyó su advertencia como amenaza al orden. Tras el pacto perdió hasta el nombre que legitimaba su autoridad y conservó solo los hábitos del mando.');
+croSet('Ormund Cineris','Creyó que gobernar era evitar el pánico a cualquier precio. Amaba a Maelis, pero leyó su advertencia como amenaza al orden. Tras el pacto perdió hasta el nombre que legitimaba su autoridad y conservó solo los hábitos del mando.');
 croSet('El escudero','Quien giró el mecanismo para que la gente pudiera salir, quien propuso el pacto y quien raspó la frase en el muro. Un hombre leal, desobediente y compasivo que confundió salvar vidas con decidir por ellas.');
 croSet('La ceniza','No viene de fuera: nace de la memoria negada y del miedo colectivo. Nombrar a los muertos, reconocer una culpa o escuchar a una víctima la debilita. No hay victoria militar posible: solo las decisiones cambian lo que significa.');
 CRO.push(

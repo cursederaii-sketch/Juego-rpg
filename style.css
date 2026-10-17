@@ -242,3 +242,18 @@ body.cine #pause,body.cine #fs,body.cine #ui,body.cine #ui *,body.fincine #pause
 .tbtns.sl .tb{min-height:44px;height:auto}
 .tbtns.sl .tb.slot{padding:5px 24px}
 @media (orientation:portrait){.tbtns.sl{top:50%}}
+
+/* ---------- viñeta narrada del duelo final (caida.js): imagen de Ormund Cineris tras el blanco de la explosión ---------- */
+#ormundStill{position:fixed;inset:0;z-index:520;background:#05030a;overflow:hidden;font-family:'Press Start 2P',monospace;user-select:none;cursor:pointer;touch-action:none}
+#ormundStill .osbg,#ormundStill .osimg{position:absolute;inset:0;width:100%;height:100%;object-position:50% 46%;will-change:transform,filter}
+#ormundStill .osbg{object-fit:cover;filter:blur(26px) brightness(.62) saturate(1.25)}
+#ormundStill .osimg{object-fit:cover;transform-origin:62% 42%;image-rendering:auto}
+#ormundStill .osfx{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;mix-blend-mode:screen}
+#ormundStill .osvig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 52%,rgba(5,2,12,.55) 100%),linear-gradient(to top,rgba(4,2,10,.92),rgba(4,2,10,.55) 22%,rgba(4,2,10,0) 44%),linear-gradient(to bottom,rgba(4,2,10,.55),rgba(4,2,10,0) 16%)}
+#ormundStill .ostx{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:0 max(16px,env(safe-area-inset-right)) max(7vh,calc(env(safe-area-inset-bottom) + 22px)) max(16px,env(safe-area-inset-left));pointer-events:none}
+#ormundStill .ostx p{margin:0;max-width:min(92vw,980px);min-height:3.6em;display:flex;align-items:flex-end;justify-content:center;text-align:center;font-size:clamp(9px,2.1vw,17px);line-height:1.9;letter-spacing:.5px;color:#f4e2b0;text-shadow:0 2px 0 #000,0 0 14px rgba(0,0,0,.9),0 0 26px rgba(120,40,200,.55);opacity:0}
+#ormundStill .ostx p.big{color:#ffd98a;font-size:clamp(10px,2.6vw,21px);text-shadow:0 2px 0 #000,0 0 16px rgba(255,120,40,.75),0 0 34px rgba(255,90,20,.5)}
+#ormundStill .ostx p .v{color:inherit}#ormundStill .ostx p .h{color:transparent;text-shadow:none}
+#ormundStill .ostx p{display:block}
+#ormundStill .oswh{position:absolute;inset:0;background:rgb(255,252,235);pointer-events:none;opacity:1}
+body.cine #pcHelp{display:none!important}

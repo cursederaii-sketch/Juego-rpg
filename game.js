@@ -82,9 +82,9 @@ const objs=()=>{const o=[];W.fires.forEach((f,i)=>o.push({x:f.x,y:f.y+6,k:'Desca
  W.npcs.forEach(n=>{if((n.night&&!S.night)||(n.when&&!n.when()))return;o.push({x:n.x,y:n.y,k:'Hablar',f:()=>say(NPC[n.id]())})});
  W.items.forEach((it,i)=>{const key=S.ri+':'+i;if(S.tk[key]||(it.hid&&!S.ab.see)||(it.when&&!it.when()))return;o.push({x:it.x,y:it.y,k:it.k||'Recoger',f:()=>pickIt(it,key)})});
  W.notes.forEach(n=>o.push({x:n.x,y:n.y+3,k:'Leer',f:()=>say(readNote(n.id))}));
- W.levers.forEach(l=>{if(!S.lv[rg.id+':'+l.id])o.push({x:l.x,y:l.y,k:'Palanca',f:()=>pull(l)})});
+ W.levers.forEach(l=>{if(!S.lv[rg.id+':'+l.id])o.push({x:l.x,y:l.y,k:l.k||'Palanca',f:()=>pull(l)})});
  W.lds.forEach(d=>{if(!S.dl[d.id])o.push({x:d.px,y:d.py,k:'Abrir',f:()=>openLd(d)})});
- W.pzs.forEach(z=>{if(!S.pz[z.id])z.t.forEach(t=>{if(!z.lit.includes(t.i))o.push({x:t.x,y:t.y+8,k:'Encender',f:()=>lightT(z,t)})})});
+ W.pzs.forEach(z=>{if(!S.pz[z.id])z.t.forEach(t=>{const on=z.lit.includes(t.i);if(!on||z.kind==='toggle')o.push({x:t.x,y:t.y+8,k:on?'Apagar':'Encender',f:()=>lightT(z,t)})})});
  W.portals.forEach(q=>{if(q.cond&&!q.cond()){if(q.lock)o.push({x:q.x,y:q.y+4,k:'Cerrado',f:()=>toast(q.lock)});return}o.push({x:q.x,y:q.y+4,k:q.k||'Entrar',f:()=>go(q)})});
  if(W.exitP&&S.bk[rg.boss]&&rg.nx)o.push({x:W.exitP.x,y:W.exitP.y+4,k:'Cruzar',f:door});return o};
 function pickIt(it,key){S.tk[key]=1;let dl=null;
@@ -97,7 +97,7 @@ function pickIt(it,key){S.tk[key]=1;let dl=null;
  else if(it.n){S.frag+=it.n;toast('+'+it.n+' fragmentos de memoria')}
  else{S.frag++;toast('Fragmento de memoria')}
  sfx(520,.25,'sine',.06,880);spark(it.x,it.y,'#ffe66d',16);save();if(dl)say(dl)}
-function pull(l){S.lv[rg.id+':'+l.id]=1;W.applyState();toast('Algo se abre a lo lejos');sfx(110,.5,'sawtooth',.06,70);G.shake=2.5;save()}
+function pull(l){S.lv[rg.id+':'+l.id]=1;W.applyState();{const sg=W.sgs.find(s=>s.need.includes(l.id));if(sg&&(l.m||sg.msg)){const n=sg.need.filter(id=>S.lv[rg.id+':'+id]).length;toast(n>=sg.need.length?(sg.msg||'Algo se abre a lo lejos'):(l.m||'Hecho')+' ('+n+'/'+sg.need.length+')')}else toast('Algo se abre a lo lejos')}sfx(110,.5,'sawtooth',.06,70);G.shake=2.5;save()}
 function openLd(d){if(S.keys[d.key]){S.dl[d.id]=1;W.clearT([d.x,d.y,d.w,d.h]);toast('Usas la '+KEYN[d.key]);sfx(300,.3,'triangle',.06,500);save()}else toast(d.lbl||'Está cerrado. Necesitas la '+KEYN[d.key])}
 function lightT(z,t){if(t.i===z.order[z.prog]){z.lit.push(t.i);z.prog++;sfx(400+z.prog*80,.3,'sine',.06,800);spark(t.x,t.y-8,'#ffe66d',14,14);
   if(z.prog>=z.order.length){S.pz[z.id]=1;W.clearT(z.door);toast('Algo antiguo recuerda... y se abre');ach('puzzle');G.shake=3;sfx(120,.7,'sawtooth',.07,60);save()}}

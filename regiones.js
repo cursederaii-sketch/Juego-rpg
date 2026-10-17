@@ -80,10 +80,13 @@ const RG=[
  W.sc('barrel',7,3,3,58,42,{avoid:'pfwb',seed:3});W.sc('crate',6,3,3,58,42,{avoid:'pfwb',seed:4});W.sc('cross',5,3,3,16,42,{avoid:'pfwb',seed:5});W.sc('bush',20,3,3,58,42,{avoid:'pfwb',seed:6,gap:1});
  torches(W,15,52,60,4);
 }},
-{id:'bosque',n:'Bosque Marchito',act:'Acto II — La verdad del reino',th:'bosque',cols:64,rows:48,m:1.7,dm:1.3,boss:'cazador',nx:'puertas',out:1,build(W){
+{id:'bosque',n:'Bosque Marchito',act:'Acto II — La verdad del reino',th:'bosque',cols:96,rows:72,m:1.7,dm:1.3,boss:'cazador',nx:'puertas',out:1,build(W){
  W.fillG('g');W.ring('wall',1);
- W.o('tree',1,1,62,3);W.o('tree',1,44,62,3);W.o('tree',1,1,3,46);W.o('tree',60,1,3,46);
+ W.o('tree',1,1,94,3);W.o('tree',1,68,94,3);W.o('tree',1,1,3,70);W.o('tree',92,1,3,70);
  W.sc('tree',230,3,3,58,42,{gap:2,seed:5});W.sc('dtree',44,3,3,58,42,{gap:2,seed:9});
+ // bosque ampliado: franja este y franja sur
+ W.sc('tree',190,61,3,31,65,{gap:2,seed:11});W.sc('tree',125,3,45,58,23,{gap:2,seed:12});
+ W.sc('dtree',40,61,3,31,65,{gap:2,seed:13});W.sc('dtree',28,3,45,58,23,{gap:2,seed:14});
  // claros y senderos
  W.room(3,36,10,8,'g');W.room(29,24,9,7,'g');W.room(11,9,9,8,'g');W.room(48,34,9,8,'g');W.room(11,25,9,7,'g');
  W.path([[8,39],[20,39],[26,34],[32,30],[36,24],[51,24],[51,20]],3,'p');
@@ -99,7 +102,7 @@ const RG=[
  W.en('hollow',22,39);W.en('hollow',25,36);W.en('archer',34,29);W.en('brute',38,22);W.en('hollow',23,19);if(!cb)W.en('archer',46,36);if(!cb)W.en('brute',44,27);
  W.item(14,12,{w:'mandoble'});W.item(52,38,{f:1});
  // --- ampliación ---
- W.portal('back',4,40,{to:'valdora',at:'exit',k:'Volver',sy:0});
+ W.portal('back',4,40,{to:'campos',at:'bosque',k:'Volver a los Campos del Exilio',sx:22,sy:0});
  W.room(55,22,5,6,'g');W.path([[51,24],[58,25]],3,'p');W.portal('fosa',58,25,{to:'fosa',at:'arriba',k:'Descender',sx:-24,sy:0});W.o('cross',56,23,1,1);W.note(56,23,'bosque3');
  W.item(54,39,{q:'estandarte',when:()=>S.q.dorn===1});
  W.room(4,10,5,4,'g');W.owall(9,11,2,2,'blood');W.item(6,12,{rel:'sed'});W.item(5,11,{n:2});
@@ -109,6 +112,46 @@ const RG=[
  W.o('cross',12,38,1,1);W.note(12,38,'bosque1');W.o('tomb',35,28,1,1);W.note(35,28,'bosque2');
  W.exit(56,8);
  W.sc('rock',12,3,3,58,42,{avoid:'pw',seed:3,gap:2});W.sc('bush',30,3,3,58,42,{avoid:'pw',seed:4,gap:1});W.sc('rubble',10,3,3,58,42,{avoid:'pw',seed:6,gap:1});
+ // --- GRAN AMPLIACIÓN (96x72): aldea quemada, círculo de piedra, estanque, cementerio y atalaya ---
+ // claros y lago (primero el terreno, luego los caminos, al final las estructuras)
+ W.room(64,5,24,21,'g');W.room(77,30,13,13,'g');W.room(4,56,14,10,'g');W.room(60,56,28,11,'g');
+ W.g('w',22,47,20,10);W.g('w',18,50,28,5);W.g('w',26,45,12,3);W.room(36,52,4,3,'g');
+ W.path([[58,25],[66,25],[74,25]],3,'p');W.path([[74,25],[75,22]],3,'p');
+ W.path([[8,43],[8,58],[12,62],[48,62],[62,62]],3,'p');
+ W.path([[26,34],[28,46],[34,56],[34,62]],3,'p');W.path([[33,53],[37,53]],1,'p');
+ W.path([[52,41],[56,50],[62,56]],3,'p');
+ W.path([[62,62],[62,56],[64,54],[84,52],[84,44],[78,32],[74,25]],3,'p');
+ // aldea de leñadores quemada (noreste)
+ hut(W,68,11,6,4,70,15);hut(W,78,11,6,4,80,15);hut(W,66,20,5,3,68,23);hut(W,80,19,5,3,82,22);
+ W.item(70,12,{sou:350});W.item(81,12,{n:3});W.item(68,21,{f:1});W.item(82,20,{sou:450});
+ W.o('well',75,17,1,1);W.o('brazier',73,17,1,1);W.o('brazier',77,17,1,1);W.fire(75,20);
+ W.o('cross',65,12,1,1);W.note(65,12,'bosque6');
+ W.o('barr',72,22,1,1);W.o('crate',78,22,1,1);W.o('barrel',64,16,1,1);W.o('crate',86,10,1,1);
+ W.amb('bq2',66,5,16,3,[['hollow',68,6],['hollow',76,6],['brute',72,7]],{souls:350});
+ W.en('soldier',68,8);W.en('soldier',74,8);W.en('brute',76,19);W.en('archer',86,14);W.en('archer',65,15);W.en('hollow',72,21);W.en('hollow',84,23);
+ torches(W,10,68,73,3);torches(W,10,78,83,3);torches(W,19,66,70,2);torches(W,18,80,84,2);
+ // círculo de piedra (este)
+ grid(W,'pillar',[79,83,87],[32,40]);W.o('tomb',83,36,1,1);W.note(83,36,'bosque7');
+ W.item(83,37,{sou:500});W.item(86,36,{n:2});
+ W.amb('bq3',78,31,11,11,[['brute',81,35],['brute',86,35],['archer',83,40],['hollow',79,39]],{souls:600});
+ W.en('hollow',80,44);W.en('archer',88,46);W.en('soldier',82,48);
+ // estanque ahogado (sur-centro): isla con ofrenda, puente podrido por el camino central
+ W.o('cross',39,52,1,1);W.note(39,52,'bosque8');W.item(38,53,{sou:600});W.item(30,50,{n:3});
+ W.en('hollow',24,60);W.en('hollow',42,60);W.en('archer',45,64);W.en('hollow',30,64);W.en('hollow',22,44);W.en('archer',40,44);
+ // cementerio de cazadores (suroeste)
+ hut(W,6,60,6,3,8,63);W.item(9,61,{n:2});W.item(14,60,{sou:400});W.fire(13,63);W.o('tomb',5,64,1,1);W.note(5,64,'bosque9');
+ W.sc('tomb',14,5,57,12,8,{seed:21,gap:2,avoid:'p'});W.sc('cross',6,5,57,12,8,{seed:22,avoid:'p'});
+ W.en('hollow',6,57);W.en('hollow',12,57);W.en('soldier',15,64);W.en('archer',16,59);W.en('hollow',20,48);
+ torches(W,59,6,11,3);
+ // atalaya caída (sureste): cámara con guardia y recompensa
+ chamber(W,70,58,12,6,'f');W.clr(75,64,1,1);W.g('f',75,64,1,1);
+ grid(W,'bpillar',[71,80],[59,62]);W.o('statue',75,58,1,1);W.o('tomb',71,63,1,1);W.note(71,63,'bosque10');
+ W.item(76,60,{sou:700});W.item(79,62,{n:3});W.fire(66,62);
+ W.en('brute',74,61);W.en('brute',78,60);W.en('archer',72,60);W.en('soldier',68,60);W.en('hollow',64,64);W.en('archer',86,62);
+ torches(W,57,71,80,3);
+ // vegetación y piedras en las franjas nuevas
+ W.sc('rock',16,61,3,31,65,{avoid:'pwf',seed:23,gap:2});W.sc('bush',40,61,3,31,65,{avoid:'pwf',seed:24,gap:1});W.sc('rubble',8,61,3,31,65,{avoid:'pwf',seed:25,gap:1});
+ W.sc('rock',14,3,45,58,23,{avoid:'pwf',seed:26,gap:2});W.sc('bush',36,3,45,58,23,{avoid:'pwf',seed:27,gap:1});W.sc('rubble',8,3,45,58,23,{avoid:'pwf',seed:28,gap:1});
  torches(W,4,46,57,5);
 }},
 {id:'puertas',n:'Puertas de la Capital',act:'Acto II — La verdad del reino',th:'puertas',cols:60,rows:44,m:2.1,dm:1.45,boss:'caballero',nx:'trono',out:1,build(W){

@@ -29,7 +29,7 @@ const free=(W,tx,ty)=>{for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const 
 const spot=(W,tx,ty)=>{for(let r=0;r<14;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=tx+dx,y=ty+dy;if(x>2&&y>2&&x<W.cols-2&&y<W.rows-2&&free(W,x,y))return[x,y]}return[tx,ty]};
 const addTo=(id,tx,ty,o)=>{const r=RG.find(q=>q.id===id);if(!r)return;const b0=r.build;
   r.build=function(W){b0.call(this,W);const p=spot(W,tx,ty);W.npc('bauti',p[0],p[1],Object.assign({wander:1},o||{}))}};
-addTo('valdora',48,34);
+addTo('valdora',64,48);
 addTo('crater',23,27,{when:()=>!!(S.rey&&S.rey.done)});
 
 // ---- camina: merodea cerca de su sitio (solo mientras juegas) ----

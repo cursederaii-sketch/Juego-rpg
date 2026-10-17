@@ -38,8 +38,8 @@ class Mapa{
  fwall(x,y,w,h,id){for(let j=y;j<y+h;j++)for(let k=x;k<x+w;k++)if(this.ok(k,j)){const i=this.i(k,j);this.on[i]='wall';this.ov[i]=this.R()*255|0;this.fw[i]=1}this.fwr.push({x,y,w,h,id})}
  owall(x,y,w,h,oath){for(let j=y;j<y+h;j++)for(let k=x;k<x+w;k++)if(this.ok(k,j)){const i=this.i(k,j);this.on[i]='wall';this.ov[i]=this.R()*255|0;this.ow[i]=oath}this.owr.push({x,y,w,h,oath})}
  portal(id,x,y,o){this.softClr(x,y,1);this.portals.push(Object.assign({id,tx:x,ty:y,x:x*16+8,y:y*16+8,sx:0,sy:20},o||{}))}
- lever(x,y,id){this.softClr(x,y,0);this.levers.push({tx:x,ty:y,x:x*16+8,y:y*16+8,id})}
- sgate(x,y,w,h,need){this.o('sgate',x,y,w,h);this.sgs.push({x,y,w,h,need})}
+ lever(x,y,id,o){this.softClr(x,y,0);this.levers.push(Object.assign({tx:x,ty:y,x:x*16+8,y:y*16+8,id},o||{}))}
+ sgate(x,y,w,h,need,o){this.o('sgate',x,y,w,h);this.sgs.push(Object.assign({x,y,w,h,need},o||{}))}
  ldoor(x,y,w,h,key,lbl){this.o('ldoor',x,y,w,h);this.lds.push({x,y,w,h,key,lbl,id:key+':'+x+':'+y,px:(x+w/2)*16,py:(y+h/2)*16+4})}
  puzzle(id,ts,order,door){ts.forEach(([x,y])=>this.o('ptorch',x,y,1,1));this.o('mdoor',door[0],door[1],door[2],door[3]);this.pzs.push({id,door,order,prog:0,lit:[],t:ts.map(([x,y,c],i)=>({i,tx:x,ty:y,x:x*16+8,y:y*16+8,c}))})}
  note(x,y,id){this.notes.push({tx:x,ty:y,x:x*16+8,y:y*16+8,id})}
@@ -51,7 +51,7 @@ class Mapa{
   for(const d of this.lds)if(S.dl[d.id])this.clearT([d.x,d.y,d.w,d.h]);for(const z of this.pzs)if(S.pz[z.id]){this.clearT(z.door);z.lit=z.t.map(t=>t.i);z.prog=z.order.length}}
  reveal(px,py,r){r=r||7;const cx=px>>4,cy=py>>4;let ch=false;const m=this.mmv.getContext('2d');
   for(let j=cy-r;j<=cy+r;j++)for(let k=cx-r;k<=cx+r;k++){if(!this.ok(k,j)||(k-cx)*(k-cx)+(j-cy)*(j-cy)>r*r)continue;const i=this.i(k,j);if(this.seen[i])continue;if(!this.los(px,py,k*16+8,j*16+8))continue;this.seen[i]=1;m.drawImage(this.mini,k,j,1,1,k,j,1,1);ch=true}return ch}
- initSeen(str){this.seen.fill(0);const m=this.mmv.getContext('2d');m.clearRect(0,0,this.cols,this.rows);if(!str)return;for(let i=0;i<this.seen.length&&i<str.length;i++)if(str.charCodeAt(i)===49){this.seen[i]=1;m.drawImage(this.mini,i%this.cols,(i/this.cols)|0,1,1,i%this.cols,(i/this.cols)|0,1,1)}}
+ initSeen(str){this.seen.fill(0);const m=this.mmv.getContext('2d');m.clearRect(0,0,this.cols,this.rows);if(!str||str.length!==this.seen.length)return;for(let i=0;i<this.seen.length&&i<str.length;i++)if(str.charCodeAt(i)===49){this.seen[i]=1;m.drawImage(this.mini,i%this.cols,(i/this.cols)|0,1,1,i%this.cols,(i/this.cols)|0,1,1)}}
  packSeen(){let s='';for(let i=0;i<this.seen.length;i++)s+=this.seen[i]?'1':'0';return s}
  // --- consulta ---
  col(tx,ty){if(!this.ok(tx,ty))return 1;const i=this.i(tx,ty);const gg=this.gd[i];if(gg==='w')return 1;if(gg==='k')return this.fly?0:1;const n=this.on[i];if(n==='wall'&&this.fw[i])return 0;return n?(COL[n]||0):0}
@@ -81,6 +81,7 @@ class Mapa{
     if(c==='k'){x.fillStyle=sd==='n'?'#8a7aaa':sd==='s'?'#05030a':'#2a2240';const r=sd==='n'?[0,0,16,1]:sd==='s'?[0,15,16,1]:sd==='w'?[0,0,1,16]:[15,0,1,16];x.fillRect(X+r[0],Y+r[1],r[2],r[3]);continue}
     if((c==='p')&&nb==='g')col=T.grass[0];else if((c==='f')&&T.grass&&nb==='g'&&this.rg.th!=='trono')col=T.grass[0];else if(c==='g'&&nb==='w')col='#0a1018';else if(c==='w'&&nb!=='w')col='#9ac8e8';else if(c==='p'&&nb==='w')col='#1a1410';
     if(col){x.globalAlpha=c==='w'?.55:c==='g'&&nb==='w'?.5:1;x.drawImage(edgeStrip(col,sd,h),X,Y);x.globalAlpha=1}}}
+  if(this.decorFloor)try{this.decorFloor(x,T)}catch(e){console.error(e)}
   // muros y tejados
   for(let ty=0;ty<Rw;ty++)for(let tx=0;tx<C;tx++){const i=this.i(tx,ty),n=this.on[i],v=this.ov[i],X=tx*16,Y=ty*16;if(!WALLISH.has(n||''))continue;
    if(n==='roof'){x.drawImage(bakeRoof(T,v%4),X,Y);if(!isW(tx,ty-1)||this.on[this.i(tx,ty-1)]!=='roof'){x.fillStyle='rgba(255,200,160,.18)';x.fillRect(X,Y,16,1)}if(this.on[this.i(tx,ty+1)]==='hwall'){x.fillStyle='rgba(0,0,0,.4)';x.fillRect(X,Y+13,16,3)}continue}

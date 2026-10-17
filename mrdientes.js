@@ -20,6 +20,6 @@ NPC.mrdientes=()=>D('MrDientes','Bauti dice que tengo dientes de castor, eso es 
 const free=(W,tx,ty)=>{for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const x=(tx+dx)*16+8,y=(ty+dy)*16+8;if(W.hit(x,y,4,3)||W.chasmAt(x,y))return false}return true};
 const spot=(W,tx,ty)=>{for(let r=0;r<14;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=tx+dx,y=ty+dy;if(x>2&&y>2&&x<W.cols-2&&y<W.rows-2&&free(W,x,y))return[x,y]}return[tx,ty]};
 const r=RG.find(q=>q.id==='valdora');
-if(r){const b0=r.build;r.build=function(W){b0.call(this,W);const p=spot(W,42,30);W.npc('mrdientes',p[0],p[1],{wander:1})}}
+if(r){const b0=r.build;r.build=function(W){b0.call(this,W);const p=spot(W,56,50);W.npc('mrdientes',p[0],p[1],{wander:1})}}
 // (camina con la misma rutina de merodeo que Bauti: bauti.js recorre todos los PNJ con "wander")
 })();

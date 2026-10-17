@@ -128,7 +128,7 @@ function drawP(){const p=P,w=WPN(),L=w.l,H=w.h,fx=p.fx,fy=p.fy,x=p.x,y=p.y,id='p
  if(A){const t=p.t;ang=t<A[0]?a0-rho*1.15:t<A[1]?a0-rho+(t-A[0])/(A[1]-A[0])*rho*2:a0+rho*(1-Math.min(1,(t-A[1])/.2)*.35)}
  else if(pose==='block')ang=Math.atan2(fy,fx)-1.1;else if(pose==='flask')ang=1.6;else ang=Math.PI/2+(fx?-fx*.4:(fy>0?-.15:.15));
  const behind=Math.sin(ang)<-.35&&!(pose==='flask');
- const wd=()=>{weapon('sword',ox,oy,ang,len,{glow:'125,249,255'});if(pose==='block'){const sx=x+fx*7,sy=y-9+fy*3;fr(sx-4,sy-5,8,11,'#3c3c72');fr(sx-4,sy-5,8,1,'#8aa3c7');fr(sx-4,sy+5,8,1,'#14142c');fr(sx-4,sy-5,1,11,'#6a6aa0');fr(sx,sy-3,1,7,'#c9a54a');fr(sx-2,sy,5,1,'#c9a54a');if(p.bt<.2)glow(sx,sy,12,'255,230,109',.5)}
+ const wd=()=>{weapon((window.WSHAPE&&WSHAPE[S.weapon])||'sword',ox,oy,ang,len,{glow:'125,249,255'});if(pose==='block'){const sx=x+fx*7,sy=y-9+fy*3;fr(sx-4,sy-5,8,11,'#3c3c72');fr(sx-4,sy-5,8,1,'#8aa3c7');fr(sx-4,sy+5,8,1,'#14142c');fr(sx-4,sy-5,1,11,'#6a6aa0');fr(sx,sy-3,1,7,'#c9a54a');fr(sx-2,sy,5,1,'#c9a54a');if(p.bt<.2)glow(sx,sy,12,'255,230,109',.5)}
   if(pose==='flask'){fr(x+fx*5-2,y-19,4,5,'#7dff9a');fr(x+fx*5-1,y-21,2,2,'#c9a54a');glow(x+fx*5,y-17,10,'90,255,140',.4)}}
  const bd=()=>body(id,x,y,fx,fy,pose,frm,{flash:fl});
  if(behind){wd();bd()}else{bd();wd()}
@@ -174,7 +174,7 @@ function hud(){const p=P;
  if(G.win>0){const a=Math.min(.5,(2.5-G.win)*.4);g.fillStyle='rgba(255,230,109,'+a+')';g.fillRect(0,GH/2-24,GW,38);tx('JEFE DERROTADO',GW/2,GH/2+2,'#fff','center',14)}}
 
 // ===== auxiliares de la ampliación =====
-const PCOL=['#5aa8ff','#ff5a5a','#ffd24a','#5aff8a'],PCOLR=['90,168,255','255,90,90','255,210,74','90,255,138'],OATHC={guardian:'125,200,255',blood:'255,80,100',oblivion:'200,150,255'};
+const PCOL=['#5aa8ff','#ff5a5a','#ffd24a','#5aff8a','#d57aff'],PCOLR=['90,168,255','255,90,90','255,210,74','90,255,138','213,122,255'],OATHC={guardian:'125,200,255',blood:'255,80,100',oblivion:'200,150,255'};
 const ptInfo=(tx_,ty_)=>{if(!W.ptm){W.ptm={};W.pzs.forEach(z=>z.t.forEach(t=>W.ptm[t.tx+','+t.ty]={z,t}))}return W.ptm[tx_+','+ty_]};
 const ptLit=(tx_,ty_)=>{const q=ptInfo(tx_,ty_);return q&&(S.pz[q.z.id]||q.z.lit.includes(q.t.i))};
 function pflame(wx,wy,tx_,ty_){const q=ptInfo(tx_,ty_);if(!q)return;const c=PCOL[q.t.c];if(ptLit(tx_,ty_)){flame(wx,wy-12,4,12,tx_);glow(wx,wy-14,14,PCOLR[q.t.c],.35)}else{fr(wx-1,wy-15,3,3,c);glow(wx,wy-14,7,PCOLR[q.t.c],.18+.08*Math.sin(TM*3+tx_))}}

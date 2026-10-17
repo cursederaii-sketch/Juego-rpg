@@ -80,6 +80,13 @@ function bakeWallFront(t,v,plaster){const c=mkc(16,16),x=c.getContext('2d'),R=rn
  if(v%5===3){x.globalAlpha=.4;for(let i=0;i<7;i++)dot(x,R()*16,6+R()*8,'#4a7a4a');x.globalAlpha=1}return c}
 function bakeWallTop(t,flags,v){const c=mkc(16,16),x=c.getContext('2d'),R=rngS(v*19+flags);rect(x,0,0,16,16,t.wt);
  for(let i=0;i<24;i++)dot(x,R()*16,R()*16,t.wh);
+ // sillares de remate: hiladas con juntas desfasadas, relieve suave y detalles según la variante
+ {const j=mixc(t.wt,'#000000',.45),lt=mixc(t.wt,t.hi,.22),o=(v*5+3)%12+2;
+  rect(x,0,7,16,1,j);rect(x,0,8,16,1,lt);rect(x,0,15,16,1,j);
+  rect(x,o,0,1,7,j);rect(x,o+1,0,1,7,lt);rect(x,(o+8)%14+1,8,1,7,j);rect(x,(o+8)%14+2,8,1,7,lt);
+  if(v===1){const gx=5,gy=3;x.globalAlpha=.8;rect(x,gx+2,gy,2,6,t.wh);rect(x,gx,gy+2,6,2,t.wh);rect(x,gx+2,gy+2,2,2,mixc(t.wh,t.hi,.5));x.globalAlpha=1}
+  else if(v===2){x.fillStyle=j;let X=3+R()*9,Y=0;for(let i=0;i<16;i++){x.fillRect(X|0,Y,1,1);X+=R()<.4?(R()<.5?-1:1):0;Y+=1}}
+  else if(v===3){x.globalAlpha=.55;for(let i=0;i<9;i++)dot(x,R()*16,R()*16,R()<.5?'#3a5a3a':'#2a4430');x.globalAlpha=1;for(let i=0;i<3;i++)dot(x,2+R()*12,2+R()*12,t.hi)}}
  if(flags&1){rect(x,0,0,16,3,mixc(t.wf[0],t.hi,.5));rect(x,0,0,16,1,t.hi);rect(x,0,3,16,1,t.wf[2])}
  if(flags&2)rect(x,0,0,1,16,mixc(t.wt,t.hi,.45));
  if(flags&4)rect(x,15,0,1,16,mixc(t.wt,'#000000',.4));return c}

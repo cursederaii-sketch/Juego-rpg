@@ -42,6 +42,11 @@ const NOTES={
  bosque1:['Marca de cazador','Las presas ya no huyen. Se acercan. Quien nos caza no distingue entre bosque y reino.'],
  bosque2:['Piedra de la Voz','No se oye a quien susurra al olvido, porque él mismo lo pidió.'],
  bosque3:['Grito en la corteza','El Foso del Rebaño está al este, bajo los pinos. Quien lo cruza sin miedo sale con la voz perdida.'],
+ bosque6:['Aviso clavado en la puerta','Aldea de los leñadores. Evacuada por orden real la noche de la ceniza. Quien se quede, quedará a cargo de sus muertos.'],
+ bosque7:['Círculo de piedra','Seis pilares sostenían la sombra de un solo roble. El roble ya no está. Los pilares siguen esperando que alguien se la devuelva.'],
+ bosque8:['Cruz del barquero','Cruzaba el estanque por unas monedas. Una noche cobró de más y el agua cobró lo suyo. Dicen que su barca aún cruza, vacía.'],
+ bosque9:['Lápida del último cazador','Aquí descansa quien nunca falló un tiro. La presa que ahora lo vigila tampoco.'],
+ bosque10:['Registro de la Atalaya','El vigía anotó cada llama que se apagó en el reino. La última entrada es de esta mañana, y la letra no es suya.'],
  puertas1:['Lápida de un legionario','Aldric era el nombre de su capitán. Juró cargar con la culpa de quien abriera la puerta. Nunca supo que quien abría era su hermano.'],
  puertas2:['Orden fechada','Orden de cierre de las puertas. Firma: el rey. Fecha: la noche de la ceniza. Anexo, en otra letra: «El escudero se opuso».'],
  arch1:['Registro de entradas','Libro de entradas del Archivo: la última página fue arrancada. Queda el borde, manchado de hollín y de dedos.'],
@@ -101,11 +106,11 @@ const NPC={
  dorn2:()=>D('Capitán Dorn','Mis hombres no te estorbarán aquí. Los de la capital sí. No te confíes.')};
 
 const CUT={
- sepulturero:()=>D('El Sepulturero','...Cavé tantas tumbas que olvidé la mía. Valdora aún respira. Pregunta allí quién fuiste.',null,()=>memD('sepulturero',D('','Una puerta se abre hacia la ciudad. Obtienes un fragmento de memoria.'))),
+ sepulturero:()=>D('El Sepulturero','...Cavé tantas tumbas que olvidé la mía. Valdora aún respira. Pregunta allí quién fuiste.',null,()=>memD('sepulturero',D('','Una puerta se abre hacia el camposanto. Obtienes un fragmento de memoria.'))),
  pastora:()=>D('La Pastora de Ceniza','La ceniza recuerda lo que tú olvidaste: el rey cerró las puertas a su propio pueblo. Busca al Cazador en el bosque... y desconfía de quien te ofrezca un trono.',null,()=>memD('pastora')),
  cazador:()=>D('El Cazador Hueco','Cacé por orden de quien no tiene nombre. La capital te espera. El Caballero que custodia su puerta... te conoce.',null,()=>memD('cazador')),
  caballero:()=>D('El Caballero que No Murió','Hermano... fuiste tú quien abrió la puerta aquella noche. Yo solo obedecí. Mi espada ya no tiene dueño.',null,()=>cabChoice()),
- rey:()=>D('El Rey sin Nombre','Así que regresaste, '+nm()+'. Yo ordené que olvidaras. Mi pueblo fue el precio de detener la ceniza. Ahora decide qué quedará del reino.',null,()=>memD('rey',finalChoice())),
+ rey:()=>D('Ormund Cineris','Así que regresaste, '+nm()+'. Yo ordené que olvidaras. Mi pueblo fue el precio de detener la ceniza. Ahora decide qué quedará del reino.',null,()=>memD('rey',finalChoice())),
  guardiana:()=>D('La Guardiana del Osario','Descansa, por fin. Llévate mi capa: te enseñará a cruzar lo que otros temen. Y llévate esto...',null,()=>truD('osario')),
  heraldo:()=>D('El Heraldo Mudo','(Mueve los labios sin sonido. Después, por primera vez en años, habla.) «El decreto... lo firmaron dos manos.»',null,()=>truD('fosa')),
  capdorn:()=>D('Capitán Dorn','Debí matarte antes. O seguirte. Quédate con el estoque: no hará lo que yo no hice.')};
@@ -138,7 +143,7 @@ const BEST={
  pastora:['La Pastora de Ceniza','Dispara brasas y llama a su rebaño.','Guio al pueblo fuera de las murallas. La ceniza la alcanzó a ella primero.','Las brasas se esquivan de lado; en la fase final llueve ceniza: no te quedes quieto.'],
  cazador:['El Cazador Hueco','Salta sobre su presa y cambia de objetivo.','Cazaba por orden de quien no tiene nombre.','Sus saltos tienen un breve aviso: esquiva atravesándolo.'],
  caballero:['El Caballero que No Murió','Un hermano de armas encadenado a su puerta.','Aldric. Cargó con una culpa que no era suya.','Aprovecha sus pausas tras el golpe amplio; en la última fase la arena se rompe.'],
- rey:['El Rey sin Nombre','Gobierna un reino que ya no lo recuerda.','Pagó con la memoria de su pueblo para detener la ceniza.','Tiene todos los ataques del reino. Paciencia: cada fase tiene un ritmo.'],
+ rey:['Ormund Cineris','Gobierna un reino que ya no lo recuerda.','Pagó con la memoria de su pueblo para detener la ceniza.','Tiene todos los ataques del reino. Paciencia: cada fase tiene un ritmo.'],
  guardiana:['La Guardiana del Osario','Salta entre huesos que se levantan.','Guardó a la reina hasta que esta se lo pidió.','Se lanza en saltos: espera el aviso y contraataca.'],
  heraldo:['El Heraldo Mudo','Teletransportes, brasas y gritos sin voz.','Anunció el decreto del olvido y perdió la voz.','Tras cada teletransporte golpea por la espalda: gira y bloquea.'],
  capdorn:['Capitán Dorn','Espadachín veloz con sus hombres.','Un capitán que prefirió el poder a la pregunta.','Elimina antes a sus soldados: el estoque es rápido pero corto.']};

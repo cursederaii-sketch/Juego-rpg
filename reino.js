@@ -65,11 +65,11 @@ NPC.andro=()=>lyTalk('Andro');
 // ---- disposición del mapa general (Diario > Mapa > El Reino) con las dos zonas nuevas ----
 Object.assign(LAY,{jardin:[4,1150],cripta:[30,34],osario:[310,34],puerto:[4,230],valdora:[254,230],bosque:[4,534],valle:[270,534],fosa:[520,534],puertas:[4,726],trono:[254,726],archivos:[456,726],marisma:[4,938],cantera:[238,938],torre:[456,938]});
 LNK.push(['valdora','jardin',1],['valdora','puerto',1],['valdora','valle',1]);
-Object.assign(REGINFO,{valdora:['Capital amurallada con río y puentes','Archivo (llave)','Catedral de las campanas','Arena de la Pastora','Accesos a Puerto, Valle, Cantera y Cripta'],
+Object.assign(REGINFO,{valdora:['Capital amurallada de 4 puertas, río y 3 puentes','Plaza Mayor con fuente','Catedral de las Campanas','Archivo (llave en el Campanario caído)','Cuartel, Mercado y Fragua','Arena de la Pastora','Accesos a Arrabales, Puerto, Valle, Cantera y Jardín'],
  jardin:['Fuente central y glorieta','2 cofres','Cripta con pocos enemigos','Soledad (jardinera), Soledad y Andro','Misión: Hasta que el camino termine'],puerto:['Muelles sobre el mar','Almacén con muro falso','Cartógrafa Ilse','Acceso desde la Capital'],valle:['Campos y molino','Capilla de la reina','Remanso sin ceniza','Acceso desde la Capital']});
 
 // ---- las regiones cambian de sitio en el mapa: se invalida la niebla antigua de la Capital (otro tamaño) ----
-{const lr=loadRegion;loadRegion=function(i,fi,at){if(RG[i].id==='valdora'&&S.vdv!==2){delete S.seen.valdora;S.vdv=2}return lr(i,fi,at)}}
+{const lr=loadRegion;loadRegion=function(i,fi,at){if(RG[i].id==='valdora'&&S.vdv!==3){delete S.seen.valdora;S.vdv=3}return lr(i,fi,at)}}
 
 
 // ---- Andro llega caminando (ya no aparece de golpe): entra desde el sur de la glorieta mientras Soledad habla ----
