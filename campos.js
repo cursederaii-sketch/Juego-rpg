@@ -95,31 +95,77 @@ NPC.mara=surv('mara');NPC.orrin=surv('orrin');
  p0(l)}}
 
 // ---- consecuencia: cruzar con los dos. El puente cede, caen al río, la corriente se los lleva y despiertas en el Remanso ----
+// v8.24: secuencia por código (sin arte nuevo). El puente se captura como piezas sueltas que se rompen de oeste a este,
+//        cámara lenta en la caída, salpicadura, cuerpos arrastrados por la corriente y escombros flotando río abajo.
 const BX=[26*16,30*16],BY=[19*16,22*16],bridgeOpen=()=>['c1','c2','c3'].every(id=>S.lv['campos:'+id]);
-const PU={on:0,t:0,n:[],warn:0,tk:0,sp:0,broke:0,gone:0};
-function puStart(){PU.on=1;PU.t=0;PU.broke=0;PU.gone=0;PU.tk=0;PU.sp=0;G.mode='puente';
+const PU={on:0,t:0,n:[],warn:0,tk:0,sp:0,broke:0,gone:0,pc:[],en:[],sheet:null,fx:null,gl:0};
+const PU_T={snap:1.35,fade:5.2,end:6.2};
+function puStart(){PU.on=1;PU.t=0;PU.broke=0;PU.gone=0;PU.tk=0;PU.sp=0;PU.gl=0;G.mode='puente';
  PU.n=fol.map(id=>W.npcs.find(q=>q.id===id)).filter(Boolean);
- PU.n.forEach((n,i)=>{n.x=P.x-14-i*14;n.y=P.y+(i?10:-10);n.mv=0});
- PU.p0=PU.n.map(n=>({x:n.x,y:n.y}));PU.q0={x:P.x,y:P.y};P.s='idle';toast('¡El puente cede!');sfx(70,.6,'sawtooth',.07,40)}
-function puTick(dt){PU.t+=dt;const t=PU.t,all=()=>[P].concat(PU.n);
+ PU.n.forEach((n,i)=>{n.x=P.x-14-i*14;n.y=P.y+(i?10:-10);n.mv=0;n.when=()=>false});   // los dibuja la secuencia
+ P.s='idle';
+ // se guarda el aspecto real del puente y el tramo pasa a ser agua: las tablas se dibujan como piezas sueltas encima
+ PU.sheet=mkc(64,48);PU.sheet.getContext('2d').drawImage(W.base,BX[0],BY[0],64,48,0,0,64,48);
+ for(let y=19;y<22;y++)for(let x=26;x<30;x++){const i=W.i(x,y);W.gd[i]='w';W.on[i]=null}
+ W.bake();W._wl=null;S.rv['campos:roto']=1;
+ PU.pc=[];
+ for(let ty=19;ty<22;ty++)for(let tx=26;tx<30;tx++){if((tx===26&&ty===21)||(tx===29&&ty===19))continue;   // esquinas que ya eran agua
+  for(let h=0;h<2;h++){const x=tx*16+h*8;
+   PU.pc.push({sx:x-BX[0],sy:ty*16-BY[0],x:x+4,y:ty*16+8,tr:PU_T.snap+((x-BX[0])/64)*.5+R()*.12,s:0,d:0,vd:0,r:0,w:(R()<.5?-1:1)*(3+R()*5),vx:(R()-.5)*34,vy:6+R()*26,tt:0,fl:30+R()*14})}}
+ PU.en=[{id:'player',x:P.x,y:P.y,k:0}].concat(PU.n.map((n,i)=>({id:KITS[n.id]?n.id:'aldeano',x:n.x,y:n.y,k:i+1})));
+ PU.en.forEach(e=>{e.tf=PU_T.snap+((e.x-BX[0])/64)*.5+.12+(e.k?0:.3);e.st=0;e.d=0;e.vd=0;e.r=0;e.sink=0;e.age=0;e.rg=0;e.dir=e.k%2?-1:1;e.sp=[20,46,38][e.k]||40;e.y0=e.y});
+ PU.fx={k:'pu',l:30,m:30};FX.push(PU.fx);
+ toast('Las tablas no aguantan…');sfx(70,.6,'sawtooth',.07,40)}
+function puTick(dt){
+ const sl=(PU.t>PU_T.snap-.05&&PU.t<PU_T.snap+.75)?.45:1;dt*=sl;PU.t+=dt;const t=PU.t,E=PU.en;   // cámara lenta en el momento de la rotura
  cam.x+=(cl(P.x-GW/2,0,W.cols*16-GW)-cam.x)*Math.min(1,dt*6);cam.y+=(cl(P.y-GH/2,0,W.rows*16-GH)-cam.y)*Math.min(1,dt*6);
- if(t<1.4){G.shake=Math.max(G.shake,1+t*2.5);PU.tk-=dt;if(PU.tk<=0){PU.tk=.25;sfx(60+R()*50,.22,'sawtooth',.05,40);spark(BX[0]+R()*64,BY[0]+R()*48,'#8a6a3a',5,6)}return}
- if(!PU.broke){PU.broke=1;   // las tablas se rompen: el tramo pasa a ser agua
-  for(let y=19;y<22;y++)for(let x=26;x<30;x++){const i=W.i(x,y);W.gd[i]='w';W.on[i]=null}
-  W.bake();W._wl=null;S.rv['campos:roto']=1;
-  G.shake=9;G.flash=.5;sfx(45,.9,'sawtooth',.09,25);[0,1,2].forEach(k=>FX.push({k:'ring',x:BX[0]+16+k*16,y:BY[0]+24,l:.9,m:.9,c:'200,230,255',big:1}));
-  spark(P.x,P.y,'#8a6a3a',24,12);spark(P.x,P.y,'#cfe6ff',16,6)}
- const f=t-1.4;   // caída y arrastre: el río corre hacia el sur
- all().forEach((e,k)=>{const sp=k?[40,34][k-1]:26,o0=k?PU.p0[k-1]:PU.q0;e.y=o0.y+f*sp;e.x=cl(o0.x+Math.sin(f*3+k*2)*5,BX[0]+8,BX[1]-8)});
- PU.sp-=dt;if(PU.sp<=0){PU.sp=.18;all().forEach(e=>{if(e.when&&!e.when())return;FX.push({k:'ring',x:e.x,y:e.y,l:.5,m:.5,c:'200,230,255'});spark(e.x,e.y,'#cfe6ff',3,4)})}
- if(t>3.3&&!PU.gone){PU.gone=1;PU.n.forEach(n=>{FX.push({k:'ring',x:n.x,y:n.y,l:.9,m:.9,c:'200,230,255',big:1});spark(n.x,n.y,'#cfe6ff',14,6);n.when=()=>false});sfx(180,.7,'sine',.05,60);toast('El río se los lleva.')}
- if(t>4.6)puEnd()}
-function puEnd(){PU.on=0;fol=[];S.rv['campos:escolta']='';S.rv['campos:muertos']=1;
+ if(t<PU_T.snap){   // crujido: cada vez más seguido, polvo y astillas
+  const k=t/PU_T.snap;G.shake=Math.max(G.shake,.5+k*3);PU.tk-=dt;
+  if(PU.tk<=0){PU.tk=.34-.25*k;sfx(55+R()*60+k*70,.2,'sawtooth',.05,40);const sx=BX[0]+R()*64,sy=BY[0]+R()*48;spark(sx,sy,'#8a6a3a',4,6);spark(sx,sy,'#cdbb94',2,3,.5)}
+ }else if(!PU.broke){PU.broke=1;G.shake=10;G.flash=.5;sfx(45,.9,'sawtooth',.09,25);sfx(130,.45,'square',.05,30);toast('¡Se rompe!');
+  [0,1,2].forEach(k=>FX.push({k:'ring',x:BX[0]+16+k*16,y:BY[0]+24,l:.9,m:.9,c:'200,230,255',big:1}))}
+ // piezas del puente
+ PU.pc.forEach(p=>{
+  if(p.s===0&&t>=p.tr){p.s=1;spark(p.x,p.y,'#8a6a3a',3,5);spark(p.x,p.y,'#cdbb94',2,3,.5)}
+  else if(p.s===1){p.vd+=340*dt;p.d+=p.vd*dt;p.x+=p.vx*dt;p.y+=p.vy*dt*.4;p.r+=p.w*dt;
+   if(p.d>=14){p.s=2;p.d=14;p.w*=.35;FX.push({k:'ring',x:p.x,y:p.y+14,l:.45,m:.45,c:'200,230,255'});spark(p.x,p.y+14,'#cfe6ff',4,4);if(R()<.3)sfx(260+R()*160,.14,'triangle',.03,90)}}
+  else if(p.s===2){p.tt+=dt;p.y+=p.fl*dt;p.x+=Math.sin(p.tt*2.4+p.sx)*6*dt;p.r+=p.w*dt;p.w*=Math.pow(.25,dt);if(p.tt>3.8)p.s=3}});
+ // personajes: caen en orden de oeste a este, el jugador el último
+ E.forEach(e=>{
+  if(e.st===0){if(t>=e.tf){e.st=1;sfx(210,.3,'sine',.05,80)}}
+  else if(e.st===1){e.vd+=300*dt;e.d+=e.vd*dt;e.r+=e.dir*dt*3.4;e.r=cl(e.r,-1.4,1.4);e.x+=e.dir*-6*dt;
+   if(e.d>=16){e.st=2;e.d=16;e.age=0;G.shake=Math.max(G.shake,e.k?4:6);FX.push({k:'ring',x:e.x,y:e.y+16,l:.8,m:.8,c:'200,230,255',big:1});FX.push({k:'ring',x:e.x,y:e.y+16,l:.5,m:.5,c:'200,230,255'});
+    spark(e.x,e.y+14,'#cfe6ff',18,9);spark(e.x,e.y+14,'#ffffff',8,5,.7);sfx(420,.3,'triangle',.06,110);sfx(90,.5,'sawtooth',.05,40);
+    if(!PU.gl){PU.gl=1;toast('¡Mara! ¡Orrin!')}}}
+  else if(e.st===2){e.age+=dt;e.y+=e.sp*dt;e.x=cl(e.x+Math.sin(e.age*2.5+e.k)*10*dt,BX[0]+8,BX[1]-8);
+   e.r+=(e.dir*1.45-e.r)*Math.min(1,dt*3);e.sink=Math.min(e.k?30:8,e.sink+dt*(e.k?12:2.4));
+   e.rg-=dt;if(e.rg<=0){e.rg=.26;FX.push({k:'ring',x:e.x,y:e.y+14,l:.5,m:.5,c:'200,230,255'});if(R()<.5)sfx(150+R()*70,.16,'sine',.03,90)}
+   if(e.k&&e.sink>=26){e.st=3;FX.push({k:'ring',x:e.x,y:e.y+14,l:.9,m:.9,c:'200,230,255',big:1});spark(e.x,e.y+14,'#cfe6ff',14,6);sfx(180,.7,'sine',.05,60);
+    if(E.every(q=>!q.k||q.st===3))toast('El río se los lleva.')}}});
+ P.x=E[0].x;P.y=E[0].y;   // la cámara sigue al jugador, que la corriente arrastra
+ if(t>=PU_T.end)puEnd()}
+// dibujo de la secuencia (espacio de mundo, dentro de la cámara y del temblor)
+function puDraw(){if(!PU.on||rg.id!=='campos')return;const t=PU.t,cy=Math.round(cam.y),fa=Math.min(1,Math.max(0,(t-PU_T.snap)/.6));
+ if(fa>0){g.globalAlpha=.55*fa;for(let i=0;i<22;i++){const x=BX[0]+((i*53)%64),y=cy+((i*41+t*(38+(i%5)*9))%(GH+20))-10;fr(x,y,2+(i%3),1,'#dcf0ff')}g.globalAlpha=1}   // espuma de la corriente
+ const pc=PU.pc;
+ for(const p of pc){if(p.s!==2)continue;const al=Math.max(0,1-Math.max(0,p.tt-1.8)/2);g.save();g.globalAlpha=al;g.translate(Math.round(p.x),Math.round(p.y+p.d));g.rotate(p.r);g.drawImage(PU.sheet,p.sx,p.sy,8,16,-4,-8,8,16);g.restore()}
+ const amp=Math.pow(Math.min(1,t/PU_T.snap),2);
+ for(const p of pc){if(p.s>1)continue;const jy=p.s?0:Math.sin(t*46+p.sx*1.7+p.sy)*amp*.9;g.save();g.translate(Math.round(p.x),Math.round(p.y+p.d+jy));g.rotate(p.r);g.drawImage(PU.sheet,p.sx,p.sy,8,16,-4,-8,8,16);g.restore()}
+ [...PU.en].sort((a,b)=>a.y-b.y).forEach(e=>{if(e.st===3)return;
+  if(e.st<2){const sh=Math.max(0,1-e.d/16);if(e.st===0||e.d<8)shadow(e.x,e.y,13,.32*sh);body(e.id,e.x,e.y+e.d,1,0,t>PU_T.snap?'hit':'idle',0,{rot:e.r});return}
+  // flotando: el cuerpo se hunde tras la línea de agua
+  const wl=e.y+14;g.save();g.beginPath();g.rect(e.x-40,e.y-70,80,wl-(e.y-70));g.clip();body(e.id,e.x,e.y+14+e.sink*.6,1,0,'hit',0,{rot:e.r});g.restore();
+  g.strokeStyle='rgba(220,240,255,.55)';g.lineWidth=1;g.beginPath();g.ellipse(e.x,wl,9+Math.sin(e.age*5)*1.5,3.5,0,0,6.283);g.stroke()})}
+function puEnd(){PU.on=0;if(PU.fx)PU.fx.l=0;PU.sheet=null;PU.pc=[];PU.en=[];fol=[];S.rv['campos:escolta']='';S.rv['campos:muertos']=1;
  loadRegion(RG.findIndex(r=>r.id==='ribera'),0);
  P.x=6*16+8;P.y=8*16+8;P.fx=1;P.fy=0;P.ax=1;P.ay=0;cam.x=cl(P.x-GW/2,0,W.cols*16-GW);cam.y=cl(P.y-GH/2,0,W.rows*16-GH);W.reveal(P.x,P.y);
  P.hp=Math.max(1,Math.round(P.mhp*.4));P.st=P.mst;G.mode='play';save();
  say(D('El río','Frío. Barro. Un banco de arena bajo un cielo gris. La corriente te escupió río abajo; a Mara y a Orrin no los devolvió. El puente ya no existe, y no hay vuelta atrás. Si quieres llegar a la orilla este, tendrás que dar la vuelta por aquí.'))}
-{const d=draw;draw=function(){d();if(!PU.on||PU.t<3.5)return;g.fillStyle='rgba(0,0,0,'+Math.min(1,(PU.t-3.5)/1)+')';g.fillRect(0,0,GW,GH)}}
+{const dp=drawP;drawP=function(){if(PU.on)return;dp()}}   // durante la secuencia el jugador lo dibuja puDraw
+{const dx=drawFX;drawFX=function(f){if(f.k==='pu'){puDraw();return}dx(f)}}
+{const d=draw;draw=function(){d();if(!PU.on)return;
+ const b=Math.round(Math.min(1,PU.t/.5)*20);g.fillStyle='#000';g.fillRect(0,0,GW,b);g.fillRect(0,GH-b,GW,b);   // bandas de cine
+ if(PU.t>PU_T.fade){g.fillStyle='rgba(0,0,0,'+Math.min(1,(PU.t-PU_T.fade)/.9)+')';g.fillRect(0,0,GW,GH)}}}
 
 {const u=update;update=function(dt){u(dt);
  if(PU.on){puTick(dt);return}
